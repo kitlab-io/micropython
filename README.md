@@ -28,7 +28,7 @@ Micropython code for Jem
       + Find your device path: ls /dev/tty. (press tab to see the options)
       + Example: /dev/tty.usbserial-DO0036EU
 - Click 'Connect' in the Pymakr toolbar and verify that MicroPython debug text starts popping up
-- Download the latest JEM API code from: https://github.com/JoshuaBThompson/JEM/tree/master/firmware/jem_api
+- Download the latest JEM API code from: https://github.com/jem-io/micropython/tree/main/api/jem
 - Open jem_api directory with Atom then click on the 'upgrade' button in the Pymakr plugin toolbar below
 - Atom should now start uploading latest JEM API to your JEM device (it may take a minute) 
 - Atom will restart your JEM board for you after upgrade
