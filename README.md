@@ -3,7 +3,7 @@ Micropython code for Jem
 
 
 ## Quickstart guide 
-- Currently we are only support Pycom WiPy2.0 with Firmware:
+- Currently we only support Pycom WiPy2.0 with Firmware:
    + WiPy-1.18.2.r7.tar.gz
    + WiPy-1.18.2.r6.tar.gz
    + WiPy-1.18.2.r5.tar.gz
