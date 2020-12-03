@@ -1,21 +1,19 @@
 # JEM micropython api
 Micropython code for Jem
 
-## Install
-### Required
-- JEM Board with Battery or Micro USB Cable
-- Computer
+## Install Instructiions 
+- Clone repo
+```bash
+>> https://github.com/jem-io/micropython.git
+```
+- Connect JEM Board to battery OR Micro USB Cable OR both
+- Press JEM power button for 0.5 - 2 seconds and make sure BLUE led is ON (RGB LED will also toggle on/off every 4 seconds if new board)
 - Install [Atom IDE](https://atom.io/)
-   + Install [Pymakr plugin](https://atom.io/packages/pymakr) 
-### Update JEM Board with latest JEM micropython
-- Clone Jem micropython repo
-- Plug in battery OR Micro USB Cable
-- Press JEM power button for 1 sec and make sure RGB LED flashing every 4 sec or so
-- Open Atom IDE and make sure Pymakr plugin installed
-- Activate Pymakr plugin so you can see the Terminal at bottom of IDE
+- Install [Pymakr Atom Plugin](https://atom.io/packages/pymakr) to interface with JEM Pycom MCU
+   + Required for first time JEM micropython install
 - Open Jem Micropython directory **/micropython/api/jem/**  with Atom
    + IMPORTANT: make sure Atom opens **/micropython/api/jem/** and not **/micropython/api/**
-      + this is due to a bug that prevents some of our libraries from importing correctly (which we will fix)
+      + there is a bug that prevents some of our libraries from importing correctly (which we will fix!)
 - If using USB
    + Click 'Connect' in Pymakr terminal and select suggested serial port
 - If no USB, make sure JEM is on and go to your WiFi settings and connect to the JEM board (wlanxxxx)
