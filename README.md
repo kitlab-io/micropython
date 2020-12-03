@@ -24,13 +24,21 @@ Micropython code for Jem
       + main.py
       + jem.py
       + ...etc
-- Enable Pymakr terminal by selecting 'Packages -> Pymakr -> Toggle Pycom Console' in Atom toolbar and 
+- Enable Pymakr terminal by selecting 'Packages -> Pymakr -> Toggle Pycom Console' in Atom toolbar
 - If using USB
    + Click 'Connect' in Pymakr terminal and select suggested serial port
 - If no USB, make sure JEM is on and go to your WiFi settings and connect to the JEM board (wlanxxxx)
    + Then Click 'Connect' in Pymakr terminal and select the WiFi ip address provided
 - Make sure pycom firmware version is one of the version we support - see [Supported Pycom Firmware](https://github.com/jem-io/micropython/blob/jt/install-instructions/README.md#pycom-firmware-upgrade-instructions)
-- Click 'Upload' to upload latest JEM micropython to board
+   + Click on the 'Get Device Info' icon in terminal left hand corner
+- Click on 'Upload' icon to flash latest JEM micropython to board
+
+### JEM API Quickstart
+#### Pycom specific micropython api
+See [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/) - for general micropython control of GPIO, I2C, SPI, UART and other features of the JEM Pycom MCU
+
+
+#### JEM sensors api
 
 ### BLE REPL Test
 - Turn on JEM with power button (Blue LED should be flashing)
