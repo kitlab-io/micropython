@@ -14,6 +14,17 @@ Micropython code for Jem
 - Open Jem Micropython directory **/micropython/api/jem/**  with Atom
    + IMPORTANT: make sure Atom opens **/micropython/api/jem/** and not **/micropython/api/**
       + there is a bug that prevents some of our libraries from importing correctly (which we will fix!)
+- Your Atom IDE Project Directory should look like:
+   + jem
+      + app
+      + drivers
+      + helpers
+      + testing
+      + __init__.py
+      + main.py
+      + jem.py
+      + ...etc
+- Enable Pymakr terminal by selecting 'Packages -> Pymakr -> Toggle Pycom Console' in Atom toolbar and 
 - If using USB
    + Click 'Connect' in Pymakr terminal and select suggested serial port
 - If no USB, make sure JEM is on and go to your WiFi settings and connect to the JEM board (wlanxxxx)
