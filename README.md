@@ -20,7 +20,7 @@ Micropython code for Jem
    + Click 'Connect' in Pymakr terminal and select suggested serial port
 - If no USB, make sure JEM is on and go to your WiFi settings and connect to the JEM board (wlanxxxx)
    + Then Click 'Connect' in Pymakr terminal and select the WiFi ip address provided
-- Make sure pycom firmware version is one of the version we support (Supported Pycom Firmware)
+- Make sure pycom firmware version is one of the version we support - see [Supported Pycom Firmware](https://github.com/jem-io/micropython/blob/jt/install-instructions/README.md#pycom-firmware-upgrade-instructions)
 - Click 'Upload' to upload latest JEM micropython to board
 
 ### BLE REPL Test
