@@ -13,7 +13,9 @@ Micropython code for Jem
 - Press JEM power button for 1 sec and make sure RGB LED flashing every 4 sec or so
 - Open Atom IDE and make sure Pymakr plugin installed
 - Activate Pymakr plugin so you can see the Terminal at bottom of IDE
-- Open Jem Micropython directory micropython/jem/ with Atom
+- Open Jem Micropython directory **/micropython/api/jem/**  with Atom
+   + IMPORTANT: make sure Atom opens **/micropython/api/jem/** and not **/micropython/api/**
+      + this is due to a bug that prevents some of our libraries from importing correctly (which we will fix)
 - If using USB
    + Click 'Connect' in Pymakr terminal and select suggested serial port
 - If no USB, make sure JEM is on and go to your WiFi settings and connect to the JEM board (wlanxxxx)
