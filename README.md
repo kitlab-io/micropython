@@ -58,6 +58,8 @@ See [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/) - 
 >>>heartbeat(True) #verify this enabled the flashing LED again
 ```
 - That's it!
+- NOTE: this BLE app is limited and does not support full Micropython REPL features so should only be used to verify BLE works
+- For JEM BLE APP IDE see: https://github.com/jem-io/app
 
 ### Pycom Firmware Upgrade Instructions
 - Only upgrade if firmware on Pycom is not version we support 
