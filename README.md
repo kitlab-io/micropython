@@ -1,7 +1,7 @@
 # JEM micropython api
-Micropython code for Jem
+Micropython code for JEM
 
-## Install Instructiions 
+## Install Instructions 
 - Clone repo
 ```bash
 >> https://github.com/jem-io/micropython.git
