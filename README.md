@@ -40,7 +40,7 @@ See [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/) - 
 
 #### JEM sensors api
 ##### IMU
-```bash
+```python
 >> from jemimu import JemIMU
 >> imu = JemIMU()
 >> pos = imu.orientation
