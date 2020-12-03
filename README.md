@@ -1,4 +1,4 @@
-# micropython
+# JEM micropython api
 Micropython code for Jem
 
 ## Supported Pycom Firmware
