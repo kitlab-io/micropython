@@ -39,6 +39,12 @@ See [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/) - 
 
 
 #### JEM sensors api
+##### IMU
+```bash
+>> from jemimu import JemIMU
+>> imu = JemIMU()
+>> pos = imu.orientation
+```
 
 ### BLE REPL Test
 - Turn on JEM with power button (Blue LED should be flashing)
