@@ -36,14 +36,31 @@ Micropython code for JEM
 ### JEM API Quickstart
 #### Pycom specific micropython api
 See [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/) - for general micropython control of GPIO, I2C, SPI, UART and other features of the JEM Pycom MCU
+```python
+from machine import Pin
 
+# initialize `21` in gpio mode and make it an output
+p_out = Pin('21', mode=Pin.OUT)
+p_out.value(1)
+p_out.value(0)
+p_out.toggle()
+p_out(True)
+```
+- See section [JEM Board Pinout](https://github.com/jem-io/micropython/blob/jt/install-instructions/README.md#JEM-Board-Pinout)
+
+# initialize `P9` in gpio mode and make it an output
+p_out = Pin('P9', mode=Pin.OUT)
+p_out.value(1)
+p_out.value(0)
+p_out.toggle()
+p_out(True)
 
 #### JEM sensors api
 ##### IMU
 ```python
->> from jemimu import JemIMU
->> imu = JemIMU()
->> pos = imu.orientation
+from jemimu import JemIMU
+imu = JemIMU()
+pos = imu.orientation
 ```
 
 ### BLE REPL Test
