@@ -61,19 +61,22 @@ See [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/) - 
 - NOTE: this BLE app is limited and does not support full Micropython REPL features so should only be used to verify BLE works
 - For JEM BLE APP IDE see: https://github.com/jem-io/app
 
-### Pycom Firmware Upgrade Instructions
+## Pycom Firmware Upgrade Instructions
 - Only upgrade if firmware on Pycom is not version we support 
-#### Supported Pycom Firmware
+### Supported Pycom Firmware
 - Currently we only support Pycom WiPy2.0 with Firmware:
    + WiPy-1.18.2.r7.tar.gz
    + WiPy-1.18.2.r6.tar.gz
    + WiPy-1.18.2.r5.tar.gz
 - Do not use latest Pycom firmware as there are known Bluetooth issues
 
-#### Using micro usb cable
+### Using micro usb cable
 - To upgrade the JEM Pycom WiPy MCU with the latest firmware follow instructions here
    + https://docs.pycom.io/gettingstarted/installation/firmwaretool.html
    + Make sure you have a micro usb cable to upgrade with
    + For JEM, connect jumper wires between LED_IN pin and GND and then reset board to force JEM into bootloader mode
       + If you don't do this before running the Pycom firmware upgrade application JEM won't upgrade
    + Make sure to use the legacy firmware mentioned above and not the firmware Pycom automatically assignes 
+   
+## JEM Board Pinout
+For latest prototype board manufactured: [V0.4.0](https://github.com/jem-io/electronics/releases/tag/0.4.0)
