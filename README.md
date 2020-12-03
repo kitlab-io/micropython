@@ -1,13 +1,6 @@
 # JEM micropython api
 Micropython code for Jem
 
-## Supported Pycom Firmware
-- Currently we only support Pycom WiPy2.0 with Firmware:
-   + WiPy-1.18.2.r7.tar.gz
-   + WiPy-1.18.2.r6.tar.gz
-   + WiPy-1.18.2.r5.tar.gz
-- Do not use latest Pycom firmware as there are known Bluetooth issues
-
 ## Install
 ### Required
 - JEM Board with Battery or Micro USB Cable
@@ -43,6 +36,13 @@ Micropython code for Jem
 
 ### Pycom Firmware Upgrade Instructions
 - Only upgrade if firmware on Pycom is not version we support 
+#### Supported Pycom Firmware
+- Currently we only support Pycom WiPy2.0 with Firmware:
+   + WiPy-1.18.2.r7.tar.gz
+   + WiPy-1.18.2.r6.tar.gz
+   + WiPy-1.18.2.r5.tar.gz
+- Do not use latest Pycom firmware as there are known Bluetooth issues
+
 #### Using micro usb cable
 - To upgrade the JEM Pycom WiPy MCU with the latest firmware follow instructions here
    + https://docs.pycom.io/gettingstarted/installation/firmwaretool.html
