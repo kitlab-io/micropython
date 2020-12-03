@@ -80,3 +80,4 @@ See [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/) - 
    
 ## JEM Board Pinout
 For latest prototype board manufactured: [V0.4.0](https://github.com/jem-io/electronics/releases/tag/0.4.0)
+![Image of JEM Board](docs/pcb-assembly-v0.4.0-image.png)
