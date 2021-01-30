@@ -4,7 +4,7 @@ Micropython code for JEM
 ## Install Instructions 
 - Clone repo
 ```bash
->> https://github.com/jem-io/micropython.git
+>> https://github.com/kitlab-io/micropython.git
 ```
 - Connect JEM Board to battery OR Micro USB Cable OR both
 - Press JEM power button for 0.5 - 2 seconds and make sure BLUE led is ON (RGB LED will also toggle on/off every 4 seconds if new board)
@@ -29,7 +29,7 @@ Micropython code for JEM
    + Click 'Connect' in Pymakr terminal and select suggested serial port
 - If no USB, make sure JEM is on and go to your WiFi settings and connect to the JEM board (wlanxxxx)
    + Then Click 'Connect' in Pymakr terminal and select the WiFi ip address provided
-- Make sure pycom firmware version is one of the version we support - see [Supported Pycom Firmware](https://github.com/jem-io/micropython/blob/main/README.md#pycom-firmware-upgrade-instructions)
+- Make sure pycom firmware version is one of the version we support - see [Supported Pycom Firmware](https://github.com/kitlab-io/micropython/blob/main/README.md#pycom-firmware-upgrade-instructions)
    + Click on the 'Get Device Info' icon in terminal left hand corner
 - Click on 'Upload' icon to flash latest JEM micropython to board
 
@@ -46,7 +46,7 @@ p_out.value(0)
 p_out.toggle()
 p_out(True)
 ```
-- See section [JEM Board Pinout](https://github.com/jem-io/micropython/blob/main/README.md#jem-board-pinout)
+- See section [JEM Board Pinout](https://github.com/kitlab-io/micropython/blob/main/README.md#jem-board-pinout)
 
 #### JEM sensors api
 ##### IMU
@@ -69,7 +69,7 @@ pos = imu.orientation
 ```
 - That's it!
 - NOTE: this BLE app is limited and does not support full Micropython REPL features so should only be used to verify BLE works
-- For JEM BLE APP IDE see: https://github.com/jem-io/app
+- For JEM BLE APP IDE see: https://github.com/kitlab-io/app
 
 ## Pycom Firmware Upgrade Instructions
 - Only upgrade if firmware on Pycom is not version we support 
@@ -89,5 +89,5 @@ pos = imu.orientation
    + Make sure to use the legacy firmware mentioned above and not the firmware Pycom automatically assignes 
    
 ## JEM Board Pinout
-For latest prototype board manufactured: [V0.4.0](https://github.com/jem-io/electronics/releases/tag/0.4.0)
+For latest prototype board manufactured: [V0.4.0](https://github.com/kitlab-io/electronics/releases/tag/0.4.0)
 ![Image of JEM Board](docs/pcb-assembly-v0.4.0-image.png)
