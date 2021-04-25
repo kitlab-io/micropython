@@ -66,7 +66,7 @@ class JemBleUart():
         self.service_uuid = uuid2bytes(service_uuid)
         self.rx_uuid = uuid2bytes(rx_uuid)
         self.tx_uuid = uuid2bytes(tx_uuid)
-        self._bt = Bluetooth()
+        self._bt = Bluetooth(mtu=200)
         self._bt.set_advertisement(name='JEM', service_uuid=self.service_uuid)
         self._bt.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED, handler=self.connected_callback)
         self._bt.advertise(True)
@@ -74,14 +74,15 @@ class JemBleUart():
         self.rx_characteristic = self.service.characteristic(uuid=self.rx_uuid)
         self.rx_callback = self.rx_characteristic.callback(trigger=Bluetooth.CHAR_WRITE_EVENT, handler=self.rx_cb_handler)
         self.tx_characteristic = self.service.characteristic(uuid=self.tx_uuid)
-        self.rx_buffer = RingBuffer(256)
+        self.rx_buffer = RingBuffer(500)
         self.tx_buffer = RingBuffer(500)
         self.prev_term = None
-        self.max_len = 20
+        self.max_tx_len = 40
         self.aux_rx_uuid = None
         self.aux_rx_characteristic = None
         self.aux_rx_callback = None
         self.tx_sent = 0
+        self.tx_sleep_ms = 25
         if(aux_rx_uuid != None):
             self.aux_rx_uuid = uuid2bytes(aux_rx_uuid)
             self.aux_rx_characteristic = self.service.characteristic(uuid=self.aux_rx_uuid)
@@ -100,7 +101,7 @@ class JemBleUart():
             print("Client disconnected")
 
 
-    def rx_cb_handler(self, chr):
+    def rx_cb_handler(self, chr, data=None):
         events = chr.events()
         if  events & Bluetooth.CHAR_WRITE_EVENT:
             self.rx_buffer.write(chr.value(), len(chr.value()))
@@ -127,26 +128,23 @@ class JemBleUart():
 
     def write(self, buf):
         data_len = len(buf)
-        max_len = 20
-        chunks = int(data_len / max_len)
-        remaining = data_len % max_len
+        chunks = int(data_len / self.max_tx_len)
+        remaining = data_len % self.max_tx_len
         start = 0
         self.tx_sent += data_len
         for chunk in range(chunks):
-            self.tx_characteristic.value(buf[start : start + max_len])
-            start += max_len
-            self.tx_sent += max_len
-            if self.tx_sent >= 20:
-                time.sleep(0.050)
+            self.tx_characteristic.value(buf[start : start + self.max_tx_len])
+            start += self.max_tx_len
+            self.tx_sent += self.max_tx_len
+            if self.tx_sent >= self.max_tx_len:
+                time.sleep_ms(self.tx_sleep_ms)
                 self.tx_sent = 0
 
         if remaining != 0:
             self.tx_characteristic.value(buf[start : start + remaining])
             self.tx_sent += remaining
-            if self.tx_sent >= 20:
-                time.sleep(0.050)
+            if self.tx_sent >= self.max_tx_len:
+                time.sleep_ms(self.tx_sleep_ms)
                 self.tx_sent = 0
-
-
 
         return data_len
