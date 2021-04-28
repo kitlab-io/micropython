@@ -16,8 +16,8 @@ class BLEUARTStream():
     def __init__(self, uart=BLEUART()):
         self._uart = uart
         self._tx_buf = bytearray()
-        self.tx_max_len = 40
-        self.tx_delay_ms = 25
+        self.tx_max_len = 100
+        self.tx_delay_ms = 20
         self._uart.set_connect_handler(self.on_connect_status_changed)
         self.prev_term = None
         self._timer = None

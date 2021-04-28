@@ -1,11 +1,6 @@
 """bq27441.py
 
 Driver: bq27441
-
-Desc: Driver for the bq27441-g1 battery fuel gauge
-
-Communication Interface:   I2C
-
 USAGE
 fg = BQ27441()
 print("State of Charge:", fg.stateOfCharge(),"%")
@@ -24,30 +19,8 @@ SDA(G16) <<<        >>>    SDA
 SCL(G17) <<<        >>>    SCL
 P22(G9)  <<<        >>>    GPOUT
 P21(G8)  <<<        >>>    !CE
-
-
 Source: Modified from - https://github.com/sparkfun/SparkFun_BQ27441_Arduino_Library
-
-The MIT License (MIT)
-Copyright (c) 2017 JEM, jem@jem.com
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
 """
-
-
 from utime import sleep_ms
 import struct
 from machine import Pin
@@ -276,14 +249,15 @@ class BQ27441:
     the fuel gauge ic"""
 
     I2C_ADDRESS = 0x55  # Default I2C address of the BQ27441-G1A
-    GPOUT_PIN  = "P7"
+    GPOUT_PIN  = "P7" #only use if buzzer disabled
 
-    def __init__(self, i2c=None, address=I2C_ADDRESS):
+    def __init__(self, i2c=None, address=I2C_ADDRESS, use_gpout=False):
         self._i2c = JemI2C(i2c,address)
         self.gpout = None
         self._shutdown_en = False
         self._userConfigControl = False
         self._sealFlag = False
+        self.use_gpout = use_gpout
 
         self.configure_gpout_input()
 
@@ -293,10 +267,12 @@ class BQ27441:
         self.power_up()
 
     def configure_gpout_input(self):
-        self.gpout = Pin(BQ27441.GPOUT_PIN, mode=Pin.IN, pull=Pin.PULL_UP)
+        if self.use_gpout:
+            self.gpout = Pin(BQ27441.GPOUT_PIN, mode=Pin.IN, pull=Pin.PULL_UP)
 
     def configure_gpout_output(self):
-        self.gpout = Pin(BQ27441.GPOUT_PIN, mode=Pin.OUT)
+        if self.use_gpout:
+            self.gpout = Pin(BQ27441.GPOUT_PIN, mode=Pin.OUT)
 
     def power_up(self):
         """Wake up fuel gauge ic if in shutdown mode"""
