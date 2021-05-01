@@ -21,6 +21,7 @@ from drivers.bq27441 import BQ27441, CurrentMeasureType, CapacityMeasureType, So
 class JemBattery(BQ27441):
     def __init__(self, i2c=None):
         """Initialize JemDevice parent class and then set the comm and bq27441 driver objects"""
+        print("Init BQ27441 may take up to 15 seconds")
         super(JemBattery, self).__init__(i2c=i2c, address=BQ27441.I2C_ADDRESS)
 
     @property
@@ -51,10 +52,10 @@ class JemBattery(BQ27441):
             print ("Failed to get average current (mA): %s" % e)
 
     @property
-    def soh(self):
-        """Return state of health"""
+    def state_of_charge(self):
+        """Return remaining charge %"""
         try:
-            result = self._device.soh(SohMeasureType.PERCENT)
+            result = self.soh(SohMeasureType.PERCENT)
             return result
         except Exception as e:
             print ("Failed to get state of health (soh): %s" % e )

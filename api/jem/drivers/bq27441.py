@@ -257,7 +257,7 @@ class BQ27441:
         self._shutdown_en = False
         self._userConfigControl = False
         self._sealFlag = False
-        self.use_gpout = use_gpout
+        self.use_gpout = use_gpout #only use P7 if disconnected from buzzer on pcb (JEM v5.1.0 or newer)
 
         self.configure_gpout_input()
 
@@ -299,12 +299,13 @@ class BQ27441:
         self.executeControlWord(BQ27441_CONTROL_SHUTDOWN)
 
     def disable_shutdown_mode(self):
-        self.configure_gpout_output()
-        # toggle gpout to exit shutdown mode
-        self.gpout.value(0)
-        sleep_ms(10)
-        self.gpout.value(1)
-        sleep_ms(10)
+        if self.use_gpout:
+            self.configure_gpout_output()
+            # toggle gpout to exit shutdown mode
+            self.gpout.value(0)
+            sleep_ms(10)
+            self.gpout.value(1)
+            sleep_ms(10)
         self._shutdown_en = False
 
 
@@ -387,7 +388,7 @@ class BQ27441:
 
 
     # Reads and returns specified state of health measurement
-    def soh(self, soh_measure_type):
+    def soh(self, soh_measure_type=SohMeasureType.PERCENT):
         sohRaw = self.readWord(BQ27441_COMMAND_SOH)
         sohStatus = sohRaw >> 8
         sohPercent = sohRaw & 0x00FF
