@@ -73,8 +73,12 @@ pos = imu.orientation
 
 ## Pycom Firmware Upgrade Instructions
 - Only upgrade if firmware on Pycom is not version we support 
-### Supported Pycom Firmware
-- Currently we only support Pycom WiPy2.0 with Firmware:
+
+### JEM V5.1.0
+- Working with [Pycom Firmware Release 1.20.2.r4](https://github.com/pycom/pycom-micropython-sigfox/releases/tag/v1.20.2.r4)
+- 
+### Legacy Supported Pycom Firmware for JEM 0.4.0
+- Older JEM V0.4.0 only supports Pycom firmware:
    + WiPy-1.18.2.r7.tar.gz
    + WiPy-1.18.2.r6.tar.gz
    + WiPy-1.18.2.r5.tar.gz
