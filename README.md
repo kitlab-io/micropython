@@ -76,7 +76,7 @@ pos = imu.orientation
 
 ### JEM V5.1.0
 - Working with [Pycom Firmware Release 1.20.2.r4](https://github.com/pycom/pycom-micropython-sigfox/releases/tag/v1.20.2.r4)
-- 
+
 ### Legacy Supported Pycom Firmware for JEM 0.4.0
 - Older JEM V0.4.0 only supports Pycom firmware:
    + WiPy-1.18.2.r7.tar.gz
