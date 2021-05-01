@@ -1,6 +1,6 @@
 """jemimu.py
 Desc: hardware abstraction layer around accel and gyro sensor
-Driver used: mpu6050
+Driver used: BNO055
 Example:
     >> imu = JemIMU()
     >> imu.gyro['y'] # deg / sec
@@ -13,12 +13,9 @@ Example:
 """
 
 from drivers.bno055 import BNO055
-from helpers.helpers import Struct
-
 
 class JemIMU(BNO055):
     def __init__(self, **kwargs):
-        """Initialize JemDevice parent class and then set the comm and mpu6050 driver objects"""
         super(JemIMU, self).__init__(**kwargs)
 
     @property
@@ -31,10 +28,9 @@ class JemIMU(BNO055):
         try:
             mag_data = self.read_magnetometer()
             # get struct so user can access: mag['x']   mag['y']   mag['z']
-            mag_struct = Struct(x=mag_data[0], y=mag_data[1], z=mag_data[2])
-            return mag_struct
+            return {'x':mag_data[0], 'y':mag_data[1], 'z':mag_data[2]}
         except Exception as e:
-            print("Failed to get mag data from {0} device - {1}".format(self.pn, e))
+            print("mag failed - from {0} device - {1}".format(self.pn, e))
 
     @property
     def gyro(self):
@@ -44,12 +40,11 @@ class JemIMU(BNO055):
             >> 0.42
         """
         try:
-            gyro_data = self.read_gyroscope()
+            d = self.read_gyroscope()
             # get struct so user can access: gyro['x']   gyro['y']   gyro['z']
-            gyro_struct = Struct(x=gyro_data[0], y=gyro_data[1], z=gyro_data[2])
-            return gyro_struct
+            return {'x':d[0], 'y':d[1], 'z':d[2]}
         except Exception as e:
-            print("Failed to get gyro from {0} device - {1}".format(self.pn, e))
+            print("gyro failed - from {0} device - {1}".format(self.pn, e))
 
     @property
     def accel(self):
@@ -59,11 +54,10 @@ class JemIMU(BNO055):
             >> 1.23
         """
         try:
-            accel_data = self.read_accelerometer()
-            accel_struct = Struct(x=accel_data[0], y=accel_data[1], z=accel_data[2])
-            return accel_struct
+            d = self.read_accelerometer()
+            return {'x':d[0], 'y':d[1], 'z':d[2]}
         except Exception as e:
-            print("Failed to get accel data from {0} device - {1}".format(self.pn, e))
+            print("accel failed - from {0} device - {1}".format(self.pn, e))
 
 
     @property
@@ -74,8 +68,7 @@ class JemIMU(BNO055):
             >> 34.5
         """
         try:
-            orientation_data = self.read_euler()
-            orientation_struct = Struct(heading=orientation_data[0], roll=orientation_data[1], pitch=orientation_data[2])
-            return orientation_struct
+            d = self.read_euler()
+            return {'yaw':d[0], 'roll':d[1], 'pitch':d[2]}
         except Exception as e:
-            print("Failed to get orientation data from {0} device - {1}".format(self.pn, e))
+            print("orientation failed - from {0} device - {1}".format(self.pn, e))

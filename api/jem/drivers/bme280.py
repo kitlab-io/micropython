@@ -54,13 +54,13 @@ class BME280:
         # load calibration data
         dig_88_a1 = self.i2c.readfrom_mem(self.address, 0x88, 26)
         dig_e1_e7 = self.i2c.readfrom_mem(self.address, 0xE1, 7)
-        self.dig_T1, self.dig_T2, self.dig_T3, self.dig_P1, \
-            self.dig_P2, self.dig_P3, self.dig_P4, self.dig_P5, \
-            self.dig_P6, self.dig_P7, self.dig_P8, self.dig_P9, \
-            _, self.dig_H1 = unpack("<HhhHhhhhhhhhBB", dig_88_a1)
+        self.dig_T1, self.dig_T2, self.dig_T3, self.dig_P1,\
+        self.dig_P2, self.dig_P3, self.dig_P4, self.dig_P5,\
+        self.dig_P6, self.dig_P7, self.dig_P8, self.dig_P9,\
+        _, self.dig_H1 = unpack("<HhhHhhhhhhhhBB", dig_88_a1)
 
         self.dig_H2, self.dig_H3, self.dig_H4,\
-            self.dig_H5, self.dig_H6 = unpack("<hBbhb", dig_e1_e7)
+        self.dig_H5, self.dig_H6 = unpack("<hBbhb", dig_e1_e7)
         # unfold H4, H5, keeping care of a potential sign
         self.dig_H4 = (self.dig_H4 * 16) + (self.dig_H5 & 0xF)
         self.dig_H5 //= 16
@@ -76,7 +76,6 @@ class BME280:
 
     def read_raw_data(self, result):
         """ Reads the raw (uncompensated) data from the sensor.
-
             Args:
                 result: array of length 3 or alike where the result will be
                 stored, in temperature, pressure, humidity order
@@ -111,7 +110,6 @@ class BME280:
 
     def read_compensated_data(self, result=None):
         """ Reads the data from the sensor and returns the compensated data.
-
             Args:
                 result: array of length 3 or alike where the result will be
                 stored, in temperature, pressure, humidity order. You may use
@@ -177,9 +175,7 @@ class BME280:
 
     @property
     def altitude(self):
-        '''
-        Altitude in m.
-        '''
+        # meters
         from math import pow
         try:
             p = 44330 * (1.0 - pow((self.read_compensated_data()[1] / 256) /
@@ -223,8 +219,7 @@ class BME280:
 
     @property
     def values(self):
-        """ human readable values """
-
+        # human readable values
         t, p, h, a = self.data
 
         return ("{}C".format(t), "{:.02f}Pa".format(p),

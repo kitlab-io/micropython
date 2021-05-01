@@ -3,18 +3,6 @@ Desc: General functions used to help with the rest of Jem code
 
 """
 
-class Struct(dict):
-    """C like struct class
-    Ex:
-    >> gyro_struct = Struct(x=0, y=0, z=0)
-    >> gyro_struct['x']
-    >> 0
-    hello
-    """
-    def __init__(self, **kwargs):
-        self.update(kwargs)
-
-
 def get_bit_value(bit):
     """Shift 1 to the right according to bits value"""
     return 1 << (bit)
