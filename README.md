@@ -33,6 +33,12 @@ Micropython code for JEM
    + Click on the 'Get Device Info' icon in terminal left hand corner
 - Click on 'Upload' icon to flash latest JEM micropython to board
 
+### JEM Upload new micropython code
+- Open Atom (with Pymakr plugin)
+- Open the /micropython/api/jem directory (**IMPORTANT:** make sure your root is the **jem** dir, not **api/jem**)
+- Connect to JEM via USB using the 'Connect' button
+- Click 'Upload'
+
 ### JEM API Quickstart
 #### Pycom specific micropython api
 See [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/) - for general micropython control of GPIO, I2C, SPI, UART and other features of the JEM Pycom MCU
