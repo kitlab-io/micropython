@@ -1,11 +1,7 @@
-# Proof-of-concept of a REPL over BLE UART.
-#
-# Tested with the Adafruit Bluefruit app on Android.
-# Set the EoL characters to \r\n.
+# REPL over BLE UART
 
 import uos
 from machine import Timer
-
 from ble_uart_peripheral import BLEUART
 
 _MP_STREAM_POLL = const(3)
@@ -31,6 +27,7 @@ class BLEUARTStream():
     def on_connect_status_changed(self, is_connected):
         if is_connected:
             self.prev_term = uos.dupterm()
+            print("BLEUARTStream (REPL) Connected")
             print("old dupterm: %s" % self.prev_term)
             uos.dupterm(self)
         else:
@@ -38,6 +35,7 @@ class BLEUARTStream():
             if self.prev_term:
                 print("inserting old dupterm %s" % self.prev_term)
                 uos.dupterm(self.prev_term)
+                print("BLEUARTStream (REPL) Disconnected")
 
     def read(self, sz=None):
         return self._uart.read(sz)

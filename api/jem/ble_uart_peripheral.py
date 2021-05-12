@@ -1,26 +1,54 @@
 # This example demonstrates a peripheral implementing the Nordic UART Service (NUS).
 from network import Bluetooth
 import binascii
+_UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 
 def uuid2bytes(uuid):
     uuid = uuid.encode().replace(b'-',b'')
     tmp = binascii.unhexlify(uuid)
     return bytes(reversed(tmp))
 
+class BLEMANAGER(object):
+    _instance = None
+    def __new__(cls):
+        if cls._instance is None:
+            print('Creating the BLEMANAGER object')
+            cls._instance = super(BLEMANAGER, cls).__new__(cls)
+            print("BLEMANAGER: init")
+            cls._instance.ble = Bluetooth(mtu=200)
+            cls._instance.ble.set_advertisement(name='JEM', service_uuid=uuid2bytes(_UART_SERVICE_UUID))
+            cls._instance.ble.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED, handler=cls._instance.connected_callback)
+            cls._instance._connected_handlers = []
+            # Put any initialization here.
+        cls._instance.ble.advertise(True)
+        return cls._instance
+
+    def add_connected_callback(self, handler):
+        if self._connected_handlers and handler not in self._connected_handlers:
+            self._connected_handlers.append(handler)
+        else:
+            self._connected_handlers.append(handler)
+
+    def connected_callback(self, bt_o):
+        print("BLEMANAGER: connected_callback")
+        events = bt_o.events()
+        if self._connected_handlers:
+            for handler in self._connected_handlers:
+                handler(events)
+
 class BLEUART:
-    def __init__(self, ble=Bluetooth(mtu=200), name="JEM", connect_status_handler=None, service_uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E", rx_uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E", tx_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"):
-        self._ble = ble
-        self._ble.set_advertisement(name='JEM', service_uuid=uuid2bytes(service_uuid))
-        self._ble.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED, handler=self.connected_callback)
-        self._ble.advertise(True)
-        self.service = self._ble.service(uuid=uuid2bytes(service_uuid), isprimary=True, nbr_chars=2)
+    def __init__(self, bleman=None, service_uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E", rx_uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E", tx_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"):
+        if bleman is None:
+            bleman = BLEMANAGER()
+        self.bleman = bleman
+        self.service = self.bleman.ble.service(uuid=uuid2bytes(service_uuid), isprimary=True, nbr_chars=2)
         self.rx_characteristic = self.service.characteristic(uuid=uuid2bytes(rx_uuid))
         self.rx_callback = self.rx_characteristic.callback(trigger=Bluetooth.CHAR_WRITE_EVENT, handler=self.rx_cb_handler)
         self.tx_characteristic = self.service.characteristic(uuid=uuid2bytes(tx_uuid))
         self._connected = False
         self._rx_buffer = bytearray()
         self._connect_status_handler = None
-        # Optionally add services=[_UART_UUID], but this is likely to make the payload too large.
+        self.bleman.add_connected_callback(self.connected_callback)
 
     def set_connect_handler(self, handler):
         self._connect_status_handler = handler
@@ -30,8 +58,7 @@ class BLEUART:
         if  events & Bluetooth.CHAR_WRITE_EVENT:
             self._rx_buffer += chr.value()
 
-    def connected_callback(self, bt_o):
-        events = bt_o.events()
+    def connected_callback(self, events):
         if  events & Bluetooth.CLIENT_CONNECTED:
             self._connected = True
             print("ble_uart_peripheral connected")
@@ -39,7 +66,7 @@ class BLEUART:
                 self._connect_status_handler(self._connected)
         elif events & Bluetooth.CLIENT_DISCONNECTED:
             self._connected = False
-            print("ble_uart_peripheral connected")
+            print("ble_uart_peripheral diconnected")
             if self._connect_status_handler:
                 self._connect_status_handler(self._connected)
 
