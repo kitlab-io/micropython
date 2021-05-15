@@ -1,4 +1,4 @@
 from ble_uart_repl import BLEUARTStream
-from ble_uart_ftp import BLEUARTFtp
+from ble_uart_ftp import BLEUARTFTP
 repl = BLEUARTStream()
-ftp = BLEUARTFtp()
+ftp = BLEUARTFTP()
