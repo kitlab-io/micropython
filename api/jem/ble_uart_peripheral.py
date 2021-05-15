@@ -37,7 +37,7 @@ class BLEMANAGER(object):
                 handler(events)
 
 class BLEUART:
-    def __init__(self, bleman=None, service_uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E", rx_uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E", tx_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"):
+    def __init__(self, bleman=None, name="BLEUART", service_uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E", rx_uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E", tx_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"):
         if bleman is None:
             bleman = BLEMANAGER()
         self.bleman = bleman
@@ -49,24 +49,31 @@ class BLEUART:
         self._rx_buffer = bytearray()
         self._connect_status_handler = None
         self.bleman.add_connected_callback(self.connected_callback)
+        self.name = name
+        self.rx_notifiy_callback = None
 
     def set_connect_handler(self, handler):
         self._connect_status_handler = handler
+
+    def set_rx_notify_callback(self, callback):
+        self.rx_notifiy_callback = callback
 
     def rx_cb_handler(self, chr, data=None):
         events = chr.events()
         if  events & Bluetooth.CHAR_WRITE_EVENT:
             self._rx_buffer += chr.value()
+            if self.rx_notifiy_callback:
+                self.rx_notifiy_callback()
 
     def connected_callback(self, events):
         if  events & Bluetooth.CLIENT_CONNECTED:
             self._connected = True
-            print("ble_uart_peripheral connected")
+            print("ble_uart_peripheral (%s) connected" % self.name)
             if self._connect_status_handler:
                 self._connect_status_handler(self._connected)
         elif events & Bluetooth.CLIENT_DISCONNECTED:
             self._connected = False
-            print("ble_uart_peripheral diconnected")
+            print("ble_uart_peripheral (%s) diconnected" % self.name)
             if self._connect_status_handler:
                 self._connect_status_handler(self._connected)
 

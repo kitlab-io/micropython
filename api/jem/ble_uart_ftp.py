@@ -3,8 +3,8 @@ from machine import Timer
 from ble_uart_peripheral import BLEUART
 
 # BLE UART FTP Service
-class BLEUART_FTP():
-    def __init__(self, uart):
+class BLEUARTFtp(BLEUART):
+    def __init__(self, uart=None):
         if uart is None:
             uart = BLEUART(service_uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA77", rx_uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA77", tx_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA77")
         self._uart = uart
@@ -14,6 +14,7 @@ class BLEUART_FTP():
         self._uart.set_connect_handler(self.on_connect_status_changed)
         self.prev_term = None
         self._timer = None
+        self._uart.set_rx_notify_callback(self.rx_notification)
 
     def _wrap_flush(self, alarm):
         self._flush()
@@ -29,6 +30,11 @@ class BLEUART_FTP():
 
     def read(self, sz=None):
         return self._uart.read(sz)
+
+    def rx_notification(self):
+        # we got some data!
+        data = self._uart.read() #read all available
+        print("rx_notification: %s" % data)
 
     def _flush(self):
         data = self._tx_buf[0:self.tx_max_len]
