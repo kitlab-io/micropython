@@ -98,3 +98,14 @@ def test_junk_data_in_middle_with_good_msg_after():
         resp = man.update(data[i:i+chunk_size])
     assert(resp is not None)
     return resp
+
+def test_write_file_cmd():
+    print("test_write_file_cmd")
+    file_name = b'test.txt'
+    data = b'hello world'
+    method = 0 #wb
+    pos = 0
+    msg = struct.pack("<BLH", method, pos, len(file_name))
+    payload = msg + file_name + data
+    write_cmd = FTPCmd.create(FTPCmd.WRITE_FILE, payload)
+    return write_cmd

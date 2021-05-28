@@ -101,8 +101,9 @@ class FTPWriteCmd(FTPCmd):
     FILE_WR_METHOD_I = 0
     FILE_WR_POS_I = FILE_WR_METHOD_I + 1
     FILE_NAME_LEN_I = FILE_WR_POS_I + 4
-
-    def __init__(self):
+    METHOD_LIST = ["wb", "ab"]
+    def __init__(self, id, payload):
+        super().__init__(id, payload)
         self.success = False
 
     def resp(self):
@@ -110,16 +111,18 @@ class FTPWriteCmd(FTPCmd):
         return FTPCmdMsg(self.id, msg).msg()
 
     def execute(self):
-        fname_len = self.payload[FTPWriteCmd.FILE_NAME_LEN_I : FTPWriteCmd.FILE_NAME_LEN_I+2]
+        method_id = self.payload[FTPWriteCmd.FILE_WR_METHOD_I]
+        pos = struct.unpack("<L",self.payload[FTPWriteCmd.FILE_WR_POS_I: FTPWriteCmd.FILE_WR_POS_I + 4])[0]
+        fname_len = struct.unpack("<H",self.payload[FTPWriteCmd.FILE_NAME_LEN_I : FTPWriteCmd.FILE_NAME_LEN_I+2])[0]
         fdata_start_i = FTPWriteCmd.FILE_NAME_LEN_I + 2 + fname_len
         fname = self.payload[FTPWriteCmd.FILE_NAME_LEN_I + 2: fdata_start_i]
-        method = self.payload[FTPWriteCmd.FILE_WR_METHOD_I]
-        pos = self.payload[FTPWriteCmd.FILE_WR_POS_I: FTPWriteCmd.FILE_WR_POS_I + 4]
-
-        self.success = self.write(fname, self.payload[fdata_start_i:], pos, method)
+        if (method_id+1) <= len(FTPWriteCmd.METHOD_LIST):
+            method = FTPWriteCmd.METHOD_LIST[method_id]
+            self.success = self.write(fname, self.payload[fdata_start_i:], pos, method)
 
     def write(self, name, data, pos=None, method="wb"):
         try:
+            print("write file %s, pos: %d, method: %s" % (name, pos, method))
             with open(name, method) as f:
                 if pos:
                     f.seek(pos)
@@ -130,7 +133,8 @@ class FTPWriteCmd(FTPCmd):
         return False
 
 class FTPReadCmd(FTPCmd):
-    def __init__(self):
+    def __init__(self, id, payload):
+        super().__init__(id, payload)
         self.data = bytearray()
 
     def resp(self):
@@ -138,8 +142,8 @@ class FTPReadCmd(FTPCmd):
 
     def execute(self):
         rd_len = self.payload[FTPReadCmd.FILE_NAME_LEN_I: FTPReadCmd.FILE_NAME_LEN_I + 2]
-        pos = self.payload[FTPWriteCmd.FILE_RD_POS_I: FTPWriteCmd.FILE_RD_POS_I + 4]
-        fname_len = self.payload[FTPReadCmd.FILE_NAME_LEN_I : FTPReadCmd.FILE_NAME_LEN_I+2]
+        pos = struct.unpack("<L",self.payload[FTPWriteCmd.FILE_RD_POS_I: FTPWriteCmd.FILE_RD_POS_I + 4])[0]
+        fname_len = struct.unpack("<H",self.payload[FTPReadCmd.FILE_NAME_LEN_I : FTPReadCmd.FILE_NAME_LEN_I+2])[0]
         fdata_start_i = FTPReadCmd.FILE_NAME_LEN_I + 2 + fname_len
         fname = self.payload[FTPReadCmd.FILE_NAME_LEN_I + 2: fdata_start_i]
         self.data += self.read(fname, pos, method)
