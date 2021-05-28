@@ -1,22 +1,5 @@
 import struct
 
-def test_fail_cmd():
-    print("FTPCmd.create(FTPCmd.FAIL_RESP, 'test-fail')")
-    fail_cmd = FTPCmd.create(FTPCmd.FAIL_RESP, "test-fail")
-    assert(type(fail_cmd) == FTPFailCmd)
-    fail_cmd.execute()
-    resp = fail_cmd.resp()
-    assert(resp != None)
-    print("Validate fail_cmd resp can be parsed back into FAIL_RESP cmd")
-    checksum_valid, end_i, ftp_cmd = FTPCmdMsg.extract(resp)
-    assert(end_i != None)
-    assert(type(ftp_cmd) == FTPFailCmd)
-    assert(ftp_cmd.id == FTPCmd.FAIL_RESP)
-    if not checksum_valid:
-        print("checksum not valid")
-    #assert(ftp_cmd.payload == bytearray("test-fail".encode('utf-8')))
-    print("SUCCESS")
-    return fail_cmd, ftp_cmd
 
 # FTP Classes used to parse incoming BLE UART FTP Commands for File i/o
 class FTPCmdMsg:
