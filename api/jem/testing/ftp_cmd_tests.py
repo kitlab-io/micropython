@@ -108,4 +108,23 @@ def test_write_file_cmd():
     msg = struct.pack("<BLH", method, pos, len(file_name))
     payload = msg + file_name + data
     write_cmd = FTPCmd.create(FTPCmd.WRITE_FILE, payload)
+    assert(write_cmd.execute() == True)
     return write_cmd
+
+def test_read_file_cmd():
+    print("test_read_file_cmd")
+    file_name = b'test.txt'
+    pos = 0
+    rd_len = 5
+    msg = struct.pack("<LHH", pos, rd_len, len(file_name))
+    payload = msg + file_name
+    rd_cmd = FTPCmd.create(FTPCmd.READ_FILE, payload)
+    assert(rd_cmd.execute() == True)
+    print("validate resp")
+    resp = rd_cmd.resp()
+    checksum_valid, end_i, ftp_cmd = FTPCmdMsg.extract(resp)
+    assert(end_i != None)
+    assert(type(ftp_cmd) == FTPReadCmd)
+    assert(ftp_cmd.id == FTPCmd.READ_FILE)
+    assert(checksum_valid == True)
+    return rd_cmd

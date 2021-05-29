@@ -119,6 +119,7 @@ class FTPWriteCmd(FTPCmd):
         if (method_id+1) <= len(FTPWriteCmd.METHOD_LIST):
             method = FTPWriteCmd.METHOD_LIST[method_id]
             self.success = self.write(fname, self.payload[fdata_start_i:], pos, method)
+        return self.success
 
     def write(self, name, data, pos=None, method="wb"):
         try:
@@ -133,6 +134,10 @@ class FTPWriteCmd(FTPCmd):
         return False
 
 class FTPReadCmd(FTPCmd):
+    FILE_RD_POS_I = 0
+    FILE_RD_LEN_I = FILE_RD_POS_I + 4
+    FILE_NAME_LEN_I = FILE_RD_LEN_I + 2
+
     def __init__(self, id, payload):
         super().__init__(id, payload)
         self.data = bytearray()
@@ -141,13 +146,12 @@ class FTPReadCmd(FTPCmd):
         return FTPCmdMsg(self.id, self.data).msg()
 
     def execute(self):
-        rd_len = self.payload[FTPReadCmd.FILE_NAME_LEN_I: FTPReadCmd.FILE_NAME_LEN_I + 2]
-        pos = struct.unpack("<L",self.payload[FTPWriteCmd.FILE_RD_POS_I: FTPWriteCmd.FILE_RD_POS_I + 4])[0]
+        pos = struct.unpack("<L",self.payload[FTPReadCmd.FILE_RD_POS_I: FTPReadCmd.FILE_RD_POS_I + 4])[0]
+        rd_len = struct.unpack("<H", self.payload[FTPReadCmd.FILE_RD_LEN_I: FTPReadCmd.FILE_RD_LEN_I + 2])[0]
         fname_len = struct.unpack("<H",self.payload[FTPReadCmd.FILE_NAME_LEN_I : FTPReadCmd.FILE_NAME_LEN_I+2])[0]
-        fdata_start_i = FTPReadCmd.FILE_NAME_LEN_I + 2 + fname_len
-        fname = self.payload[FTPReadCmd.FILE_NAME_LEN_I + 2: fdata_start_i]
-        self.data += self.read(fname, pos, method)
-
+        fname = self.payload[FTPReadCmd.FILE_NAME_LEN_I + 2: FTPReadCmd.FILE_NAME_LEN_I + 2 + fname_len]
+        self.data += self.read(fname, pos, rd_len)
+        return len(self.data) > 0
 
     def read(self, name, pos=None, rd_len=None):
         try:
@@ -161,6 +165,21 @@ class FTPReadCmd(FTPCmd):
         return data
 
 class FTPChecksumCmd(FTPCmd):
+    FILE_LEN_I = 0
+
+    def __init__(self, id, payload):
+        super().__init__(id, payload)
+        self.checksum = None
+
+    def resp(self):
+        return FTPCmdMsg(self.id, bytearray([self.checksum])).msg()
+
+    def execute(self):
+        fname_len = struct.unpack("<H",self.payload[FTPChecksumCmd.FILE_LEN_I : FTPChecksumCmd.FILE_LEN_I+2])[0]
+        fname = self.payload[FTPChecksumCmd.FILE_LEN_I + 2: FTPChecksumCmd.FILE_LEN_I + 2 + fname_len]
+        self.checksum = self.get_checksum(fname)
+        return self.checksum is not None
+
     def get_checksum(self, name):
         try:
             c = None
