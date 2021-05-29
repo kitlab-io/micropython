@@ -128,3 +128,12 @@ def test_read_file_cmd():
     assert(ftp_cmd.id == FTPCmd.READ_FILE)
     assert(checksum_valid == True)
     return rd_cmd
+
+def test_checksum_file_cmd():
+    print("test_checksum_file_cmd")
+    file_name = b'test.txt'
+    msg = struct.pack("<H", len(file_name))
+    payload = msg + file_name
+    chk_cmd = FTPCmd.create(FTPCmd.FILE_CHECKSUM, payload)
+    assert(chk_cmd.execute() == True)
+    return chk_cmd
