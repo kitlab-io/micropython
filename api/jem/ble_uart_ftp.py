@@ -16,6 +16,7 @@ class BLEUARTFTP(BLEUART):
         self.prev_term = None
         self._timer = None
         self._uart.set_rx_notify_callback(self.rx_notification)
+        self.ftp_cmd_manager = FTPCMDManager()
 
     def _wrap_flush(self, alarm):
         self._flush()

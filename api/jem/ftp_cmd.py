@@ -35,7 +35,14 @@ class FTPCmdMsg:
         start_i, end_i, cmd_id, payload_len, checksum_valid = None, None, None, None, None
         ftp_cmd = None
         if FTPCmdMsg.START in buffer:
-            start_i = buffer.index(FTPCmdMsg.START)
+
+            start_i = 0 # find start of start header index
+            for i in range(len(buffer)):
+                if FTPCmdMsg.START not in buffer[i:]:
+                    break
+                else:
+                    start_i = i #this is the start index
+
             print("start_i: %d" % start_i)
             if len(buffer[start_i:]) >= (FTPCmdMsg.CMD_ID_I + 1):
                 cmd_id = buffer[start_i + FTPCmdMsg.CMD_ID_I]
@@ -44,10 +51,7 @@ class FTPCmdMsg:
                     payload_len = struct.unpack("<H",buffer[start_i + FTPCmdMsg.PAYLOAD_LEN_I: start_i + FTPCmdMsg.PAYLOAD_LEN_I + 2])[0]
                     print("payload_len: %d" % payload_len)
                     remaining = len(buffer[start_i + FTPCmdMsg.PAYLOAD_I:])
-                    if remaining >= payload_len:
-                        payload_ready = True
                     if remaining > payload_len:
-                        checksum_ready = True
                         checkum_i = start_i + FTPCmdMsg.PAYLOAD_I + payload_len
                         rx_checksum = buffer[checkum_i]
                         end_i = checkum_i + 1
@@ -66,10 +70,10 @@ class FTPCmdMsg:
 
 class FTPCmd:
     #cmd ids
-    READ_FILE = 1
-    WRITE_FILE = 2
-    FILE_CHECKSUM = 3
-    FAIL_RESP = 4
+    READ_FILE = 3
+    WRITE_FILE = 4
+    FILE_CHECKSUM = 5
+    FAIL_RESP = 6
     CMD_ID_LIST = [READ_FILE, WRITE_FILE, FILE_CHECKSUM, FAIL_RESP]
     def __init__(self, id, payload):
         self.id = id
@@ -91,7 +95,9 @@ class FTPCmd:
         CMD_ID_MAP = {FTPCmd.READ_FILE: FTPReadCmd, FTPCmd.WRITE_FILE: FTPWriteCmd, FTPCmd.FILE_CHECKSUM: FTPChecksumCmd, FTPCmd.FAIL_RESP: FTPFailCmd}
         if id in FTPCmd.CMD_ID_LIST:
             return CMD_ID_MAP[id](id, payload)
-        return None
+        else:
+            print("cmd_id %d, not found, return failed cmd" % id)
+            return CMD_ID_MAP[FTPCmd.FAIL_RESP](FTPCmd.FAIL_RESP, b"cmd_id invalid")
 
 class FTPFailCmd(FTPCmd):
     def resp(self):
@@ -115,7 +121,7 @@ class FTPWriteCmd(FTPCmd):
         pos = struct.unpack("<L",self.payload[FTPWriteCmd.FILE_WR_POS_I: FTPWriteCmd.FILE_WR_POS_I + 4])[0]
         fname_len = struct.unpack("<H",self.payload[FTPWriteCmd.FILE_NAME_LEN_I : FTPWriteCmd.FILE_NAME_LEN_I+2])[0]
         fdata_start_i = FTPWriteCmd.FILE_NAME_LEN_I + 2 + fname_len
-        fname = self.payload[FTPWriteCmd.FILE_NAME_LEN_I + 2: fdata_start_i]
+        fname = self.payload[FTPWriteCmd.FILE_NAME_LEN_I + 2: fdata_start_i].decode('utf-8')
         if (method_id+1) <= len(FTPWriteCmd.METHOD_LIST):
             method = FTPWriteCmd.METHOD_LIST[method_id]
             self.success = self.write(fname, self.payload[fdata_start_i:], pos, method)
