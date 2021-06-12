@@ -37,7 +37,6 @@ class BLEUARTFTP(BLEUART):
         # we got some data!
         data = self.read()
         self.update(data)
-        print("rx_notification: %s" % data)
 
     def update(self, data):
         resp = self.ftp_cmd_manager.update(data)

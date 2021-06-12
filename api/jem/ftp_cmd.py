@@ -43,20 +43,16 @@ class FTPCmdMsg:
                 else:
                     start_i = i #this is the start index
 
-            print("start_i: %d" % start_i)
             if len(buffer[start_i:]) >= (FTPCmdMsg.CMD_ID_I + 1):
                 cmd_id = buffer[start_i + FTPCmdMsg.CMD_ID_I]
-                print("cmd_id: %d" % cmd_id)
                 if len(buffer[start_i:]) >= (FTPCmdMsg.PAYLOAD_LEN_I + 1):
                     payload_len = struct.unpack("<H",buffer[start_i + FTPCmdMsg.PAYLOAD_LEN_I: start_i + FTPCmdMsg.PAYLOAD_LEN_I + 2])[0]
-                    print("payload_len: %d" % payload_len)
                     remaining = len(buffer[start_i + FTPCmdMsg.PAYLOAD_I:])
                     if remaining > payload_len:
                         checkum_i = start_i + FTPCmdMsg.PAYLOAD_I + payload_len
                         rx_checksum = buffer[checkum_i]
                         end_i = checkum_i + 1
                         real_checksum = FTPCmdMsg.get_checksum(buffer[start_i: checkum_i])
-                        print("checkum_i: %d, got: %d, exp: %d" % (checkum_i, rx_checksum, real_checksum))
                         checksum_valid = (rx_checksum == real_checksum)
                         p_start = start_i + FTPCmdMsg.PAYLOAD_I
                         p_end = start_i + FTPCmdMsg.PAYLOAD_I + payload_len
@@ -129,7 +125,6 @@ class FTPWriteCmd(FTPCmd):
 
     def write(self, name, data, pos=None, method="wb"):
         try:
-            print("write file %s, pos: %d, method: %s" % (name, pos, method))
             with open(name, method) as f:
                 if pos:
                     f.seek(pos)
