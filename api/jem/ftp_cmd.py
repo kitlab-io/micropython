@@ -174,28 +174,34 @@ class FTPChecksumCmd(FTPCmd):
     def __init__(self, id, payload):
         super().__init__(id, payload)
         self.checksum = None
+        self.file_len = None
 
     def resp(self):
-        return FTPCmdMsg(self.id, bytearray([self.checksum])).msg()
+        msg = struct.pack("<BL", self.checksum, self.file_len)
+        return FTPCmdMsg(self.id, msg).msg()
 
     def execute(self):
         fname_len = struct.unpack("<H",self.payload[FTPChecksumCmd.FILE_LEN_I : FTPChecksumCmd.FILE_LEN_I+2])[0]
-        fname = self.payload[FTPChecksumCmd.FILE_LEN_I + 2: FTPChecksumCmd.FILE_LEN_I + 2 + fname_len]
-        self.checksum = self.get_checksum(fname)
+        fname = self.payload[FTPChecksumCmd.FILE_LEN_I + 2: FTPChecksumCmd.FILE_LEN_I + 2 + fname_len].decode('utf-8')
+        checksum, f_len = self.get_checksum(fname)
+        self.checksum = checksum
+        self.file_len = f_len
         return self.checksum is not None
 
     def get_checksum(self, name):
         try:
             c = None
+            l = 0
             with open(name, "rb") as f:
                 sum = 0
                 for line in f.readlines():
+                    l += len(line)
                     for d in line:
                         sum = (sum + d) & 0x00FF
                 c = ((sum ^ 0xFF) + 1) & 0x00FF
         except Exception as e:
             print("FTPCmd.get_checksum failed %s" % e)
-        return c
+        return c, l
 
 class FTPCMDManager:
     def __init__(self):
