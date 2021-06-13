@@ -150,7 +150,7 @@ class FTPReadCmd(FTPCmd):
         pos = struct.unpack("<L",self.payload[FTPReadCmd.FILE_RD_POS_I: FTPReadCmd.FILE_RD_POS_I + 4])[0]
         rd_len = struct.unpack("<H", self.payload[FTPReadCmd.FILE_RD_LEN_I: FTPReadCmd.FILE_RD_LEN_I + 2])[0]
         fname_len = struct.unpack("<H",self.payload[FTPReadCmd.FILE_NAME_LEN_I : FTPReadCmd.FILE_NAME_LEN_I+2])[0]
-        fname = self.payload[FTPReadCmd.FILE_NAME_LEN_I + 2: FTPReadCmd.FILE_NAME_LEN_I + 2 + fname_len]
+        fname = self.payload[FTPReadCmd.FILE_NAME_LEN_I + 2: FTPReadCmd.FILE_NAME_LEN_I + 2 + fname_len].decode('utf-8')
         self.data += self.read(fname, pos, rd_len)
         return len(self.data) > 0
 
@@ -158,9 +158,12 @@ class FTPReadCmd(FTPCmd):
         try:
             data = None
             with open(name, "rb") as f:
-                if pos:
+                if pos is not None:
                     f.seek(pos)
-                data = f.read(rd_len)
+                if rd_len:
+                    data = f.read(rd_len)
+                else:
+                    data = f.read()
         except Exception as e:
             print("FTPCmd.read failed %s" % e)
         return data
