@@ -1,13 +1,13 @@
-# Proof-of-concept of a FTP over BLE UART.
+# Proof-of-concept of a FTP over BLE UART
 from machine import Timer
 from ble_uart_peripheral import BLEUART
 from ftp_cmd import *
 
 
-class BLEUARTFTP(BLEUART):
+class BLEUARTFTP:
     def __init__(self, uart=None):
         if uart is None:
-            uart = BLEUART(service_uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA77", rx_uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA77", tx_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA77")
+            uart = BLEUART(name="BLEUARTFTP", service_uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA77", rx_uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA77", tx_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA77")
         self._uart = uart
         self._tx_buf = bytearray()
         self.tx_max_len = 100
@@ -26,9 +26,9 @@ class BLEUARTFTP(BLEUART):
 
     def on_connect_status_changed(self, is_connected):
         if is_connected:
-            print("BLEUART_FTP Connected")
+            print("BLEUARTFTP CONNECTED")
         else:
-            print("BLEUART_FTP - DISCONNECTED")
+            print("BLEUARTFTP - DISCONNECTED")
 
     def read(self, sz=None):
         return self._uart.read(sz)

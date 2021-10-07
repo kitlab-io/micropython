@@ -1,9 +1,14 @@
-# This example demonstrates a peripheral implementing the Nordic UART Service (NUS).
+# This example demonstrates a peripheral implementing the Nordic UART Service
 from network import Bluetooth
+import time
 import binascii
 _UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
+_UART_TX_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+_UART_RX_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 
 def uuid2bytes(uuid):
+    if type(uuid) == int:
+        return uuid
     uuid = uuid.encode().replace(b'-',b'')
     tmp = binascii.unhexlify(uuid)
     return bytes(reversed(tmp))
@@ -15,7 +20,7 @@ class BLEMANAGER(object):
             print('Creating the BLEMANAGER object')
             cls._instance = super(BLEMANAGER, cls).__new__(cls)
             print("BLEMANAGER: init")
-            cls._instance.ble = Bluetooth(mtu=200)
+            cls._instance.ble = Bluetooth()
             cls._instance.ble.set_advertisement(name='JEM', service_uuid=uuid2bytes(_UART_SERVICE_UUID))
             cls._instance.ble.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED, handler=cls._instance.connected_callback)
             cls._instance._connected_handlers = []
@@ -36,10 +41,12 @@ class BLEMANAGER(object):
             for handler in self._connected_handlers:
                 handler(events)
 
+
 class BLEUART:
-    def __init__(self, bleman=None, name="BLEUART", service_uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E", rx_uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E", tx_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"):
+    def __init__(self, bleman=None, name="BLEUART", service_uuid = None, rx_uuid = None, tx_uuid = None):
         if bleman is None:
             bleman = BLEMANAGER()
+            time.sleep(0.2)
         self.bleman = bleman
         self.service = self.bleman.ble.service(uuid=uuid2bytes(service_uuid), isprimary=True, nbr_chars=2)
         self.rx_characteristic = self.service.characteristic(uuid=uuid2bytes(rx_uuid))
@@ -60,7 +67,7 @@ class BLEUART:
 
     def rx_cb_handler(self, chr, data=None):
         events = chr.events()
-        if  events & Bluetooth.CHAR_WRITE_EVENT:
+        if events & Bluetooth.CHAR_WRITE_EVENT:
             self._rx_buffer += chr.value()
             if self.rx_notifiy_callback:
                 self.rx_notifiy_callback()

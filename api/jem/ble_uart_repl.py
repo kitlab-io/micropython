@@ -2,14 +2,16 @@
 
 import uos
 from machine import Timer
-from ble_uart_peripheral import BLEUART
+from ble_uart_peripheral import BLEUART, _UART_SERVICE_UUID, _UART_TX_UUID, _UART_RX_UUID
 
 _MP_STREAM_POLL = const(3)
 _MP_STREAM_POLL_RD = const(0x0001)
 
 # Simple buffering stream to support the dupterm requirements.
-class BLEUARTStream():
-    def __init__(self, uart=BLEUART()):
+class BLEUARTStream:
+    def __init__(self, uart=None):
+        if uart is None:
+            uart = BLEUART(name="BLEUARTREPL", service_uuid = _UART_SERVICE_UUID, rx_uuid = _UART_RX_UUID, tx_uuid = _UART_TX_UUID )
         self._uart = uart
         self._tx_buf = bytearray()
         self.tx_max_len = 100
