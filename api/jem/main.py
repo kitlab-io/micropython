@@ -1,5 +1,7 @@
 #main.py
-print("hello world!")
+from kits import kit_main
+kit_main.load_kit()
+
 from network import WLAN
 def setup_wifi():
     wlan = WLAN()

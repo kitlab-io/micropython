@@ -1,13 +1,13 @@
-# Proof-of-concept of a FTP over BLE UART
+# Proof-of-concept of a Kit Remote Control over BLE UART
 from machine import Timer
 from ble_uart_peripheral import BLEUART
 from ftp_cmd import *
 
 
-class BLEUARTFTP:
+class BLEUARTREMOTECONTROL:
     def __init__(self, uart=None):
         if uart is None:
-            uart = BLEUART(name="BLEUARTFTP", service_uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA77", rx_uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA77", tx_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA77")
+            uart = BLEUART(name="BLEUARTREMOTECONTROL", service_uuid = 0xCA33, rx_uuid = 0xCB33, tx_uuid = 0xCC33)
         self._uart = uart
         self._tx_buf = bytearray()
         self.tx_max_len = 100
@@ -16,7 +16,6 @@ class BLEUARTFTP:
         self.prev_term = None
         self._timer = None
         self._uart.set_rx_notify_callback(self.rx_notification)
-        self.ftp_cmd_manager = FTPCMDManager()
 
     def _wrap_flush(self, alarm):
         self._flush()
@@ -26,9 +25,9 @@ class BLEUARTFTP:
 
     def on_connect_status_changed(self, is_connected):
         if is_connected:
-            print("BLEUARTFTP - CONNECTED")
+            print("BLEUARTREMOTECONTROL - CONNECTED")
         else:
-            print("BLEUARTFTP - DISCONNECTED")
+            print("BLEUARTREMOTECONTROL - DISCONNECTED")
 
     def read(self, sz=None):
         return self._uart.read(sz)
@@ -37,15 +36,22 @@ class BLEUARTFTP:
         # we got some data!
         try:
             data = self.read()
-            self.update(data)
-            #print("rx_notification: %s" % data)
+            resp = self.cmd_handler(data)
+            if resp:
+                self.write(resp)
         except Exception as e:
-            print("BLEUARTFTP rx_notification failed - %s" % e)
+            print("BLEUARTREMOTECONTROL rx_notification failed: %s" % e)
 
-    def update(self, data):
-        resp = self.ftp_cmd_manager.update(data)
-        if resp:
-            self.write(resp)
+    def cmd_handler(self, data):
+        #cmd_handler is called when the RemoteControlBleService receives a valid message from the App over BLE
+        resp = "ok"
+        try:
+            code = data.decode("utf-8") # convert to string instead of byte array
+            eval(code) # example: eval("move(50,40)") will move car left =50, right=40
+        except Exception as e:
+            resp = "cmd_handler failed: %s" % e
+            print(resp)
+        return resp
 
     def _flush(self):
         data = self._tx_buf[0:self.tx_max_len]
