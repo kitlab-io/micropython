@@ -3,9 +3,10 @@ Call the desired kit code here and initialized in load_kit method
 jem/main.py will call load kit_main.load_kit  on startup
 
 ex:
-def load_kit(rc_ble_service):
+def load_kit():
     from drone_kit import DroneKit
     kit = DroneKit()
+    kit.start()
     return kit
 
 main.py:
