@@ -1,47 +1,50 @@
-# JEM micropython api
-Micropython code for JEM
+# Micropython for JEM
+Micropython code for JEM core
 
-## Install Instructions 
-- Clone repo
+## Quickstart
+### Install Atom IDE + Pymakr plugin
+- [Atom IDE Download](https://atom.io/)
+- [Atom Pymakr Plugin](https://atom.io/packages/pymakr)
+   + Used by Atom to talk to JEM Micropython
+
+### Flash latest Kitlab JEM Micropython to board
+- Download / unzip latest Kitlab JEM micropython [release](https://github.com/kitlab-io/micropython/releases)
+- Open Atom IDE and open directory **./micropython/api/jem**
+- Turn on JEM board
+- Open Pymakr terminal which will appear at bottom of Atom IDE
+- Click 'Connect' to talk to JEM
+- Click 'Upload' to flash latest code to JEM
+
+### Run Demo application
+- JEM Micropython code comes installed with a simple demo app
+- With Pymakr terminal open and connect to JEM, press 'Enter' key several times on the terminal to get REPL prompt
+- Execute JEM Demo App using following micropython commands from REPL
 ```bash
->> https://github.com/kitlab-io/micropython.git
+>> demo = jem.Demo()
+
+# 1) Make noise when button pressed
+>> demo.start_button_buzzer(freq_hz = 100)
+# now just press button
+>> demo.start_button_buzzer(freq_hz = 400)
+# try again ...
+
+# 2) Make noise with motion
+>> demo.start_motion_buzzer(min_freq_hz = 100, max_freq_hz = 500)
+# now move JEM fast and slow to make low or high pitch sounds
+
+# 3) Make color with range sensor
+>> demo.start_color_range()
+# move your hand closely over the sensors window and then slowly move up / down - color led should change
 ```
-- Connect JEM Board to battery OR Micro USB Cable OR both
-- Press JEM power button for 0.5 - 2 seconds and make sure BLUE led is ON (RGB LED will also toggle on/off every 4 seconds if new board)
-- Install [Atom IDE](https://atom.io/)
-- Install [Pymakr Atom Plugin](https://atom.io/packages/pymakr) to interface with JEM Pycom MCU
-   + Required for first time JEM micropython install
-- Open Jem Micropython directory **/micropython/api/jem/**  with Atom
-   + IMPORTANT: make sure Atom opens **/micropython/api/jem/** and not **/micropython/api/**
-      + there is a bug that prevents some of our libraries from importing correctly (which we will fix!)
-- Your Atom IDE Project Directory should look like:
-   + jem
-      + app
-      + drivers
-      + helpers
-      + testing
-      + __init__.py
-      + main.py
-      + jem.py
-      + ...etc
-- Enable Pymakr terminal by selecting 'Packages -> Pymakr -> Toggle Pycom Console' in Atom toolbar
-- If using USB
-   + Click 'Connect' in Pymakr terminal and select suggested serial port
-- If no USB, make sure JEM is on and go to your WiFi settings and connect to the JEM board (wlanxxxx)
-   + Then Click 'Connect' in Pymakr terminal and select the WiFi ip address provided
-- Make sure pycom firmware version is one of the version we support - see [Supported Pycom Firmware](https://github.com/kitlab-io/micropython/blob/main/README.md#pycom-firmware-upgrade-instructions)
-   + Click on the 'Get Device Info' icon in terminal left hand corner
-- Click on 'Upload' icon to flash latest JEM micropython to board
+- Type help to get more demo options
+```bash
+>> demo.help()
+```
 
-### JEM Upload new micropython code
-- Open Atom (with Pymakr plugin)
-- Open the /micropython/api/jem directory (**IMPORTANT:** make sure your root is the **jem** dir, not **api/jem**)
-- Connect to JEM via USB using the 'Connect' button
-- Click 'Upload'
+## Advanced
+Users can control JEM gpio, pwm, adc, dac, uart and read from sensors
 
-### JEM API Quickstart
-#### Pycom specific micropython api
-See [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/) - for general micropython control of GPIO, I2C, SPI, UART and other features of the JEM Pycom MCU
+### Simple GPIO test
 ```python
 from machine import Pin
 
@@ -52,52 +55,27 @@ p_out.value(0)
 p_out.toggle()
 p_out(True)
 ```
-- See section [JEM Board Pinout](https://github.com/kitlab-io/micropython/blob/main/README.md#jem-board-pinout)
 
-#### JEM sensors api
-##### IMU
-```python
-from jemimu import JemIMU
-imu = JemIMU()
-pos = imu.orientation
+- For more examples see [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/)
+
+
+## Connect over WiFi
+- Open Atom IDE and connect to JEM over Pymakr terminal
+- In REPL type
+```bash
+>> from jemwifi import *
+>> wifi = setup_wifi(name="JemWifi") # can use any name you want
 ```
 
-### BLE REPL Test
-- Turn on JEM with power button (Blue LED should be flashing)
-- Visit the Online [Micropython Bluetooth REPL](https://glennrub.github.io/webbluetooth/micropython/repl/)
-- Click the 'CONNECT' button and then click on the 'JEM' device
-- Now click on the terminal and press enter a couple times and you should see JEM respond with '>>>'
-- You can enable or disable the Blue LED as an example
+- Open your Wifi network and look for 'JemWifi' then connect
+- Now go back to Atom IDE and click 'Connect'
+   + select '192.168.4.1'
+- Now you can talk to JEM over Wifi and don't need USB cable
+- To keep this setting after reset, put the following code in main.py
 ```python
->>>from pycom import heartbeat
->>>hearbeat(False) #verify this disables LED
->>>heartbeat(True) #verify this enabled the flashing LED again
+from jemwifi import *
+wifi = setup_wifi(name="JemWifi")
 ```
-- That's it!
-- NOTE: this BLE app is limited and does not support full Micropython REPL features so should only be used to verify BLE works
-- For JEM BLE APP IDE see: https://github.com/kitlab-io/app
+- Then 'Upload' code to board
 
-## Pycom Firmware Upgrade Instructions
-- Only upgrade if firmware on Pycom is not version we support 
-
-### JEM V5.1.0
-- Working with [Pycom Firmware Release 1.20.2.r4](https://github.com/pycom/pycom-micropython-sigfox/releases/tag/v1.20.2.r4)
-
-### Legacy Supported Pycom Firmware for JEM 0.4.0
-- Older JEM V0.4.0 only supports Pycom firmware:
-   + WiPy-1.18.2.r7.tar.gz
-   + WiPy-1.18.2.r6.tar.gz
-   + WiPy-1.18.2.r5.tar.gz
-- Do not use latest Pycom firmware as there are known Bluetooth issues
-
-### Using micro usb cable
-- To upgrade the JEM Pycom WiPy MCU with the latest firmware follow instructions here
-   + https://docs.pycom.io/gettingstarted/installation/firmwaretool.html
-   + Make sure you have a micro usb cable to upgrade with
-   + For JEM, connect jumper wires between LED_IN pin and GND and then reset board to force JEM into bootloader mode
-      + If you don't do this before running the Pycom firmware upgrade application JEM won't upgrade
-   + Make sure to use the legacy firmware mentioned above and not the firmware Pycom automatically assignes 
-   
-## JEM Board Pinout
-For latest prototype board manufactured: [V0.4.0](https://github.com/kitlab-io/electronics/releases/tag/0.4.0)
-![Image of JEM Board](docs/pcb-assembly-v0.4.0-image.png)
+## JEM Board
