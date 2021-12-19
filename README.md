@@ -58,7 +58,7 @@ p_out(True)
 
 - For more examples see [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/)
 
-### JEM sensors api
+### JEM Sensors
 ```python
 from jemimu import JemIMU
 imu = JemIMU()
@@ -83,10 +83,11 @@ bar.read()
 from drivers import button
 btn = button.Button()
 btn.read() # should return 0 or 1 depending if pressed
+
+# add buzzer instructions
+
+# add rgb led instructions
 ```
-
-
-
 
 ## Connect over WiFi
 - Open Atom IDE and connect to JEM over Pymakr terminal
