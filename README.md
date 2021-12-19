@@ -95,10 +95,10 @@ btn.read() # should return 0 or 1 depending if pressed
 >> from jemwifi import *
 >> wifi = setup_wifi(name="JemWifi") # can use any name you want
 ```
-
 - Open your Wifi network and look for 'JemWifi' then connect
 - Now go back to Atom IDE and click 'Connect'
    + select '192.168.4.1'
+   + If you don't see an IP Address option restart Atom
 - Now you can talk to JEM over Wifi and don't need USB cable
 - To keep this setting after reset, put the following code in main.py
 ```python
@@ -108,3 +108,4 @@ wifi = setup_wifi(name="JemWifi")
 - Then 'Upload' code to board
 
 ## JEM Board
+![Image of JEM Board V5.1.0](docs/JEM-V5.1.0-drawing.png)
