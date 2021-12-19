@@ -110,3 +110,7 @@ wifi = setup_wifi(name="JemWifi")
 
 ## JEM Board
 ![Image of JEM Board V5.1.0](docs/JEM-V5.1.0-drawing.png)
+
+## Update JEM Pycom WIPY 3.0 firmware
+- [pycom firmware update](https://docs.pycom.io/updatefirmware/device/)
+  + Make sure to use firmware version specified in the JEM Micropython [Releases](https://github.com/kitlab-io/micropython/releases)
