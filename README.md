@@ -1,4 +1,4 @@
-# Micropython for JEM
+# JEM Micropython
 Micropython code for JEM core
 
 ## Quickstart
@@ -17,7 +17,7 @@ Micropython code for JEM core
 
 ### Run Demo application
 - JEM Micropython code comes installed with a simple demo app
-- With Pymakr terminal open and connect to JEM, press 'Enter' key several times on the terminal to get REPL prompt
+- With Pymakr terminal open and connected to JEM, press 'Enter' key several times on the terminal to get REPL prompt
 - Execute JEM Demo App using following micropython commands from REPL
 ```bash
 >> demo = jem.Demo()
