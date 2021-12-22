@@ -39,12 +39,12 @@ import jembarometer
 import jemimu
 import jemlight
 import jemrange
+import jembuzzer
+import jemled
 from drivers import button
 from drivers import peripherals
 
 class Jem(object):
-    """Abstraction layer for JEM hardware module
-    """
     def __init__(self):
         self.imu = jemimu.JemIMU()
         self.distance = jemrange.JemRange()
@@ -52,3 +52,5 @@ class Jem(object):
         self.battery = jembattery.JemBattery()
         self.barometer = jembarometer.JemBarometer()
         self.btn = button.Button()
+        self.buzzer = jembuzzer.JemBuzzer()
+        self.led = jemled.JemLed()
