@@ -4,5 +4,6 @@
 from jemwifi import *
 
 wifi = setup_wifi()
-from kits.demo.neopixel import Neopixel
-pix = Neopixel()
+from kits.demo.demo import Demo
+
+demo = Demo()

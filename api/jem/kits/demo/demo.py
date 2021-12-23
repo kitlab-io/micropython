@@ -1,8 +1,9 @@
 # demo.py
 # run some example code to demonstrate JEM features
 from jem import Jem
-from neopixel import Neopixel
+from kits.demo.neopixel import Neopixel
 import pycom
+# test
 class Demo:
     def __init__(self):
         self.jem = Jem()
