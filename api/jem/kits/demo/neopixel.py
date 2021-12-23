@@ -97,18 +97,18 @@ class Neopixel:
                 utime.sleep_ms(wait)
 
     # sparkle the LEDs to the set color
-    def sparkle(self, c, wait=DEFAULT_WAIT_MS):
+    def sparkle(self, c=(127, 127, 127), wait=DEFAULT_WAIT_MS):
         pixel = int.from_bytes(os.urandom(1), "big") % self.num_leds
         pixel2 = int.from_bytes(os.urandom(1), "big") % self.num_leds
-        data[pixel] = c
-        data[pixel2] = c
+        self.data[pixel] = c
+        self.data[pixel2] = c
         self.chain.show( self.data )
         utime.sleep_ms(wait)
         self.data[pixel] = (0,0,0)
         self.data[pixel2] = (0,0,0)
 
     # Fade the brightness up  down and update a brightness parameter for other modes.
-    def fade(self, c, wait=DEFAULT_WAIT_MS):
+    def fade(self, c=(127, 127, 127), wait=DEFAULT_WAIT_MS):
     # Increases brightness
         for i in range(0, 50, 1):
             self.chain.set_brightness(i)
@@ -126,7 +126,7 @@ class Neopixel:
             self.solid(c, 0)
 
     # Display a single colour on all LEDs.
-    def solid(self, c, wait=DEFAULT_WAIT_MS):
+    def solid(self, c=(127, 127, 127), wait=DEFAULT_WAIT_MS):
         for i in range(0, self.num_leds, 1):
     # Color set by user variable c and that color's position on the wheel
             self.data[i] = c

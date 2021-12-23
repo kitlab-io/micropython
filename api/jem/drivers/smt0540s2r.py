@@ -9,7 +9,7 @@ class SMT0540S2R:
         self.freq_hz = freq_hz
         self.channel = channel
         self.pwm = PWM(self.channel, self.freq_hz)
-        self.pwm_sig = self.pwm.channel(self.channel, pin=self.sig_pin, duty_cycle=SMT0540S2R.DUTY_CYCLE)
+        self.pwm_sig = self.pwm.channel(self.channel, pin=self.sig_pin, duty_cycle=0)
 
     def start(self, freq_hz=100):
         self.pwm = PWM(self.channel, freq_hz)
