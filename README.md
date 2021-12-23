@@ -25,7 +25,10 @@ Micropython code for JEM core
 >> demo.jem.imu.orientation # show roll, pitch, yaw degrees
 >> demo.jem.buzzer.start(freq_hz = 100) # make buzzer sound
 >> demo.jem.buzzer.stop()
->> demo.neopixel.rainbow() # do some fancy lantern led show
+>> demo.neopixel.sparkle() # randomly turns on two leds, default color is white but you can change
+>> demo.neopixel.sparkle(c=(127,0,0)) # sparkle red
+>> demo.neopixel.sparkle(c=(0,0,127)) # sparkle blue
+>> demo.neopixel.rainbow() # do some fancy lantern led show (take about 15 seconds)
 >> demo.jem.btn.read() # read button value
 ```
 
