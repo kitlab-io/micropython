@@ -20,25 +20,13 @@ Micropython code for JEM core
 - With Pymakr terminal open and connected to JEM, press 'Enter' key several times on the terminal to get REPL prompt
 - Execute JEM Demo App using following micropython commands from REPL
 ```bash
->> demo = jem.Demo()
-
-# 1) Make noise when button pressed
->> demo.start_button_buzzer(freq_hz = 100)
-# now just press button
->> demo.start_button_buzzer(freq_hz = 400)
-# try again ...
-
-# 2) Make noise with motion
->> demo.start_motion_buzzer(min_freq_hz = 100, max_freq_hz = 500)
-# now move JEM fast and slow to make low or high pitch sounds
-
-# 3) Make color with range sensor
->> demo.start_color_range()
-# move your hand closely over the sensors window and then slowly move up / down - color led should change
-```
-- Type help to get more demo options
-```bash
->> demo.help()
+>> demo.jem.led.set_color(0x880000) # jem red rgb led
+>> demo.jem.led.set_color(0x000088) # jem blue rgb led
+>> demo.jem.imu.orientation # show roll, pitch, yaw degrees
+>> demo.jem.buzzer.start(freq_hz = 100) # make buzzer sound
+>> demo.jem.buzzer.stop()
+>> demo.neopixel.rainbow() # do some fancy lantern led show
+>> demo.jem.btn.read() # read button value
 ```
 
 ## Advanced
