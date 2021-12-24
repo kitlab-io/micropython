@@ -5,9 +5,9 @@ from kits.demo.neopixel import Neopixel
 import pycom
 # test
 class Demo:
-    def __init__(self):
+    def __init__(self, neopixel_leds=64):
         self.jem = Jem()
-        self.neopixel = Neopixel()
+        self.neopixel = Neopixel(num_leds=neopixel_leds)
 
     def toggle_led(color1=0x440000, color2=0x004400, duration=10.0):
         start = time.time()
