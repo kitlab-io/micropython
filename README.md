@@ -33,6 +33,14 @@ Micropython code for JEM core
 >> demo.jem.btn.read() # read button value
 ```
 
+### Neopixel + IMU
+```bash
+>> demo = Demo()
+>> demo.start_sparkle_motion_thread(count=25, rainbow=True)
+>> # now move the jem around a bit (around the roll axis is best)
+>> demo.stop_sparkle_motion_thread()
+```
+
 ## Advanced
 Users can control JEM gpio, pwm, adc, dac, uart and read from sensors
 
