@@ -135,3 +135,10 @@ class Neopixel:
             self.data[i] = c
         self.chain.show( self.data )
         utime.sleep_ms(wait)
+
+    def set_pixels(self, start_pixel, end_pixel, c=(127,127,127), dir=1):
+        for i in range(start_pixel, end_pixel, dir):
+            if i >= self.num_leds or i < 0:
+                continue
+            self.data[i] = c
+        self.chain.show( self.data )
