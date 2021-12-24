@@ -20,14 +20,15 @@ Micropython code for JEM core
 - With Pymakr terminal open and connected to JEM, press 'Enter' key several times on the terminal to get REPL prompt
 - Execute JEM Demo App using following micropython commands from REPL
 ```bash
+>> demo = Demo(neopixel_leds=64)
 >> demo.jem.led.set_color(0x880000) # jem red rgb led
 >> demo.jem.led.set_color(0x000088) # jem blue rgb led
 >> demo.jem.imu.orientation # show roll, pitch, yaw degrees
 >> demo.jem.buzzer.start(freq_hz = 100) # make buzzer sound
 >> demo.jem.buzzer.stop()
->> demo.neopixel.sparkle() # randomly turns on two leds, default color is white but you can change
->> demo.neopixel.sparkle(c=(127,0,0)) # sparkle red
->> demo.neopixel.sparkle(c=(0,0,127)) # sparkle blue
+>> demo.neopixel.sparkle(count=10) # randomly turns on ten leds, default color is white but you can change
+>> demo.neopixel.sparkle(count=10, c=(127,0,0)) # sparkle red
+>> demo.neopixel.sparkle(count=10, c=(0,0,127)) # sparkle blue
 >> demo.neopixel.rainbow() # do some fancy lantern led show (take about 15 seconds)
 >> demo.jem.btn.read() # read button value
 ```
