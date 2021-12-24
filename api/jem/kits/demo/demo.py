@@ -5,21 +5,21 @@ from kits.demo.neopixel import Neopixel
 import pycom
 import _thread
 import time
-# test
+# Demo
 class Demo:
     def __init__(self, neopixel_leds=64):
         self.jem = Jem()
         self.neopixel = Neopixel(num_leds=neopixel_leds)
         self._run = False
 
-    def _sparkle_with_motion(self):
+    def _sparkle_with_motion(self, rainbow=False, count=10):
         # don't call this directly!
         # use the start_sparkle_motion_thread
         diff_roll = 0.0
         prev_roll = self.jem.imu.orientation['roll']
         while self._run:
             if diff_roll >= 0.5:
-                self.neopixel.sparkle(count=10)
+                self.neopixel.sparkle(count=count, random_color=rainbow)
             time.sleep(0.1)
 
             new_roll = self.jem.imu.orientation['roll']
@@ -27,9 +27,9 @@ class Demo:
             prev_roll = new_roll
 
 
-    def start_sparkle_motion_thread(self):
+    def start_sparkle_motion_thread(self, rainbow=True, count=10):
         self._run = True
-        _thread._start_new_thread(self.sparkle_with_motion, ())
+        _thread.start_new_thread(self._sparkle_with_motion, (rainbow, count))
 
     def stop_sparkle_motion_thread(self):
         self._run = False

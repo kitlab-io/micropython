@@ -6,4 +6,4 @@ global wlan
 wlan = setup_wifi()
 from kits.demo.demo import Demo
 
-#demo = Demo()
+#demo = Demo() # run demo to use neopixels for example

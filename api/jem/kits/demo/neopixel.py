@@ -96,11 +96,13 @@ class Neopixel:
                 self.chain.show( data )
                 utime.sleep_ms(wait)
 
-    # sparkle the LEDs to the set color
-    def sparkle(self, c=(127, 127, 127), wait=DEFAULT_WAIT_MS, count=2):
+    # sparkle the LEDs to the set color or random
+    def sparkle(self, c=(127, 127, 127), wait=DEFAULT_WAIT_MS, count=2, random_color=False):
         pixels = [0]*count
         for i in range(len(pixels)):
             pixels[i] = int.from_bytes(os.urandom(1), "big") % self.num_leds
+            if random_color:
+                c = wheel(int.from_bytes(os.urandom(1), "big")  % 255)
             self.data[pixels[i]] = c
         self.chain.show( self.data )
         utime.sleep_ms(wait)
