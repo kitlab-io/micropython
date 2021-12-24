@@ -2,8 +2,8 @@
 #from kits import kit_main
 #kit_main.load_kit()]
 from jemwifi import *
-
-wifi = setup_wifi()
+global wlan
+wlan = setup_wifi()
 from kits.demo.demo import Demo
 
-demo = Demo()
+#demo = Demo()

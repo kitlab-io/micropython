@@ -97,15 +97,16 @@ class Neopixel:
                 utime.sleep_ms(wait)
 
     # sparkle the LEDs to the set color
-    def sparkle(self, c=(127, 127, 127), wait=DEFAULT_WAIT_MS):
-        pixel = int.from_bytes(os.urandom(1), "big") % self.num_leds
-        pixel2 = int.from_bytes(os.urandom(1), "big") % self.num_leds
-        self.data[pixel] = c
-        self.data[pixel2] = c
+    def sparkle(self, c=(127, 127, 127), wait=DEFAULT_WAIT_MS, count=2):
+        pixels = [0]*count
+        for i in range(len(pixels)):
+            pixels[i] = int.from_bytes(os.urandom(1), "big") % self.num_leds
+            self.data[pixels[i]] = c
         self.chain.show( self.data )
         utime.sleep_ms(wait)
-        self.data[pixel] = (0,0,0)
-        self.data[pixel2] = (0,0,0)
+
+        for i in range(len(pixels)):
+            self.data[pixels[i]] = (0,0,0)
 
     # Fade the brightness up  down and update a brightness parameter for other modes.
     def fade(self, c=(127, 127, 127), wait=DEFAULT_WAIT_MS):
