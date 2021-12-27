@@ -30,6 +30,7 @@ class Neopixel:
         self.chain = WS2812(num_leds=num_leds, brightness=brightness, data_pin='P11' )
         self.num_leds = num_leds
         self.data = [(0,0,0)] * num_leds
+
     # Cycles all the lights through rainbow colors
     def rainbow(self, wait=DEFAULT_WAIT_MS):
         for j in range (0,256,1):
@@ -142,3 +143,12 @@ class Neopixel:
                 continue
             self.data[i] = c
         self.chain.show( self.data )
+
+    def clear_display(self):
+		self.chain.clear()
+        self.chain.send_buf()
+
+    def update_display(self, num_modified_pixels):
+		if not num_modified_pixels:
+			return
+		self.chain.send_buf()

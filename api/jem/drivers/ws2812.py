@@ -15,22 +15,6 @@ from machine import enable_irq
 from uos import uname
 
 class WS2812:
-    """
-    Driver for WS2812 RGB LEDs. May be used for controlling single LED or chain
-    of LEDs.
-
-    Example of use:
-
-        chain = WS2812( num_leds=4, brightness=10, dataPin='P11' )
-        data = [
-            (255, 0, 0),    # red
-            (0, 255, 0),    # green
-            (0, 0, 255),    # blue
-            (85, 85, 85),   # white
-        ]
-        chain.show(data)
-
-    """
     # Values to put inside SPI register for each color's bit
     buf_bytes = (b'\xE0\xE0', # 0  0b00
                  b'\xE0\xFC', # 1  0b01
@@ -38,12 +22,6 @@ class WS2812:
                  b'\xFC\xFC') # 3  0b11
 
     def __init__(self, num_leds=1, brightness=100, data_pin='P11'):
-        """
-        Params:
-        * num_leds = count of LEDs
-        * brightness = light brightness (integer : 0 to 100%)
-        * dataPin = pin to connect data channel (LoPy4 only)
-        """
         self.num_leds = num_leds
         self.brightness = brightness
 
@@ -64,37 +42,20 @@ class WS2812:
         self.show([])
 
     def show(self, data):
-        """
-        Show RGB data on LEDs. Expected data = [(R, G, B), ...] where R, G and B
-        are intensities of colors in range from 0 to 255. One RGB tuple for each
-        LED. Count of tuples may be less than count of connected LEDs.
-        """
         self.fill_buf(data)
         self.send_buf()
 
     def send_buf(self):
-        """
-        Send buffer over SPI.
-        """
         disable_irq()
         self.spi.write(self.buf)
         enable_irq()
         gc.collect()
 
+    def put_pixel(self, addr, red, green, blue):
+        c = (red, green, blue)
+        self.update_buf(c, start=addr)
+
     def update_buf(self, data, start=0):
-        """
-        Fill a part of the buffer with RGB data.
-
-        Order of colors in buffer is changed from RGB to GRB because WS2812 LED
-        has GRB order of colors. Each color is represented by 4 bytes in buffer
-        (1 byte for each 2 bits).
-
-        Returns the index of the first unfilled LED
-
-        Note: If you find this function ugly, it's because speed optimisations
-        beated purity of code.
-        """
-
         buf = self.buf
         buf_bytes = self.buf_bytes
         brightness = self.brightness
@@ -125,11 +86,6 @@ class WS2812:
         return index // 24
 
     def fill_buf(self, data):
-        """
-        Fill buffer with RGB data.
-
-        All LEDs after the data are turned off.
-        """
         end = self.update_buf(data)
 
         # Turn off the rest of the LEDs
@@ -140,7 +96,13 @@ class WS2812:
             index += 2
 
     def set_brightness(self, brightness):
-        """
-        Set brighness of all leds
-        """
         self.brightness = brightness
+
+
+    def clear(self):
+		# turn off the rest of the LEDs
+		buf = self.buf
+		off = self.buf_bytes[0]
+		for index in range(self.buf_length):
+			buf[index] = off
+			index += 1
