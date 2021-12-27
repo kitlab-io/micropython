@@ -104,5 +104,5 @@ class WS2812:
 		buf = self.buf
 		off = self.buf_bytes[0]
 		for index in range(self.buf_length):
-			buf[index] = off
-			index += 1
+			buf[index:index+2] = off
+			index += 2

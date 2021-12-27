@@ -1,0 +1,51 @@
+{
+  "networks": [
+    {
+      "ssid":"thompson",
+      "password":"6262005346korea"
+    },
+  ],
+  "port": "/dev/ttyACM0",
+  "baudrate": 115200,
+  "remapConsole": false,
+  "sceneTimeout": 40,
+  "tzOffsetSeconds": 3600,
+  "LedMatrix": {
+    "debug": false,
+    "columns": 32,
+    "stride": 8,
+    "fps": 10
+  },
+  "Boot": {
+    "intensity": 0.03
+  },
+  "Animation": {
+    "intensity": 0.05,
+    "debug": false,
+    "icons": [
+        "icons/game-tetris.bin",
+        "icons/game-pingpong.bin",
+        "icons/newyears.bin",
+        "icons/matrix.bin",
+        "icons/game-invaders-1.bin",
+        "icons/game-invaders-2.bin",
+        "icons/tv-movie.bin"
+    ]
+  },
+  "Clock": {
+    "intensity": 0.05,
+    "debug": true
+  },
+  "disabledDemo": {
+    "intensity": 0.05
+  },
+  "Fire": {
+    "intensity": 0.05
+  },
+  "Weather": {
+    "intensity": 0.05,
+    "debug": true,
+    "lat": 59.3293,
+    "lon": 18.0686
+  }
+}

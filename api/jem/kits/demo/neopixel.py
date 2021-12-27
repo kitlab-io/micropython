@@ -145,10 +145,10 @@ class Neopixel:
         self.chain.show( self.data )
 
     def clear_display(self):
-		self.chain.clear()
+        self.chain.clear()
         self.chain.send_buf()
 
     def update_display(self, num_modified_pixels):
-		if not num_modified_pixels:
-			return
-		self.chain.send_buf()
+        if not num_modified_pixels:
+            return
+        self.chain.send_buf()

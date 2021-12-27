@@ -1,10 +1,11 @@
 # ledmatrix.py
 # Modified from: https://github.com/noahwilliamsson/lamatrix/blob/master/ledmatrix.py
 # Modified by: jbthompson.eng@gmail.com
+from kits.demo.neopixel import Neopixel
 
 class LedMatrix:
 	def __init__(self, config):
-        self.rtc = None
+		self.rtc = None
 		self.debug = False
 		self.stride = 8
 		self.columns = 32
@@ -28,13 +29,10 @@ class LedMatrix:
 		# For avoiding multiplications and divisions
 		self.num_modified_pixels = self.num_pixels  # optimization: avoid rendering too many pixels
 		# This is laid out in physical order
-		self.fb = [
-			bytearray(self.num_pixels*3),
-			bytearray(self.num_pixels*3),
-		]
+		self.fb = [bytearray(self.num_pixels*3), bytearray(self.num_pixels*3),]
 		self.fb_index = 0
 		# Initialize display
-        self.driver = Neopixel(num_leds=self.num_pixels)
+		self.driver = Neopixel(num_leds=self.num_pixels)
 
 	def xy_to_phys(self, x, y):
 		"""
@@ -318,11 +316,11 @@ class LedMatrix:
 		# There are still pixels to dissolve
 		return True
 
-    def set_rtc(self, scene):
+	def set_rtc(self, scene):
 		# Resynchronize RTC
 		self.rtc = RTC()
 		self.rtc.ntp_sync('ntps1-1.eecsit.tu-berlin.de')
-		print('HAL: Waiting for NTP sync')
+		print('LedMatrix: Waiting for NTP sync')
 		if type(scene) != int:
 			# Kludge: render RTC sync progress
 			frame = 0
