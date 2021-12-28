@@ -17,7 +17,7 @@ class WeatherScene:
 	This module displays a weather forecast from SMHI (Sweden)
 	"""
 
-	dir_prefix = 'weather/'
+	dir_prefix = '/flash/kits/demo/weather/'
 
 	def __init__(self, display, config):
 		"""
