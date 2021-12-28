@@ -2,6 +2,8 @@
 # Modified from: https://github.com/noahwilliamsson/lamatrix/blob/master/ledmatrix.py
 # Modified by: jbthompson.eng@gmail.com
 from kits.demo.neopixel import Neopixel
+import time
+from machine import RTC
 
 class LedMatrix:
 	def __init__(self, config):
@@ -319,7 +321,7 @@ class LedMatrix:
 	def set_rtc(self, scene):
 		# Resynchronize RTC
 		self.rtc = RTC()
-		self.rtc.ntp_sync('ntps1-1.eecsit.tu-berlin.de')
+		self.rtc.ntp_sync('pool.ntp.org')
 		print('LedMatrix: Waiting for NTP sync')
 		if type(scene) != int:
 			# Kludge: render RTC sync progress

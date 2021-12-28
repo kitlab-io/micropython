@@ -1,6 +1,6 @@
 from network import WLAN
 from machine import RTC
-from pixelfont import PixelFont
+from kits.demo.pixelfont import PixelFont
 
 class BootScene:
 	"""
@@ -68,4 +68,3 @@ class BootScene:
 		display.render_text(PixelFont, text, 1, 1, intensity)
 		display.render()
 		return True
-        

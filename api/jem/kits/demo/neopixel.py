@@ -152,3 +152,7 @@ class Neopixel:
         if not num_modified_pixels:
             return
         self.chain.send_buf()
+
+    def put_pixel(self, addr, red, green, blue):
+        c = [(red, green, blue)]
+        self.chain.update_buf(c, start=addr)

@@ -3,13 +3,13 @@
 import time
 import gc
 try:
-	import urequests as requests
+	import kits.demo.urequests as requests
 except ImportError:
 	import requests
 
 # Local imports
-from pixelfont import PixelFont
-from icon import Icon
+from kits.demo.pixelfont import PixelFont
+from kits.demo.icon import Icon
 
 # Based on demoscene.py
 class WeatherScene:
@@ -267,4 +267,3 @@ class WeatherScene:
 				break
 			stash.append(c[0])
 		return bytes(stash)
-        

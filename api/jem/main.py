@@ -4,6 +4,7 @@
 #from jemwifi import *
 #global wlan
 #wlan = setup_wifi()
-#from kits.demo.matrix_demo import MatrixDemo
+from kits.demo.matrix_demo import MatrixDemo
+d = MatrixDemo()
 print("hello world")
 #demo = Demo() # run demo to use neopixels for example

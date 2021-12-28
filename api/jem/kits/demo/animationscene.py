@@ -1,7 +1,7 @@
 # Render a box with up to three animations
 #
 import time
-from icon import Icon
+from kits.demo.icon import Icon
 
 class AnimationScene:
 	"""Render animations from https://developer.lametric.com"""

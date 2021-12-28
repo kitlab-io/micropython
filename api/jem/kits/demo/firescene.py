@@ -2,7 +2,7 @@ try:
 	from uos import urandom
 except:
 	from os import urandom
-from pixelfont import PixelFont
+from kits.demo.pixelfont import PixelFont
 
 class FireScene:
 	"""This module implements an example scene with a traveling pixel"""
@@ -87,4 +87,3 @@ class FireScene:
 		if not self.remaining_frames:
 			return False
 		return True
-        

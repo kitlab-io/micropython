@@ -4,6 +4,9 @@
       "ssid":"thompson",
       "password":"6262005346korea"
     },
+    {"ssid": "JoshiPhone8",
+      "password": "6f4x606rkvf78"
+    }
   ],
   "port": "/dev/ttyACM0",
   "baudrate": 115200,
@@ -23,13 +26,8 @@
     "intensity": 0.05,
     "debug": false,
     "icons": [
-        "icons/game-tetris.bin",
-        "icons/game-pingpong.bin",
-        "icons/newyears.bin",
-        "icons/matrix.bin",
-        "icons/game-invaders-1.bin",
-        "icons/game-invaders-2.bin",
-        "icons/tv-movie.bin"
+        "/flash/kits/demo/icons/game-brick.bin",
+        "/flash/kits/demo/icons/game-snake.bin",
     ]
   },
   "Clock": {

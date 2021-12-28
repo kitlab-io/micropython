@@ -29,19 +29,22 @@ class MatrixDemo:
 	def start(self):
 		# We're running under MCU here
 		from kits.demo.bootscene import BootScene
-		scene = BootScene(display, config['Boot'])
+		scene = BootScene(self.display, self.config['Boot'])
 		wlan = WLAN(mode=WLAN.STA)
 		if not wlan.isconnected():
 			print('WLAN: Scanning for networks')
 			scene.render(0,0,0)
 			default_ssid, default_auth = wlan.ssid(), wlan.auth()
 			candidates = wlan.scan()
-			for conf in config['networks']:
+			for c in candidates:
+				print("candidate: %s" % c)
+
+			for conf in self.config['networks']:
 				nets = [candidate for candidate in candidates if candidate.ssid == conf['ssid']]
 				if not nets:
 					continue
 				print('WLAN: Connecting to known network: {}'.format(nets[0].ssid))
-				wlan.connect(nets[0].ssid, auth=(nets[0].sec, conf['password']))
+				wlan.connect(ssid=conf['ssid'], auth=(WLAN.WPA2, conf['password']))
 				for i in range(1,40):
 					scene.render(i, 0, 0)
 					time.sleep(0.2)
@@ -52,48 +55,47 @@ class MatrixDemo:
 		scene.render(0, 0, 0)
 		if not wlan.isconnected():
 			# TODO: This will only use SSID/auth settings from NVRAM during cold boots
-			print('WLAN: No known networks, enabling AP with ssid={}, pwd={}'.format(default_ssid, default_auth[1]))
-			wlan.init(mode=WLAN.AP, ssid=default_ssid, auth=default_auth, channel=6)
+			print('WLAN: No known networks')
 		else:
-			display.clear()
+			self.display.clear()
 			print('WLAN: Connected with IP: {}'.format(wlan.ifconfig()[0]))
 			# Initialize RTC now that we're connected
-			display.set_rtc(scene)
+			self.display.set_rtc(scene)
 			scene.render(0,0,0)
 		scene = None
 		del BootScene
 
 
 		# This is where it all begins
-		r = RenderLoop(display, config)
+		r = RenderLoop(self.display, self.config)
 
-		if 'Clock' in config:
+		if 'Clock' in self.config:
 			from kits.demo.clockscene import ClockScene
-			scene = ClockScene(display, config['Clock'])
+			scene = ClockScene(self.display, self.config['Clock'])
 			r.add_scene(scene)
 			gc.collect()
 
-		if 'Demo' in config:
+		if 'Demo' in self.config:
 			from kits.demo.demoscene import DemoScene
-			scene = DemoScene(display, config['Demo'])
+			scene = DemoScene(self.display, self.config['Demo'])
 			r.add_scene(scene)
 			gc.collect()
 
-		if 'Weather' in config:
+		if 'Weather' in self.config:
 			from kits.demo.weatherscene import WeatherScene
-			scene = WeatherScene(display, config['Weather'])
+			scene = WeatherScene(self.display, self.config['Weather'])
 			r.add_scene(scene)
 			gc.collect()
 
-		if 'Fire' in config:
+		if 'Fire' in self.config:
 			from kits.demo.firescene import FireScene
-			scene = FireScene(display, config['Fire'])
+			scene = FireScene(self.display, self.config['Fire'])
 			r.add_scene(scene)
 			gc.collect()
 
-		if 'Animation' in config:
+		if 'Animation' in self.config:
 			from kits.demo.animationscene import AnimationScene
-			scene = AnimationScene(display, config['Animation'])
+			scene = AnimationScene(self.display, self.config['Animation'])
 			r.add_scene(scene)
 			gc.collect()
 

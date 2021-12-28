@@ -51,10 +51,6 @@ class WS2812:
         enable_irq()
         gc.collect()
 
-    def put_pixel(self, addr, red, green, blue):
-        c = (red, green, blue)
-        self.update_buf(c, start=addr)
-
     def update_buf(self, data, start=0):
         buf = self.buf
         buf_bytes = self.buf_bytes
