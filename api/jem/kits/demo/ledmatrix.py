@@ -86,11 +86,13 @@ class LedMatrix:
 		"""
 		Set pixel ni the to-be-displayed frame buffer"
 		"""
+		#print("put_pixel: %d, %d, %d, %d, %d" % (x,y,r,g,b))
 		if x > self.columns:
 			# TODO: proper fix for 16x16 displays
 			x -= self.stride
 			y += 8
 		if x >= self.columns or y >= self.stride:
+			#print("put_pixel failed: x >= self.columns or y >= self.stride")
 			return
 		pixel = self.xy_to_phys(x, y)
 		offset = pixel*3

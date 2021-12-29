@@ -69,15 +69,15 @@ class MatrixDemo:
 		# This is where it all begins
 		r = RenderLoop(self.display, self.config)
 
-		if 'Clock' in self.config:
-			from kits.demo.clockscene import ClockScene
-			scene = ClockScene(self.display, self.config['Clock'])
-			r.add_scene(scene)
-			gc.collect()
-
 		if 'Demo' in self.config:
 			from kits.demo.demoscene import DemoScene
 			scene = DemoScene(self.display, self.config['Demo'])
+			r.add_scene(scene)
+			gc.collect()
+			
+		if 'Clock' in self.config:
+			from kits.demo.clockscene import ClockScene
+			scene = ClockScene(self.display, self.config['Clock'])
 			r.add_scene(scene)
 			gc.collect()
 

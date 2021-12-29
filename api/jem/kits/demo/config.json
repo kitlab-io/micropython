@@ -11,7 +11,7 @@
   "port": "/dev/ttyACM0",
   "baudrate": 115200,
   "remapConsole": false,
-  "sceneTimeout": 40,
+  "sceneTimeout": 5,
   "tzOffsetSeconds": 3600,
   "LedMatrix": {
     "debug": false,
@@ -20,10 +20,10 @@
     "fps": 10
   },
   "Boot": {
-    "intensity": 0.03
+    "intensity": 1.0
   },
   "Animation": {
-    "intensity": 0.05,
+    "intensity": 1.0,
     "debug": false,
     "icons": [
         "/flash/kits/demo/icons/game-brick.bin",
@@ -31,17 +31,17 @@
     ]
   },
   "Clock": {
-    "intensity": 0.05,
+    "intensity": 1.0,
     "debug": true
   },
-  "disabledDemo": {
-    "intensity": 0.05
+  "Demo": {
+    "intensity": 1.0
   },
   "Fire": {
-    "intensity": 0.05
+    "intensity": 1.0
   },
   "Weather": {
-    "intensity": 0.05,
+    "intensity": 1.0,
     "debug": true,
     "lat": 59.3293,
     "lon": 18.0686

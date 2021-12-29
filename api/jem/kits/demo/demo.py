@@ -7,7 +7,7 @@ import _thread
 import time
 # Demo
 class Demo:
-    def __init__(self, neopixel_leds=64):
+    def __init__(self, neopixel_leds=256):
         self.jem = Jem()
         self.neopixel = Neopixel(num_leds=neopixel_leds)
         self._run = False
@@ -43,18 +43,18 @@ class Demo:
         while self._run:
             if diff_roll >= 0.5:
                 self.neopixel.sparkle(count=count, random_color=rainbow)
-            time.sleep(0.1)
+            time.sleep(0.01)
 
             new_roll = self.jem.imu.orientation['roll']
             diff_roll = abs(new_roll - prev_roll)
             prev_roll = new_roll
 
 
-    def start_sparkle_motion_thread(self, rainbow=True, count=10):
+    def start_sparkle_motion_thread(self, rainbow=True, count=100):
         self._run = True
         _thread.start_new_thread(self._sparkle_with_motion, (rainbow, count))
 
-    def start_leveler_motion_thread(self, rainbow=True, count=10):
+    def start_leveler_motion_thread(self, rainbow=True, count=100):
         self._run = True
         _thread.start_new_thread(self._leveler_with_motion, ())
 

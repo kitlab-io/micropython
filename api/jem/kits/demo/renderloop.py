@@ -29,6 +29,7 @@ class RenderLoop:
 		Add new scene to the render loop.
 		Called by main.py.
 		"""
+		print("add_scene: %s" % scene)
 		self.scenes.append(scene)
 
 	def next_frame(self, button_state=0):
