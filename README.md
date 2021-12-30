@@ -41,6 +41,23 @@ Micropython code for JEM core
 >> demo.stop_sparkle_motion_thread()
 ```
 
+### Run Demos from Led Matrix Library
+- From: https://github.com/noahwilliamsson/lamatrix
+- This is initialized by default in main.py
+```bash
+d.start_fire_scene()
+# note, if you want to use the weather scene, you will need to add your home router ssid / password to config.js in /api/jem/kits/demo/config.js
+# also, if you use the weather scene, your wifi repl won't work anymore (will fix later)
+# stop the scene from running over and over
+d.stop_render()
+# add a bunch of scenes that will loop over and over (you can change scene timeout in config.js
+d.start_fire_scene()
+d.start_demo_scene()
+d.start_animation_scene()
+```
+
+
+
 ## Advanced
 Users can control JEM gpio, pwm, adc, dac, uart and read from sensors
 
