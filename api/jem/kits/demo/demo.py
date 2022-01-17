@@ -25,6 +25,16 @@ class Demo:
             c = (0,0,0)
         self.neopixel.set_pixels(start_pixel=prev_last_pixel, end_pixel=last_pixel, c=c, dir=dir)
 
+    def _button_test(self):
+        while self._run:
+            if not self.jem.btn.read():
+                pycom.rgbled(0x008800)
+                time.sleep(0.1)
+            else:
+                pycom.rgbled(0x000000)
+                time.sleep(0.1)
+            time.sleep(0.1)
+
     def _leveler_with_motion(self):
         prev_roll = 0
         roll = self.jem.imu.orientation['roll']
@@ -63,6 +73,11 @@ class Demo:
 
     def stop_leveler_motion_thread(self):
         self._run = False
+
+    def start_button_test(self):
+        print("start_button_test")
+        self._run = True
+        _thread.start_new_thread(self._button_test, ())
 
     def toggle_led(self, color1=0x440000, color2=0x004400, duration=10.0):
         start = time.time()
