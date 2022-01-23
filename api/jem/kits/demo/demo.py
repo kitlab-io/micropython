@@ -7,10 +7,11 @@ import _thread
 import time
 # Demo
 class Demo:
-    def __init__(self, neopixel_leds=256):
+    def __init__(self, neopixel_leds=256, rc_ble_service=None):
         self.jem = Jem()
         self.neopixel = Neopixel(num_leds=neopixel_leds)
         self._run = False
+        self._rc_ble_service = rc_ble_service
 
     def leveler(self, prev_roll, roll):
         c=(127, 127, 127)
@@ -59,6 +60,24 @@ class Demo:
             diff_roll = abs(new_roll - prev_roll)
             prev_roll = new_roll
 
+    def _kit_aux_notify(self):
+        # this function just sends data to jem app (if connected) using the extra ble characteristic in the rc service
+        count = 0
+        if not self._rc_ble_service:
+            print("_kit_aux_notify failed: _rc_ble_service not set")
+            return
+        try:
+            while self._run:
+                time.sleep(2)
+                s = b"count: %s" % count
+                self._rc_ble_service._uart.write_aux(s)
+                count += 1
+        except Exception as e:
+            print("_kit_aux_notify failed: %s" % e)
+
+    def start_kit_notify_thread(self):
+        self._run = True
+        _thread.start_new_thread(self._kit_aux_notify, ())
 
     def start_sparkle_motion_thread(self, rainbow=True, count=100):
         self._run = True

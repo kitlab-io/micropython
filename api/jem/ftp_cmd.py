@@ -1,7 +1,5 @@
 import struct
-
-
-# FTP Classes used to parse incoming BLE UART FTP Commands for File i/o
+# FTP helpers used to parse incoming BLE UART FTP Commands for File i/o
 class FTPCmdMsg:
     START = bytearray([1,2]) #SOH, STX ascii
     START_I = 0

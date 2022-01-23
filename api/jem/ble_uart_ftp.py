@@ -1,8 +1,7 @@
-# Proof-of-concept of a FTP over BLE UART
+# FTP over BLE UART
 from machine import Timer
 from ble_uart_peripheral import BLEUART
 from ftp_cmd import *
-
 
 class BLEUARTFTP:
     def __init__(self, uart=None):

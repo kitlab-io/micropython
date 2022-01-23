@@ -1,10 +1,10 @@
-# This example demonstrates a peripheral implementing the Nordic UART Service
+# Peripheral implementing the BLE UART Service
 from network import Bluetooth
 import time
 import binascii
 _UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
-_UART_TX_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
-_UART_RX_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+_UART_RX_UUID =      "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+_UART_TX_UUID =      "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
 def uuid2bytes(uuid):
     if type(uuid) == int:
@@ -43,15 +43,19 @@ class BLEMANAGER(object):
 
 
 class BLEUART:
-    def __init__(self, bleman=None, name="BLEUART", service_uuid = None, rx_uuid = None, tx_uuid = None):
+    def __init__(self, bleman=None, name="BLEUART", service_uuid = None, rx_uuid = None, tx_uuid = None, aux_uuid = None):
         if bleman is None:
             bleman = BLEMANAGER()
             time.sleep(0.2)
         self.bleman = bleman
-        self.service = self.bleman.ble.service(uuid=uuid2bytes(service_uuid), isprimary=True, nbr_chars=2)
+        nbr_chars = 3 if aux_uuid else 2
+        self.service = self.bleman.ble.service(uuid=uuid2bytes(service_uuid), isprimary=True, nbr_chars=nbr_chars)
         self.rx_characteristic = self.service.characteristic(uuid=uuid2bytes(rx_uuid))
         self.rx_callback = self.rx_characteristic.callback(trigger=Bluetooth.CHAR_WRITE_EVENT, handler=self.rx_cb_handler)
         self.tx_characteristic = self.service.characteristic(uuid=uuid2bytes(tx_uuid))
+        self.aux_characteristic = None
+        if aux_uuid:
+            self.aux_characteristic = self.service.characteristic(uuid=uuid2bytes(aux_uuid))
         self._connected = False
         self._rx_buffer = bytearray()
         self._connect_status_handler = None
@@ -97,3 +101,8 @@ class BLEUART:
     def write(self, data):
         if self._connected:
             self.tx_characteristic.value(data)
+
+    def write_aux(self, data):
+        # used if service want to notify client of some extra data not part of typical uart stream
+        if self._connected and self.aux_characteristic:
+            self.aux_characteristic.value(data)

@@ -10,9 +10,10 @@ import time
 from kits.demo.matrix_demo import MatrixDemo
 d = MatrixDemo()
 time.sleep(1)
-
 """
+
 from kits.demo.demo import Demo
-demo = Demo() # run demo to use neopixels for example
+demo = Demo(rc_ble_service=rc) # run demo to use neopixels for example
 demo.start_button_test()
+
 #demo.start_sparkle_motion_thread()
