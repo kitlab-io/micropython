@@ -113,16 +113,15 @@ class Demo:
     def _main_thread(self):
         # put stuff that you want to run in the background here
         self.start_button_test()
-        count = 0
         if not self._rc_ble_service:
             print("_kit_aux_notify failed: _rc_ble_service not set")
             return
         try:
             while self._main_run:
-                time.sleep(2)
-                s = b"count: %s" % count
+                time.sleep(0.1)
+                roll = self.jem.imu.orientation['roll']
+                s = b"roll: %s" % roll
                 self._rc_ble_service._uart.write_aux(s)
-                count += 1
         except Exception as e:
             print("_kit_aux_notify failed: %s" % e)
 
