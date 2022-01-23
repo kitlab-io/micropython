@@ -2,7 +2,7 @@ try:
 	from uos import urandom
 except:
 	from os import urandom
-from kits.demo.pixelfont import PixelFont
+from kits.lantern.pixelfont import PixelFont
 
 class FireScene:
 	"""This module implements an example scene with a traveling pixel"""

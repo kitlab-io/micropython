@@ -1,7 +1,7 @@
 # demo.py
 # run some example code to demonstrate JEM features
 from jem import Jem
-from kits.demo.neopixel import Neopixel
+from drivers.neopixel import Neopixel
 import pycom
 import _thread
 import time

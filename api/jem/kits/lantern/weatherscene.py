@@ -3,13 +3,13 @@
 import time
 import gc
 try:
-	import kits.demo.urequests as requests
+	import kits.lantern.urequests as requests
 except ImportError:
 	import requests
 
 # Local imports
-from kits.demo.pixelfont import PixelFont
-from kits.demo.icon import Icon
+from kits.lantern.pixelfont import PixelFont
+from kits.lantern.icon import Icon
 
 # Based on demoscene.py
 class WeatherScene:
@@ -17,7 +17,7 @@ class WeatherScene:
 	This module displays a weather forecast from SMHI (Sweden)
 	"""
 
-	dir_prefix = '/flash/kits/demo/weather/'
+	dir_prefix = '/flash/kits/lantern/weather/'
 
 	def __init__(self, display, config):
 		"""

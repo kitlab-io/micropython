@@ -7,7 +7,7 @@ wlan = setup_wifi()
 
 """
 import time
-from kits.demo.matrix_demo import MatrixDemo
+from kits.lantern.matrix_demo import MatrixDemo
 d = MatrixDemo()
 time.sleep(1)
 """

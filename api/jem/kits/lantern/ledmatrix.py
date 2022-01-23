@@ -1,7 +1,7 @@
 # ledmatrix.py
 # Modified from: https://github.com/noahwilliamsson/lamatrix/blob/master/ledmatrix.py
 # Modified by: jbthompson.eng@gmail.com
-from kits.demo.neopixel import Neopixel
+from drivers.neopixel import Neopixel
 import time
 from machine import RTC
 

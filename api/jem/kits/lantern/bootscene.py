@@ -1,6 +1,6 @@
 from network import WLAN
 from machine import RTC
-from kits.demo.pixelfont import PixelFont
+from kits.lantern.pixelfont import PixelFont
 
 class BootScene:
 	"""

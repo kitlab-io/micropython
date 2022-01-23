@@ -7,7 +7,7 @@ import gc
 from math import ceil
 import json
 import _thread
-from kits.demo.ledmatrix import LedMatrix
+from kits.lantern.ledmatrix import LedMatrix
 # This is to make sure we have a large contiguous block of RAM on devices with
 # 520kB RAM after all modules and modules have been compiled and instantiated.
 #
