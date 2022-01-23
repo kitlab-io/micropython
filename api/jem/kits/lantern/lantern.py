@@ -1,4 +1,4 @@
-# matrix_demo.py
+# lantern.py
 # Modified from: https://github.com/noahwilliamsson/lamatrix/blob/master/main.py
 # Modified by: jbthompson.eng@gmail.com
 import sys
@@ -19,7 +19,7 @@ from network import WLAN
 gc.collect()
 from kits.demo.renderloop import RenderLoop
 
-class MatrixDemo:
+class Lantern:
 	def __init__(self):
 		f = open('/flash/kits/demo/config.json')
 		self.config = json.loads(f.read())

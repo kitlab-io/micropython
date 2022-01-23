@@ -13,6 +13,9 @@ class Demo:
         self._run = False
         self._rc_ble_service = rc_ble_service
 
+    def start(self):
+        self.start_button_test()
+
     def leveler(self, prev_roll, roll):
         c=(127, 127, 127)
         max_pixels = self.neopixel.num_leds
