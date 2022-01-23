@@ -14,7 +14,7 @@ class Demo:
         self._rc_ble_service = rc_ble_service
 
     def start(self):
-        self.start_button_test()
+        self.start_main_thread()
 
     def leveler(self, prev_roll, roll):
         c=(127, 127, 127)
@@ -109,3 +109,24 @@ class Demo:
             time.sleep(1)
             pycom.rgbled(color2)
             time.sleep(1)
+
+    def _main_thread(self):
+        # put stuff that you want to run in the background here
+        self.start_button_test()
+        count = 0
+        if not self._rc_ble_service:
+            print("_kit_aux_notify failed: _rc_ble_service not set")
+            return
+        try:
+            while self._main_run:
+                time.sleep(2)
+                s = b"count: %s" % count
+                self._rc_ble_service._uart.write_aux(s)
+                count += 1
+        except Exception as e:
+            print("_kit_aux_notify failed: %s" % e)
+
+    def start_main_thread(self):
+        print("start_main_thread")
+        self._main_run = True
+        _thread.start_new_thread(self._main_thread, ())

@@ -8,7 +8,7 @@ wlan = setup_wifi()
 from kits import kit_main
 kit = None
 if kit_main.kit_available:
-    kit = kit_main.load_kit()
+    kit = kit_main.load_kit(rc=rc)
 
 """
 import time
