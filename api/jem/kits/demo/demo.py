@@ -117,11 +117,14 @@ class Demo:
             print("_kit_aux_notify failed: _rc_ble_service not set")
             return
         try:
+            prev_roll = None
             while self._main_run:
                 time.sleep(0.1)
                 roll = self.jem.imu.orientation['roll']
-                s = b"roll: %s" % roll
-                self._rc_ble_service._uart.write_aux(s)
+                if prev_roll != roll:
+                    s = b"roll: %s" % roll
+                    self._rc_ble_service._uart.write_aux(s)
+                    prev_roll = roll
         except Exception as e:
             print("_kit_aux_notify failed: %s" % e)
 
