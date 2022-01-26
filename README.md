@@ -49,17 +49,25 @@ Micropython code for JEM core
 
 ### Run Demos from Led Matrix Library
 - From: https://github.com/noahwilliamsson/lamatrix
-- This is initialized by default in main.py
+- This is initialized by default in main.py by doing the following:
+```python
+# main.py
+# change kit from 'demo' to 'lantern'
+if kit_main.kit_available:
+    kit = kit_main.load_kit(rc=rc, kit='lantern')
+```
+- Then re-flash the code to JEM
+
 ```bash
-d.start_fire_scene()
+kit.start_fire_scene()
 # note, if you want to use the weather scene, you will need to add your home router ssid / password to config.js in /api/jem/kits/demo/config.js
 # also, if you use the weather scene, your wifi repl won't work anymore (will fix later)
 # stop the scene from running over and over
-d.stop_render()
+kit.stop_render()
 # add a bunch of scenes that will loop over and over (you can change scene timeout in config.js
-d.start_fire_scene()
-d.start_demo_scene()
-d.start_animation_scene()
+kit.start_fire_scene()
+kit.start_demo_scene()
+kit.start_animation_scene()
 ```
 
 
