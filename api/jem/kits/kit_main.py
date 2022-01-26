@@ -1,10 +1,11 @@
 """ kit_main.py
 Call the desired kit code here (from main.py) and initialized in load_kit method
 """
-from kits.demo.demo import Demo
+
 kit_available = True
 kit_running = False
 def load_kit(**kwargs):
+    from kits.demo.demo import Demo
     global kit_running
     # load kit code here - see example
     print("load_kit")
