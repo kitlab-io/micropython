@@ -17,26 +17,32 @@ Micropython code for JEM core
 
 ### Run Demo application
 - JEM Micropython code comes installed with a simple demo app
-- With Pymakr terminal open and connected to JEM, press 'Enter' key several times on the terminal to get REPL prompt
-- Execute JEM Demo App using following micropython commands from REPL
+   + After power up it takes about 10 seconds for JEM to initialize
+   + Then you can press the JEM user button and the RGB LED should turn green
+- If you want to play around with the Demo, connect micro usb to JEM and open Pymakr terminal
+- Interact with JEM Demo App using following micropython commands from REPL
 ```bash
->> demo = Demo(neopixel_leds=64)
->> demo.jem.led.set_color(0x880000) # jem red rgb led
->> demo.jem.led.set_color(0x000088) # jem blue rgb led
->> demo.jem.imu.orientation # show roll, pitch, yaw degrees
->> demo.jem.buzzer.start(freq_hz = 100) # make buzzer sound
->> demo.jem.buzzer.stop()
->> demo.neopixel.sparkle(count=10) # randomly turns on ten leds, default color is white but you can change
->> demo.neopixel.sparkle(count=10, c=(127,0,0)) # sparkle red
->> demo.neopixel.sparkle(count=10, c=(0,0,127)) # sparkle blue
->> demo.neopixel.rainbow() # do some fancy lantern led show (take about 15 seconds)
->> demo.jem.btn.read() # read button value
+# initially a button press thread is running that turns led green if pressed
+# you can stop this by doing
+>> kit._run = False #
+# you can also stop the main demo thread that is collecting imu data to send to app by doing this
+>> kit._main_thread = False
+# now you can mess around
+>> kit.jem.led.set_color(0x880000) # jem red rgb led
+>> kit.jem.led.set_color(0x000088) # jem blue rgb led
+>> kit.jem.imu.orientation # show roll, pitch, yaw degrees
+>> kit.jem.buzzer.start(freq_hz = 100) # make buzzer sound
+>> kit.jem.buzzer.stop()
+>> kit.neopixel.sparkle(count=10) # randomly turns on ten leds, default color is white but you can change
+>> kit.neopixel.sparkle(count=10, c=(127,0,0)) # sparkle red
+>> kit.neopixel.sparkle(count=10, c=(0,0,127)) # sparkle blue
+>> kit.neopixel.rainbow() # do some fancy lantern led show (take about 15 seconds)
+>> kit.jem.btn.read() # read button value
 ```
 
 ### Neopixel + IMU
 ```bash
->> demo = Demo()
->> demo.start_sparkle_motion_thread(count=25, rainbow=True)
+>> kit.start_sparkle_motion_thread(count=25, rainbow=True)
 >> # now move the jem around a bit (around the roll axis is best)
 >> demo.stop_sparkle_motion_thread()
 ```

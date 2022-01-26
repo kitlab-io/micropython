@@ -38,6 +38,7 @@ class Demo:
                 pycom.rgbled(0x000000)
                 time.sleep(0.1)
             time.sleep(0.1)
+        print("Demo button thread stopped")
 
     def _leveler_with_motion(self):
         prev_roll = 0
@@ -112,6 +113,7 @@ class Demo:
 
     def _main_thread(self):
         # put stuff that you want to run in the background here
+        print("Demo main thread started")
         self.start_button_test()
         if not self._rc_ble_service:
             print("_kit_aux_notify failed: _rc_ble_service not set")
@@ -127,6 +129,7 @@ class Demo:
                     prev_roll = roll
         except Exception as e:
             print("_kit_aux_notify failed: %s" % e)
+        print("Demo main thread stopped")
 
     def start_main_thread(self):
         print("start_main_thread")
