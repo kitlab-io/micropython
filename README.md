@@ -40,16 +40,17 @@ Micropython code for JEM core
 >> kit.jem.btn.read() # read button value
 ```
 
-### Neopixel + IMU
+### Demo Application using Neopixel + IMU
 ```bash
 >> kit.start_sparkle_motion_thread(count=25, rainbow=True)
 >> # now move the jem around a bit (around the roll axis is best)
 >> demo.stop_sparkle_motion_thread()
 ```
 
-### Run Demos from Led Matrix Library
-- From: https://github.com/noahwilliamsson/lamatrix
-- This is initialized by default in main.py by doing the following:
+### Lantern Kit
+- Lantern Kit uses code from: https://github.com/noahwilliamsson/lamatrix
+- Initially JEM is set to use Demo Kit, but you can easily switch
+- Open main.py in Atom editor and update the code to say kit='lantern' instead of kit='demo':
 ```python
 # main.py
 # change kit from 'demo' to 'lantern'
