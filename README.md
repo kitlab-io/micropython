@@ -58,6 +58,7 @@ if kit_main.kit_available:
     kit = kit_main.load_kit(rc=rc, kit='lantern')
 ```
 - Then re-flash the code to JEM
+- Wait for JEM to finish initializing before trying the following commands in Atom Pymakr terminal
 
 ```bash
 kit.start_fire_scene()
@@ -70,8 +71,6 @@ kit.start_fire_scene()
 kit.start_demo_scene()
 kit.start_animation_scene()
 ```
-
-
 
 ## Advanced
 Users can control JEM gpio, pwm, adc, dac, uart and read from sensors
