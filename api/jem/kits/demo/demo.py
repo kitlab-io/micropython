@@ -1,7 +1,7 @@
 # demo.py
 # run some example code to demonstrate JEM features
 from jem import Jem
-from kits.demo.neopixel import Neopixel
+from drivers.neopixel import Neopixel
 import pycom
 import _thread
 import time
@@ -12,6 +12,9 @@ class Demo:
         self.neopixel = Neopixel(num_leds=neopixel_leds)
         self._run = False
         self._rc_ble_service = rc_ble_service
+
+    def start(self):
+        self.start_main_thread()
 
     def leveler(self, prev_roll, roll):
         c=(127, 127, 127)
@@ -35,6 +38,7 @@ class Demo:
                 pycom.rgbled(0x000000)
                 time.sleep(0.1)
             time.sleep(0.1)
+        print("Demo button thread stopped")
 
     def _leveler_with_motion(self):
         prev_roll = 0
@@ -106,3 +110,28 @@ class Demo:
             time.sleep(1)
             pycom.rgbled(color2)
             time.sleep(1)
+
+    def _main_thread(self):
+        # put stuff that you want to run in the background here
+        print("Demo main thread started")
+        self.start_button_test()
+        if not self._rc_ble_service:
+            print("_kit_aux_notify failed: _rc_ble_service not set")
+            return
+        try:
+            prev_roll = None
+            while self._main_run:
+                time.sleep(0.1)
+                roll = self.jem.imu.orientation['roll']
+                if prev_roll != roll:
+                    s = b"roll: %s" % roll
+                    self._rc_ble_service._uart.write_aux(s)
+                    prev_roll = roll
+        except Exception as e:
+            print("_kit_aux_notify failed: %s" % e)
+        print("Demo main thread stopped")
+
+    def start_main_thread(self):
+        print("start_main_thread")
+        self._main_run = True
+        _thread.start_new_thread(self._main_thread, ())

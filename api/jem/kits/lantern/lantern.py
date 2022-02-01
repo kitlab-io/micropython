@@ -1,4 +1,4 @@
-# matrix_demo.py
+# lantern.py
 # Modified from: https://github.com/noahwilliamsson/lamatrix/blob/master/main.py
 # Modified by: jbthompson.eng@gmail.com
 import sys
@@ -7,7 +7,7 @@ import gc
 from math import ceil
 import json
 import _thread
-from kits.demo.ledmatrix import LedMatrix
+from kits.lantern.ledmatrix import LedMatrix
 # This is to make sure we have a large contiguous block of RAM on devices with
 # 520kB RAM after all modules and modules have been compiled and instantiated.
 #
@@ -17,11 +17,11 @@ from kits.demo.ledmatrix import LedMatrix
 #large_temp_chunk = bytearray(3400)
 from network import WLAN
 gc.collect()
-from kits.demo.renderloop import RenderLoop
+from kits.lantern.renderloop import RenderLoop
 
-class MatrixDemo:
+class Lantern:
 	def __init__(self):
-		f = open('/flash/kits/demo/config.json')
+		f = open('/flash/kits/lantern/config.json')
 		self.config = json.loads(f.read())
 		f.close()
     	# Initialize led matrix framebuffer on top of Neopixel -> WS2812 driver
@@ -65,7 +65,7 @@ class MatrixDemo:
 
 	def start_demo_scene(self):
 		if 'Demo' in self.config:
-			from kits.demo.demoscene import DemoScene
+			from kits.lantern.demoscene import DemoScene
 			scene = DemoScene(self.display, self.config['Demo'])
 			self.render_loop.add_scene(scene)
 			gc.collect()
@@ -76,7 +76,7 @@ class MatrixDemo:
 
 	def start_clock_scene(self):
 		if 'Clock' in self.config:
-			from kits.demo.clockscene import ClockScene
+			from kits.lantern.clockscene import ClockScene
 			scene = ClockScene(self.display, self.config['Clock'])
 			self.render_loop.add_scene(scene)
 			gc.collect()
@@ -87,7 +87,7 @@ class MatrixDemo:
 
 	def start_weather_scene(self):
 		if 'Weather' in self.config:
-			from kits.demo.weatherscene import WeatherScene
+			from kits.lantern.weatherscene import WeatherScene
 			self.connect_to_internet()
 			scene = WeatherScene(self.display, self.config['Weather'])
 			self.render_loop.add_scene(scene)
@@ -99,7 +99,7 @@ class MatrixDemo:
 
 	def start_fire_scene(self):
 		if 'Fire' in self.config:
-			from kits.demo.firescene import FireScene
+			from kits.lantern.firescene import FireScene
 			scene = FireScene(self.display, self.config['Fire'])
 			self.render_loop.add_scene(scene)
 			gc.collect()
@@ -110,7 +110,7 @@ class MatrixDemo:
 
 	def start_animation_scene(self):
 		if 'Animation' in self.config:
-			from kits.demo.animationscene import AnimationScene
+			from kits.lantern.animationscene import AnimationScene
 			scene = AnimationScene(self.display, self.config['Animation'])
 			self.render_loop.add_scene(scene)
 			gc.collect()

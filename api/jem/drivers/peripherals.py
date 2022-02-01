@@ -1,4 +1,4 @@
-from machine import I2C, SPI, Pin, ADC, DAC
+from machine import I2C, SPI, Pin
 from ustruct import unpack as unp
 from ustruct import pack
 

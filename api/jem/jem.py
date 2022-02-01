@@ -34,9 +34,9 @@ Example:
     >>[0x04, 0x05]
 
 """
+import jemimu
 import jembattery
 import jembarometer
-import jemimu
 import jemlight
 import jemrange
 import jembuzzer

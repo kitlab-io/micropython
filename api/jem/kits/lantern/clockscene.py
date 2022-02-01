@@ -6,7 +6,7 @@
 #
 import time
 # Local imports
-from kits.demo.pixelfont import PixelFont
+from kits.lantern.pixelfont import PixelFont
 
 
 class ClockScene:

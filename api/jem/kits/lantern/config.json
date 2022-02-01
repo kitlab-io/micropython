@@ -26,8 +26,8 @@
     "intensity": 1.0,
     "debug": false,
     "icons": [
-        "/flash/kits/demo/icons/game-brick.bin",
-        "/flash/kits/demo/icons/game-snake.bin",
+        "/flash/kits/lantern/icons/game-brick.bin",
+        "/flash/kits/lantern/icons/game-snake.bin",
     ]
   },
   "Clock": {

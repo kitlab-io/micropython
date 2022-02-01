@@ -1,4 +1,4 @@
-from kits.demo.pixelfont import PixelFont
+from kits.lantern.pixelfont import PixelFont
 
 class DemoScene:
 	"""This module implements an example scene with a traveling pixel"""
