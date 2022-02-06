@@ -43,19 +43,19 @@ class BLEMANAGER(object):
 
 
 class BLEUART:
-    def __init__(self, bleman=None, name="BLEUART", service_uuid = None, rx_uuid = None, tx_uuid = None, aux_uuid = None):
+    def __init__(self, bleman=None, name="BLEUART", service_uuid = None, rx_uuid = None, tx_uuid = None, aux_uuids = []):
         if bleman is None:
             bleman = BLEMANAGER()
             time.sleep(0.2)
         self.bleman = bleman
-        nbr_chars = 3 if aux_uuid else 2
+        nbr_chars = 3 + len(aux_uuids)
         self.service = self.bleman.ble.service(uuid=uuid2bytes(service_uuid), isprimary=True, nbr_chars=nbr_chars)
         self.rx_characteristic = self.service.characteristic(uuid=uuid2bytes(rx_uuid))
         self.rx_callback = self.rx_characteristic.callback(trigger=Bluetooth.CHAR_WRITE_EVENT, handler=self.rx_cb_handler)
         self.tx_characteristic = self.service.characteristic(uuid=uuid2bytes(tx_uuid))
         self.aux_characteristic = None
-        if aux_uuid:
-            self.aux_characteristic = self.service.characteristic(uuid=uuid2bytes(aux_uuid))
+        if aux_uuids:
+            self.aux_characteristic = self.service.characteristic(uuid=uuid2bytes(aux_uuids[0]))
         self._connected = False
         self._rx_buffer = bytearray()
         self._connect_status_handler = None
