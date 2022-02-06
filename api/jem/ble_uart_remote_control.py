@@ -119,11 +119,10 @@ class BLEUARTREMOTECONTROL:
 
     def _aux_flush(self):
         try:
-            if not self._uart.is_connected():
-                return
             data = self._aux_tx_buf[0:self.tx_max_len]
             self._aux_tx_buf = self._aux_tx_buf[self.tx_max_len:]
-            self._uart.aux_chars[RC_AUX_UUID].value(data)
+            if self.is_connected():
+                self._uart.aux_chars[RC_AUX_UUID].value(data)
             if self._aux_tx_buf:
                 self.schedule_aux_tx()
         except Exception as e:
@@ -140,3 +139,6 @@ class BLEUARTREMOTECONTROL:
         self._aux_tx_buf += buf
         if empty:
             self.schedule_aux_tx()
+
+    def is_connected(self):
+        return self._uart.is_connected()
