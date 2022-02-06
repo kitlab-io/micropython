@@ -54,8 +54,10 @@ class BLEUART:
         self.rx_callback = self.rx_characteristic.callback(trigger=Bluetooth.CHAR_WRITE_EVENT, handler=self.rx_cb_handler)
         self.tx_characteristic = self.service.characteristic(uuid=uuid2bytes(tx_uuid))
         self.aux_characteristic = None
-        if aux_uuids:
-            self.aux_characteristic = self.service.characteristic(uuid=uuid2bytes(aux_uuids[0]))
+        self.aux_chars = {}
+        for uuid in aux_uuids:
+            self.aux_chars[uuid] = self.service.characteristic(uuid=uuid2bytes(uuid))
+            self.aux_characteristic = self.aux_chars[uuid]
         self._connected = False
         self._rx_buffer = bytearray()
         self._connect_status_handler = None

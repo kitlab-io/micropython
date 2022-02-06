@@ -3,11 +3,12 @@ from machine import Timer
 from ble_uart_peripheral import BLEUART
 from ftp_cmd import *
 
+RC_AUX_UUID = 0xCD33
 
 class BLEUARTREMOTECONTROL:
     def __init__(self, uart=None):
         if uart is None:
-            uart = BLEUART(name="BLEUARTREMOTECONTROL", service_uuid = 0xCA33, rx_uuid = 0xCB33, tx_uuid = 0xCC33, aux_uuids = [0xCD33])
+            uart = BLEUART(name="BLEUARTREMOTECONTROL", service_uuid = 0xCA33, rx_uuid = 0xCB33, tx_uuid = 0xCC33, aux_uuids = [RC_AUX_UUID])
         self._uart = uart
         self._tx_buf = bytearray()
         self._aux_tx_buf = bytearray() # used for sending extra data from Kit to App (like asynchronous sensor data)
