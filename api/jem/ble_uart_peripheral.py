@@ -104,7 +104,5 @@ class BLEUART:
         if self._connected:
             self.tx_characteristic.value(data)
 
-    def write_aux(self, data):
-        # used if service want to notify client of some extra data not part of typical uart stream
-        if self._connected and self.aux_characteristic:
-            self.aux_characteristic.value(data)
+    def is_connected(self):
+        return self._connected

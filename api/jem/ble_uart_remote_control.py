@@ -92,11 +92,16 @@ class BLEUARTREMOTECONTROL:
             self.schedule_tx()
 
     def _aux_flush(self):
-        data = self._aux_tx_buf[0:self.tx_max_len]
-        self._aux_tx_buf = self._aux_tx_buf[self.tx_max_len:]
-        self._uart.write_aux(data)
-        if self._aux_tx_buf:
-            self.schedule_aux_tx()
+        try:
+            if not self._uart.is_connected():
+                return
+            data = self._aux_tx_buf[0:self.tx_max_len]
+            self._aux_tx_buf = self._aux_tx_buf[self.tx_max_len:]
+            self._uart.aux_chars[RC_AUX_UUID].value(data)
+            if self._aux_tx_buf:
+                self.schedule_aux_tx()
+        except Exception as e:
+            print("_aux_flush failed: %s" % e)
 
     def write(self, buf):
         empty = not self._tx_buf
