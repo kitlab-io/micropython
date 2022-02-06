@@ -53,17 +53,21 @@ class BLEUART:
         self.rx_characteristic = self.service.characteristic(uuid=uuid2bytes(rx_uuid))
         self.rx_callback = self.rx_characteristic.callback(trigger=Bluetooth.CHAR_WRITE_EVENT, handler=self.rx_cb_handler)
         self.tx_characteristic = self.service.characteristic(uuid=uuid2bytes(tx_uuid))
-        self.aux_characteristic = None
         self.aux_chars = {}
         for uuid in aux_uuids:
             self.aux_chars[uuid] = self.service.characteristic(uuid=uuid2bytes(uuid))
-            self.aux_characteristic = self.aux_chars[uuid]
         self._connected = False
         self._rx_buffer = bytearray()
         self._connect_status_handler = None
         self.bleman.add_connected_callback(self.connected_callback)
         self.name = name
         self.rx_notifiy_callback = None
+
+    def set_aux_callback(self, uuid, callback, trigger_type):
+        try:
+            self.aux_chars[uuid].callback(trigger=trigger_type, handler=callback)
+        except Exception as e:
+            print("set_aux_callback failed: %s" % e)
 
     def set_connect_handler(self, handler):
         self._connect_status_handler = handler

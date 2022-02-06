@@ -1,14 +1,15 @@
 # Proof-of-concept of a Kit Remote Control over BLE UART
 from machine import Timer
-from ble_uart_peripheral import BLEUART
+from ble_uart_peripheral import BLEUART, Bluetooth
 from ftp_cmd import *
 
 RC_AUX_UUID = 0xCD33
+RC_SYNC_UUID = 0xCF33
 
 class BLEUARTREMOTECONTROL:
     def __init__(self, uart=None):
         if uart is None:
-            uart = BLEUART(name="BLEUARTREMOTECONTROL", service_uuid = 0xCA33, rx_uuid = 0xCB33, tx_uuid = 0xCC33, aux_uuids = [RC_AUX_UUID])
+            uart = BLEUART(name="BLEUARTREMOTECONTROL", service_uuid = 0xCA33, rx_uuid = 0xCB33, tx_uuid = 0xCC33, aux_uuids = [RC_AUX_UUID, RC_SYNC_UUID])
         self._uart = uart
         self._tx_buf = bytearray()
         self._aux_tx_buf = bytearray() # used for sending extra data from Kit to App (like asynchronous sensor data)
@@ -22,6 +23,10 @@ class BLEUARTREMOTECONTROL:
         self._cmd_timer = None
         self._cmd_queue = []
         self._uart.set_rx_notify_callback(self.rx_notification)
+        self._uart.set_aux_callback(uuid=RC_SYNC_UUID, callback=self.sync_callback, trigger_type=Bluetooth.CHAR_WRITE_EVENT)
+
+    def sync_callback(self, chr, data=None):
+        print("got sync callback")
 
     def _wrap_flush(self, alarm):
         self._flush()
