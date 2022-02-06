@@ -1,4 +1,4 @@
-# Proof-of-concept of a Kit Remote Control over BLE UART
+# Kit Remote Control over BLE
 from machine import Timer
 from ble_uart_peripheral import BLEUART, Bluetooth
 from ftp_cmd import *
@@ -24,9 +24,17 @@ class BLEUARTREMOTECONTROL:
         self._cmd_queue = []
         self._uart.set_rx_notify_callback(self.rx_notification)
         self._uart.set_aux_callback(uuid=RC_SYNC_UUID, callback=self.sync_callback, trigger_type=Bluetooth.CHAR_WRITE_EVENT)
+        self._sync_ready = False
 
     def sync_callback(self, chr, data=None):
         print("got sync callback")
+        try:
+            events = chr.events()
+            if events & Bluetooth.CHAR_WRITE_EVENT:
+                self._sync_ready = bool(int(chr.value()))
+                print("sync_ready: %s" % self._sync_ready)
+        except Exception as e:
+            print("sync_callback failed: %s" % e)
 
     def _wrap_flush(self, alarm):
         self._flush()
