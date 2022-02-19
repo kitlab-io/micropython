@@ -12,6 +12,7 @@ Micropython code for JEM core
 - Open Atom IDE and open directory **./micropython/api/jem**
 - Turn on JEM board
 - Open Pymakr terminal which will appear at bottom of Atom IDE
+- Set Pymakr to upload all file types (not just python) by clicking on **Pymakr -> Settings -> Global -> Upload all file types**
 - Click 'Connect' to talk to JEM
 - Click 'Upload' to flash latest code to JEM
 
