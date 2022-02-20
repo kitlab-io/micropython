@@ -122,10 +122,12 @@ class Demo:
             prev_roll = None
             while self._main_run:
                 time.sleep(0.1)
+                if not self._rc_ble_service.is_connected():
+                    continue
                 roll = self.jem.imu.orientation['roll']
                 if prev_roll != roll:
-                    s = b"roll: %s" % roll
-                    self._rc_ble_service._uart.write_aux(s)
+                    s = b"roll = %s" % roll
+                    self._rc_ble_service.write_aux(s)
                     prev_roll = roll
         except Exception as e:
             print("_kit_aux_notify failed: %s" % e)

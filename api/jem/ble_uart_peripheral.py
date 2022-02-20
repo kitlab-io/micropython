@@ -43,25 +43,31 @@ class BLEMANAGER(object):
 
 
 class BLEUART:
-    def __init__(self, bleman=None, name="BLEUART", service_uuid = None, rx_uuid = None, tx_uuid = None, aux_uuid = None):
+    def __init__(self, bleman=None, name="BLEUART", service_uuid = None, rx_uuid = None, tx_uuid = None, aux_uuids = []):
         if bleman is None:
             bleman = BLEMANAGER()
             time.sleep(0.2)
         self.bleman = bleman
-        nbr_chars = 3 if aux_uuid else 2
+        nbr_chars = 3 + len(aux_uuids)
         self.service = self.bleman.ble.service(uuid=uuid2bytes(service_uuid), isprimary=True, nbr_chars=nbr_chars)
         self.rx_characteristic = self.service.characteristic(uuid=uuid2bytes(rx_uuid))
         self.rx_callback = self.rx_characteristic.callback(trigger=Bluetooth.CHAR_WRITE_EVENT, handler=self.rx_cb_handler)
         self.tx_characteristic = self.service.characteristic(uuid=uuid2bytes(tx_uuid))
-        self.aux_characteristic = None
-        if aux_uuid:
-            self.aux_characteristic = self.service.characteristic(uuid=uuid2bytes(aux_uuid))
+        self.aux_chars = {}
+        for uuid in aux_uuids:
+            self.aux_chars[uuid] = self.service.characteristic(uuid=uuid2bytes(uuid))
         self._connected = False
         self._rx_buffer = bytearray()
         self._connect_status_handler = None
         self.bleman.add_connected_callback(self.connected_callback)
         self.name = name
         self.rx_notifiy_callback = None
+
+    def set_aux_callback(self, uuid, callback, trigger_type):
+        try:
+            self.aux_chars[uuid].callback(trigger=trigger_type, handler=callback)
+        except Exception as e:
+            print("set_aux_callback failed: %s" % e)
 
     def set_connect_handler(self, handler):
         self._connect_status_handler = handler
@@ -102,7 +108,5 @@ class BLEUART:
         if self._connected:
             self.tx_characteristic.value(data)
 
-    def write_aux(self, data):
-        # used if service want to notify client of some extra data not part of typical uart stream
-        if self._connected and self.aux_characteristic:
-            self.aux_characteristic.value(data)
+    def is_connected(self):
+        return self._connected

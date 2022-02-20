@@ -11,7 +11,7 @@ _MP_STREAM_POLL_RD = const(0x0001)
 class BLEUARTStream:
     def __init__(self, uart=None):
         if uart is None:
-            uart = BLEUART(name="BLEUARTREPL", service_uuid = _UART_SERVICE_UUID, rx_uuid = _UART_RX_UUID, tx_uuid = _UART_TX_UUID, aux_uuid = None )
+            uart = BLEUART(name="BLEUARTREPL", service_uuid = _UART_SERVICE_UUID, rx_uuid = _UART_RX_UUID, tx_uuid = _UART_TX_UUID )
         self._uart = uart
         self._tx_buf = bytearray()
         self.tx_max_len = 100

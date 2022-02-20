@@ -1,13 +1,15 @@
-# Proof-of-concept of a Kit Remote Control over BLE UART
+# Kit Remote Control over BLE
 from machine import Timer
-from ble_uart_peripheral import BLEUART
+from ble_uart_peripheral import BLEUART, Bluetooth
 from ftp_cmd import *
 
+RC_AUX_UUID = 0xCD33
+RC_SYNC_UUID = 0xCF33
 
 class BLEUARTREMOTECONTROL:
     def __init__(self, uart=None):
         if uart is None:
-            uart = BLEUART(name="BLEUARTREMOTECONTROL", service_uuid = 0xCA33, rx_uuid = 0xCB33, tx_uuid = 0xCC33, aux_uuid = 0xCD33)
+            uart = BLEUART(name="BLEUARTREMOTECONTROL", service_uuid = 0xCA33, rx_uuid = 0xCB33, tx_uuid = 0xCC33, aux_uuids = [RC_AUX_UUID, RC_SYNC_UUID])
         self._uart = uart
         self._tx_buf = bytearray()
         self._aux_tx_buf = bytearray() # used for sending extra data from Kit to App (like asynchronous sensor data)
@@ -21,6 +23,21 @@ class BLEUARTREMOTECONTROL:
         self._cmd_timer = None
         self._cmd_queue = []
         self._uart.set_rx_notify_callback(self.rx_notification)
+        self._uart.set_aux_callback(uuid=RC_SYNC_UUID, callback=self.sync_callback, trigger_type=Bluetooth.CHAR_WRITE_EVENT)
+
+    def sync_callback(self, chr, data=None):
+        try:
+            events = chr.events()
+            if events & Bluetooth.CHAR_WRITE_EVENT:
+                sync_type = chr.value().decode('utf-8').lower()
+                if sync_type == 'v':
+                    self.schedule_eval_cmd()
+                elif sync_type == 'x':
+                    self.schedule_exec_cmd()
+                elif sync_type == 'c':
+                    self._cmd_queue.clear()
+        except Exception as e:
+            print("sync_callback failed: %s" % e)
 
     def _wrap_flush(self, alarm):
         self._flush()
@@ -58,29 +75,41 @@ class BLEUARTREMOTECONTROL:
             resp = "ok"
             code = data.decode("utf-8") # convert to string instead of byte array
             self._cmd_queue.append(code)
-            self.schedule_cmd()
         except Exception as e:
             resp = "queue_cmd failed: %s" % e
             print(resp)
         return resp
 
-    def schedule_cmd(self):
-        self._cmd_timer = Timer.Alarm(self._wrap_cmd, ms=self.cmd_delay_ms, periodic=False)
+    def schedule_eval_cmd(self):
+        self._cmd_timer = Timer.Alarm(self._wrap_eval_cmd, ms=self.cmd_delay_ms, periodic=False)
 
-    def _wrap_cmd(self, alarm):
-        self._execute_next_cmd()
+    def schedule_exec_cmd(self):
+        self._cmd_timer = Timer.Alarm(self._wrap_exec_cmd, ms=self.cmd_delay_ms, periodic=False)
 
-    def _execute_next_cmd(self):
+    def _wrap_eval_cmd(self, alarm):
+        self._execute_next_cmd(eval_cmd=True)
+
+    def _wrap_exec_cmd(self, alarm):
+        self._execute_next_cmd(eval_cmd=False)
+
+    def _execute_next_cmd(self, eval_cmd):
         #cmd_handler is called when the RemoteControlBleService receives a valid message from the App over BLE
         try:
             if not self._cmd_queue:
                 return
-            code = self._cmd_queue.pop()
-            eval(code) # example: eval("move(50,40)") will move car left =50, right=40
+            code = ""
+            for code_str in self._cmd_queue:
+                code += code_str
+            self._cmd_queue.clear()
+            if eval_cmd:
+                resp = eval(code) # example: eval("move(50,40)") will move car left =50, right=40
+                if resp:
+                    self.write(bytearray(str(resp)))
+            else:
+                exec(code)
         except Exception as e:
             print("_cmd failed: %s" % e)
-        if self._cmd_queue:
-            self.schedule_cmd()
+            self._cmd_queue.clear()
         return
 
     def _flush(self):
@@ -91,11 +120,15 @@ class BLEUARTREMOTECONTROL:
             self.schedule_tx()
 
     def _aux_flush(self):
-        data = self._aux_tx_buf[0:self.tx_max_len]
-        self._aux_tx_buf = self._aux_tx_buf[self.tx_max_len:]
-        self._uart.write_aux(data)
-        if self._aux_tx_buf:
-            self.schedule_aux_tx()
+        try:
+            data = self._aux_tx_buf[0:self.tx_max_len]
+            self._aux_tx_buf = self._aux_tx_buf[self.tx_max_len:]
+            if self.is_connected():
+                self._uart.aux_chars[RC_AUX_UUID].value(data)
+            if self._aux_tx_buf:
+                self.schedule_aux_tx()
+        except Exception as e:
+            print("_aux_flush failed: %s" % e)
 
     def write(self, buf):
         empty = not self._tx_buf
@@ -108,3 +141,6 @@ class BLEUARTREMOTECONTROL:
         self._aux_tx_buf += buf
         if empty:
             self.schedule_aux_tx()
+
+    def is_connected(self):
+        return self._uart.is_connected()
