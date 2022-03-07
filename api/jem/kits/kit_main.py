@@ -16,6 +16,9 @@ def load_kit(**kwargs):
             elif 'lantern' == kwargs['kit'].lower():
                 kit = load_lantern_kit(**kwargs)
                 kit_running = True
+            elif 'window' == kwargs['kit'].lower():
+                kit = load_window_kit(**kwargs)
+                kit_running = True
         else:
             print("Not kit defined using default Demo")
             kit = load_demo_kit(**kwargs)
@@ -36,3 +39,9 @@ def load_lantern_kit(**kwargs):
     print("load_lantern_kit")
     lantern_demo = Lantern()
     return lantern_demo
+
+def load_window_kit(**kwargs):
+    from kits.window.window import Window
+    print("load_window_kit")
+    window_kit = Window()
+    return window_kit

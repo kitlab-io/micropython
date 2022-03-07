@@ -144,6 +144,13 @@ class Neopixel:
             self.data[i] = c
         self.chain.show( self.data )
 
+    def set_pixel(self, pixel, color):
+        #color (r,g,b) = (126,126,45) for example
+        if i >= self.num_leds or i < 0:
+            printf("set_pixel %d failed, invalid pixel" % pixel)
+        self.data[pixel] = color
+        self.chain.show( self.data )
+
     def clear_display(self):
         self.chain.clear()
         self.chain.send_buf()
