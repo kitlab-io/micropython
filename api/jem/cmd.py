@@ -220,6 +220,9 @@ class CmdManager:
     def __init__(self):
         self.buffer = bytearray()
 
+    def reset(self):
+        self.buffer = bytearray()
+
     def update(self, data):
         self.buffer += data
         checksum_valid, end_index, cmd = CmdMsg.extract(self.buffer)

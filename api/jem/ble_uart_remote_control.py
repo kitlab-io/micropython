@@ -31,12 +31,10 @@ class BLEUARTREMOTECONTROL:
             events = chr.events()
             if events & Bluetooth.CHAR_WRITE_EVENT:
                 sync_type = chr.value().decode('utf-8').lower()
-                if sync_type == 'v':
-                    self.schedule_eval_cmd()
-                elif sync_type == 'x':
-                    self.schedule_exec_cmd()
-                elif sync_type == 'c':
+                if sync_type == 'c':
                     self._cmd_queue.clear()
+                if sync_type == 'r':
+                    self.cmd_manager.reset()
         except Exception as e:
             print("sync_callback failed: %s" % e)
 
