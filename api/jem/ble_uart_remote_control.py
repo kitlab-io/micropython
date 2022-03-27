@@ -1,7 +1,7 @@
 # Kit Remote Control over BLE
 from machine import Timer
 from ble_uart_peripheral import BLEUART, Bluetooth
-from ftp_cmd import *
+from cmd import *
 
 RC_AUX_UUID = 0xCD33
 RC_SYNC_UUID = 0xCF33
@@ -22,6 +22,7 @@ class BLEUARTREMOTECONTROL:
         self._aux_timer = None
         self._cmd_timer = None
         self._cmd_queue = []
+        self.cmd_manager = CmdManager()
         self._uart.set_rx_notify_callback(self.rx_notification)
         self._uart.set_aux_callback(uuid=RC_SYNC_UUID, callback=self.sync_callback, trigger_type=Bluetooth.CHAR_WRITE_EVENT)
 
@@ -64,8 +65,9 @@ class BLEUARTREMOTECONTROL:
         # we got some data!
         try:
             data = self.read()
-            resp = self.queue_cmd(data)
-            if resp:
+            code_data = self.cmd_manager.update(data)
+            if code_data:
+                resp = self.queue_cmd(code_data)
                 self.write(resp)
         except Exception as e:
             print("BLEUARTREMOTECONTROL rx_notification failed: %s" % e)
@@ -75,6 +77,7 @@ class BLEUARTREMOTECONTROL:
             resp = "ok"
             code = data.decode("utf-8") # convert to string instead of byte array
             self._cmd_queue.append(code)
+            self.schedule_exec_cmd()
         except Exception as e:
             resp = "queue_cmd failed: %s" % e
             print(resp)

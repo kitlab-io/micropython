@@ -1,7 +1,7 @@
 # FTP over BLE UART
 from machine import Timer
 from ble_uart_peripheral import BLEUART
-from ftp_cmd import *
+from cmd import *
 
 class BLEUARTFTP:
     def __init__(self, uart=None):
@@ -15,7 +15,7 @@ class BLEUARTFTP:
         self.prev_term = None
         self._timer = None
         self._uart.set_rx_notify_callback(self.rx_notification)
-        self.ftp_cmd_manager = FTPCMDManager()
+        self.ftp_cmd_manager = CmdManager()
 
     def _wrap_flush(self, alarm):
         self._flush()
