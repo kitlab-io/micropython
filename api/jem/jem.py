@@ -49,7 +49,7 @@ class Jem(object):
         self.imu = jemimu.JemIMU()
         self.distance = jemrange.JemRange()
         self.light = jemlight.JemLight()
-        self.battery = jembattery.JemBattery()
+        #self.battery = jembattery.JemBattery()
         self.barometer = jembarometer.JemBarometer()
         self.btn = button.Button()
         self.buzzer = jembuzzer.JemBuzzer()
