@@ -113,6 +113,7 @@ class Demo:
 
     def _main_thread(self):
         # put stuff that you want to run in the background here
+        return
         print("Demo main thread started")
         self.start_button_test()
         if not self._rc_ble_service:

@@ -25,7 +25,7 @@ def wheel(wheel_pos):
 
 class Neopixel:
     DEFAULT_WAIT_MS = 10
-    def __init__(self, num_leds=64, brightness=5):
+    def __init__(self, num_leds=64, brightness=0.05):
         pycom.heartbeat(False) # disable pycom heartbeat for now, might not need to do this
         self.chain = WS2812(num_leds=num_leds, brightness=brightness, data_pin='P11' )
         self.num_leds = num_leds
@@ -146,7 +146,7 @@ class Neopixel:
 
     def set_pixel(self, pixel, color):
         #color (r,g,b) = (126,126,45) for example
-        if i >= self.num_leds or i < 0:
+        if pixel >= self.num_leds or pixel < 0:
             printf("set_pixel %d failed, invalid pixel" % pixel)
         self.data[pixel] = color
         self.chain.show( self.data )

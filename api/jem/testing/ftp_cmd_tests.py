@@ -1,17 +1,17 @@
-from jem.ftp_cmd import *
+from jem.cmd import *
 
 def test_fail_cmd():
     print("test_fail_cmd")
-    fail_cmd = FTPCmd.create(FTPCmd.FAIL_RESP, "test-fail")
+    fail_cmd = Cmd.create(Cmd.FAIL_RESP, "test-fail")
     assert(type(fail_cmd) == FTPFailCmd)
     fail_cmd.execute()
     resp = fail_cmd.resp()
     assert(resp != None)
     print("Validate fail_cmd resp can be parsed back into FAIL_RESP cmd")
-    checksum_valid, end_i, ftp_cmd = FTPCmdMsg.extract(resp)
+    checksum_valid, end_i, ftp_cmd = CmdMsg.extract(resp)
     assert(end_i != None)
     assert(type(ftp_cmd) == FTPFailCmd)
-    assert(ftp_cmd.id == FTPCmd.FAIL_RESP)
+    assert(ftp_cmd.id == Cmd.FAIL_RESP)
     if not checksum_valid:
         print("checksum not valid")
     #assert(ftp_cmd.payload == bytearray("test-fail".encode('utf-8')))
@@ -20,9 +20,9 @@ def test_fail_cmd():
 
 def test_one_shot():
     print("test_one_shot")
-    man = FTPCMDManager()
+    man = CmdManager()
     print("create fail_cmd raw buffer")
-    fail_cmd = FTPCmd.create(FTPCmd.FAIL_RESP, "test-fail")
+    fail_cmd = Cmd.create(Cmd.FAIL_RESP, "test-fail")
     fail_cmd.execute()
     data = fail_cmd.resp()
     print("insert resp into cmd man update")
@@ -30,11 +30,22 @@ def test_one_shot():
     assert(resp is not None)
     return resp
 
+def test_code_cmd():
+    print("test_code_cmd")
+    man = CmdManager()
+    print("create cmd raw buffer")
+    code_cmd = Cmd.create(Cmd.EXE_CODE, "test-code")
+    assert(code_cmd.execute() == True)
+    cmd_msg = code_cmd.resp()
+    print("insert resp into cmd man update")
+    assert(cmd_msg is not None)
+    return cmd_msg
+
 def test_by_chunks():
     print("test_by_chunks")
-    man = FTPCMDManager()
+    man = CmdManager()
     print("create fail_cmd raw buffer")
-    fail_cmd = FTPCmd.create(FTPCmd.FAIL_RESP, "test-fail")
+    fail_cmd = Cmd.create(Cmd.FAIL_RESP, "test-fail")
     fail_cmd.execute()
     data = fail_cmd.resp()
     print("insert resp into cmd man update one byte each")
@@ -46,9 +57,9 @@ def test_by_chunks():
 
 def test_chunks_with_junk_data():
     print("test_chunks_with_junk_data")
-    man = FTPCMDManager()
+    man = CmdManager()
     print("create fail_cmd raw buffer")
-    fail_cmd = FTPCmd.create(FTPCmd.FAIL_RESP, "test-fail")
+    fail_cmd = Cmd.create(Cmd.FAIL_RESP, "test-fail")
     fail_cmd.execute()
     buffer = fail_cmd.resp()
     data = bytearray(b'1234')
@@ -62,9 +73,9 @@ def test_chunks_with_junk_data():
 
 def test_chunks_with_junk_data_in_middle():
     print("test_chunks_with_junk_data_in_middle")
-    man = FTPCMDManager()
+    man = CmdManager()
     print("create fail_cmd raw buffer")
-    fail_cmd = FTPCmd.create(FTPCmd.FAIL_RESP, "test-fail")
+    fail_cmd = Cmd.create(Cmd.FAIL_RESP, "test-fail")
     fail_cmd.execute()
     buffer = fail_cmd.resp()
     data = buffer[0:6]
@@ -80,15 +91,15 @@ def test_chunks_with_junk_data_in_middle():
 
 def test_junk_data_in_middle_with_good_msg_after():
     print("test_junk_data_in_middle_with_good_msg_after")
-    man = FTPCMDManager()
+    man = CmdManager()
     print("create fail_cmd raw buffer")
-    fail_cmd = FTPCmd.create(FTPCmd.FAIL_RESP, "test-fail")
+    fail_cmd = Cmd.create(Cmd.FAIL_RESP, "test-fail")
     fail_cmd.execute()
     buffer = fail_cmd.resp()
     data = buffer[0:6]
     data += bytearray(b'123456789abcde')
 
-    fail_cmd2 = FTPCmd.create(FTPCmd.FAIL_RESP, "test-fail2")
+    fail_cmd2 = Cmd.create(Cmd.FAIL_RESP, "test-fail2")
     fail_cmd2.execute()
     buffer2 = fail_cmd2.resp()
     data += buffer2
@@ -107,7 +118,7 @@ def test_write_file_cmd():
     pos = 0
     msg = struct.pack("<BLH", method, pos, len(file_name))
     payload = msg + file_name + data
-    write_cmd = FTPCmd.create(FTPCmd.WRITE_FILE, payload)
+    write_cmd = Cmd.create(Cmd.WRITE_FILE, payload)
     assert(write_cmd.execute() == True)
     return write_cmd
 
@@ -118,14 +129,14 @@ def test_read_file_cmd():
     rd_len = 5
     msg = struct.pack("<LHH", pos, rd_len, len(file_name))
     payload = msg + file_name
-    rd_cmd = FTPCmd.create(FTPCmd.READ_FILE, payload)
+    rd_cmd = Cmd.create(Cmd.READ_FILE, payload)
     assert(rd_cmd.execute() == True)
     print("validate resp")
     resp = rd_cmd.resp()
-    checksum_valid, end_i, ftp_cmd = FTPCmdMsg.extract(resp)
+    checksum_valid, end_i, ftp_cmd = CmdMsg.extract(resp)
     assert(end_i != None)
     assert(type(ftp_cmd) == FTPReadCmd)
-    assert(ftp_cmd.id == FTPCmd.READ_FILE)
+    assert(ftp_cmd.id == Cmd.READ_FILE)
     assert(checksum_valid == True)
     return rd_cmd
 
@@ -134,6 +145,6 @@ def test_checksum_file_cmd():
     file_name = b'test.txt'
     msg = struct.pack("<H", len(file_name))
     payload = msg + file_name
-    chk_cmd = FTPCmd.create(FTPCmd.FILE_CHECKSUM, payload)
+    chk_cmd = Cmd.create(Cmd.FILE_CHECKSUM, payload)
     assert(chk_cmd.execute() == True)
     return chk_cmd
