@@ -152,8 +152,11 @@ class Neopixel:
         self.chain.show( self.data )
 
     def clear_display(self):
-        self.chain.clear()
-        self.chain.send_buf()
+        #self.chain.clear()
+        #self.chain.send_buf()
+        for i in range(len(self.data)):
+            self.data[i] = (0,0,0)
+        self.chain.show(self.data)
 
     def update_display(self, num_modified_pixels):
         if not num_modified_pixels:
