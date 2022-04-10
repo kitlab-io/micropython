@@ -426,7 +426,7 @@ module.exports = {
       this.code = ` ${pixelData}`
     },
     changeSize () {
-      console.log("JOSH!!! ChangeSize);
+      console.log("JOSH!!! ChangeSize");
       const refs = this.$refs
       if(this.usePreview){
         const before = refs.previewBefore
