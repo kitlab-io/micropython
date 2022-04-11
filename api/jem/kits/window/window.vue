@@ -6,7 +6,7 @@
         <div class="layout align-end is-paint mt-negative-container">
           <div class="editor">
             <div class="draw" :style="getDrawStyle" ref="drawGrid">
-            <div>1</div><div>2</div>
+            <button>1</button><div>2</div>
             </div>
           </div>
         </div>
