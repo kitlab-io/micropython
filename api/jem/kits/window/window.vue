@@ -528,8 +528,8 @@ $px: 2px;
   font-family: 'Press Start 2P', -apple-system, BlinkMacSystemFont, Segoe UI,
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
-  height: 100%;
-  width: 100%;
+  height: 500px;
+  width: 500px;
 }
 
 .copied {
