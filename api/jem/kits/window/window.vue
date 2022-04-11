@@ -5,7 +5,9 @@
         <!-- <h2 class="title">Paint</h2> -->
         <div class="layout align-end is-paint mt-negative-container">
           <div class="editor">
-            <div class="draw" :style="getDrawStyle" ref="drawGrid"></div>
+            <div class="draw" :style="getDrawStyle" ref="drawGrid">
+            <div>1</div><div>2</div>
+            </div>
           </div>
         </div>
 
