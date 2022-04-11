@@ -93,30 +93,6 @@ module.exports = {
     kitReady: false
   }),
   computed: {
-    getRows () {
-      if (window.innerWidth > 1439) {
-        return 9
-      }
-
-      if (window.innerWidth > 720) {
-        return 7
-      }
-
-      return 5
-    },
-    getLabelBtnErase () {
-      const { erase } = this
-
-      return erase ? 'Erase' : 'Paint'
-    },
-    getClassBtnErase () {
-      const { erase } = this
-
-      return {
-        'is-warning': erase,
-        'is-success': !erase
-      }
-    },
     getDrawStyle () {
       const { white } = this
 
@@ -629,14 +605,15 @@ footer .mb {
     height: 300px;
     // width: 600px;
     // height: 600px;
-    border: 3px solid #333333;
-    background-color: #fdfdfd;
+    border: 3px solid #920b0b;
+    background-color: #272c77;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
     background-image: linear-gradient(45deg, #e2e2e2 25%, transparent 25%, transparent 75%, #e2e2e2 75%, #e2e2e2),
       linear-gradient( 45deg, #e2e2e2 25%, transparent 25%, transparent 75%, #e2e2e2 75%, #e2e2e2);
     background-size: 30px 30px;
     background-position: 0 0, 15px 15px;
+    z-index: 1;
   }
 }
 
@@ -743,19 +720,4 @@ input[type="file"], .is-canvas {
   margin-top: -2%;
 }
 
-textarea {
-  resize: none;
-}
-
-.social-buttons {
-  position: absolute;
-  right: 5%;
-  margin-bottom: 0;
-}
-
-.share {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-}
 </style>
