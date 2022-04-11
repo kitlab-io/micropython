@@ -615,7 +615,7 @@ footer .mb {
       linear-gradient( 45deg, #e2e2e2 25%, transparent 25%, transparent 75%, #e2e2e2 75%, #e2e2e2);
     background-size: 30px 30px;
     background-position: 0 0, 15px 15px;
-    z-index: 1;
+    z-index: 10;
   }
 }
 
