@@ -1,5 +1,5 @@
 <template>
-  <main id="remote-control-window">
+  <div id="remote-control-window">
     <div class="layout wrap-row mt">
       <section class="nes-container with-title h-container section-paint">
         <!-- <h2 class="title">Paint</h2> -->
@@ -58,30 +58,13 @@
         </div>
       </section>
 
-     <!-- <section class="form nes-container with-title h-container section-config">
-        <div class="layout nowrap-column">
-            <label>Preview</label>
-            <div class="preview">
-              <div class="before" ref="previewBefore"></div>
-            </div>
-        </div>
-      </section>-->
-
-        <!--<section class="form nes-container with-title h-container section-config">
-        
-       <div class="nes-field mt">
-          <label for="height">Code generated</label>
-          <textarea id="code" ref="textcode" :rows="getRows" name="code" readonly class="nes-input w100" v-model="code"></textarea>
-        </div>
-      </section>-->
-
       <footer class="layout justify-center align-center wrap-column">
         <div class="is-canvas">
           <canvas id="canvas" class="canvas" ref="canvas"></canvas>
         </div>
       </footer>
     </div>
-  </main>
+  </div>
 </template>
 
 <script>
@@ -107,7 +90,6 @@ module.exports = {
     white: false,
     backgroundColor: '#ffffff',
     colorCache: null,
-    usePreview: false,
     kitReady: false
   }),
   computed: {
@@ -353,19 +335,6 @@ module.exports = {
       this.sendPixel(pixel.id, pixel.color);
       //this.output()
     },
-    setPreview () {
-      const size = parseInt(this.size, 10)
-      const pixel = (577 / size) / 3
-      const boxShadows = this.getBoxShadows(pixel)
-      const refs = this.$refs
-      const before = refs.previewBefore
-      before.style.top = `${pixel * -1}px`
-      before.style.left = `${pixel * -1}px`
-      before.style.width = `${pixel}px`
-      before.style.height = `${pixel}px`
-      before.style.boxShadow = boxShadows
-      before.style.background = 'transparent'
-    },
     getPixelData () {
       const pixel = 1
       const allDivs = this.getAllDivs()
@@ -418,21 +387,12 @@ module.exports = {
       return spliced.join(', \n')
     },
     output () {
-      if(this.usePreview){
-        this.setPreview();
-      }
-
       const pixelData = this.getPixelData()
       this.code = ` ${pixelData}`
     },
     changeSize () {
       console.log("JOSH!!! ChangeSize");
       const refs = this.$refs
-      if(this.usePreview){
-        const before = refs.previewBefore
-        before.style = '';
-      }
-
       if (this.size > 100) {
         this.sizeError = true
         return
@@ -528,24 +488,14 @@ $px: 2px;
   font-family: 'Press Start 2P', -apple-system, BlinkMacSystemFont, Segoe UI,
     Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
     sans-serif;
-  height: 500px;
-  width: 500px;
+  height: 500%;
+  width: 500%;
 }
 
 .copied {
   position: absolute !important;
   top: -55px !important;
   left: 30% !important;
-}
-
-.preview {
-  border: 4px solid #333333 !important;
-  height: 200px !important;
-  width: 200px !important;
-  display: inline-block !important;
-  margin-right: 2.8em !important;
-  position: relative !important;
-  box-sizing: border-box !important;
 }
 
 .before {
@@ -730,11 +680,6 @@ footer .mb {
   }
   .section-config {
     margin-bottom: 1em;
-  }
-  .preview {
-    align-self: center;
-    margin-bottom: 1em;
-    display: flex !important;
   }
   footer {
     margin-bottom: 1em;
