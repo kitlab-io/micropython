@@ -453,7 +453,7 @@ a, a:hover {
 }
 </style>
 
-<style scoped lang="scss">
+<style lang="scss">
 $px: 2px;
 
 #remote-control-window {
