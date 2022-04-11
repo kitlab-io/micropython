@@ -6,7 +6,7 @@
         <div class="layout align-end is-paint mt-negative-container">
           <div id="pixel-editor">
             <div class="draw" :style="getDrawStyle" ref="drawGrid">
-            <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div>
+            <!--<div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div>-->
             </div>
           </div>
         </div>
@@ -369,7 +369,6 @@ module.exports = {
       this.code = ` ${pixelData}`
     },
     changeSize () {
-      console.log("JOSH!!! ChangeSize");
       const refs = this.$refs
       if (this.size > 100) {
         this.sizeError = true
@@ -384,12 +383,6 @@ module.exports = {
 
       this.code = CODE_START
       //this.removeChilds()
-      /*
-      0  1  2  3
-      7  6  5  4
-      8  9  10 11
-      15 14 13 12
-      */
       /*
       let id_list = [7,   6,   5,  4,  3,  2,  1,  0,
                      8,   9,   10, 11, 12, 13, 14, 15,
