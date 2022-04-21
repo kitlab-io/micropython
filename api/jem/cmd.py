@@ -1,5 +1,21 @@
 import struct
+import os, sys, json
 # FTP helpers used to parse incoming BLE UART FTP Commands for File i/o
+
+def walk(root, dirs=[], files=[]):
+    for f in os.listdir(root):
+        if os.stat(root + '/' + f)[0] == 0x4000:
+            if not dirs:
+                dirs = []
+            dirs.append(f)
+        else:\r\n\
+            if not files:
+                files = []
+            files.append(f)
+    yield root, dirs, files
+    for d in dirs:
+        yield from walk(root + '/' + d)
+
 class CmdMsg:
     START = bytearray([1,2]) #SOH, STX ascii
     START_I = 0
@@ -215,6 +231,33 @@ class FTPChecksumCmd(Cmd):
         except Exception as e:
             print("Cmd.get_checksum failed %s" % e)
         return c, l
+
+class FTPGetDirsCmd(Cmd):
+    ROOT_NAME_LEN_I = 0
+
+    def __init__(self, id, payload):
+        super().__init__(id, payload)
+        self.data = ""
+
+    def resp(self):
+        return CmdMsg(self.id, self.data).msg()
+
+    def execute(self):
+        root_name_len = struct.unpack("<H",self.payload[FTPGetDirsCmd.ROOT_NAME_LEN_I : FTPGetDirsCmd.ROOT_NAME_LEN_I+2])[0]
+        root_name = self.payload[FTPGetDirsCmd.ROOT_NAME_LEN_I + 2: FTPGetDirsCmd.ROOT_NAME_LEN_I + 2 + fname_len].decode('utf-8')
+        dir_struct = self.get_dir_list(root_name)
+        self.data = json.dumps(dir_struct).encode('utf8') # to raw bytes
+        return True
+
+    def get_dir_list(self, name):
+        # directory structure as list of dictionary elements
+        try:
+            d = []
+            for root, subdirs, files in walk('" + rootPath + "'):
+                d.append({'root':root, 'subdirs':subdirs, 'files': files})
+        except Exception as e:
+            print("Cmd.FTPGetDirList failed %s" % e)
+        return d
 
 class CmdManager:
     def __init__(self):
