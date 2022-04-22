@@ -2,13 +2,16 @@ import struct
 import os, sys, json
 # FTP helpers used to parse incoming BLE UART FTP Commands for File i/o
 
+OS_IS_DIR_NUM  = 0x4000
+
 def walk(root, dirs=[], files=[]):
     for f in os.listdir(root):
-        if os.stat(root + '/' + f)[0] == 0x4000:
+        p = os.path.join(root,f)
+        if os.stat(p)[0] == OS_IS_DIR_NUM:
             if not dirs:
                 dirs = []
             dirs.append(f)
-        else:\r\n\
+        else:
             if not files:
                 files = []
             files.append(f)
@@ -86,7 +89,9 @@ class Cmd:
     FAIL_RESP = 6
     #generic cmd ids
     EXE_CODE = 7 # execute some code, used for general cmds not ftp
-    CMD_ID_LIST = [READ_FILE, WRITE_FILE, FILE_CHECKSUM, FAIL_RESP, EXE_CODE]
+    #get directory structure
+    GET_DIRS = 8
+    CMD_ID_LIST = [READ_FILE, WRITE_FILE, FILE_CHECKSUM, FAIL_RESP, EXE_CODE, GET_DIRS]
     def __init__(self, id, payload):
         self.id = id
         if type(payload) == str:
@@ -105,7 +110,8 @@ class Cmd:
     @classmethod
     def create(cls, id, payload):
         CMD_ID_MAP = {Cmd.READ_FILE: FTPReadCmd, Cmd.WRITE_FILE: FTPWriteCmd,
-        Cmd.FILE_CHECKSUM: FTPChecksumCmd, Cmd.FAIL_RESP: FTPFailCmd, Cmd.EXE_CODE: CodeCmd}
+        Cmd.FILE_CHECKSUM: FTPChecksumCmd, Cmd.FAIL_RESP: FTPFailCmd, Cmd.EXE_CODE: CodeCmd,
+        Cmd.GET_DIRS: FTPGetDirsCmd }
 
         if id in Cmd.CMD_ID_LIST:
             return CMD_ID_MAP[id](id, payload)
@@ -244,19 +250,19 @@ class FTPGetDirsCmd(Cmd):
 
     def execute(self):
         root_name_len = struct.unpack("<H",self.payload[FTPGetDirsCmd.ROOT_NAME_LEN_I : FTPGetDirsCmd.ROOT_NAME_LEN_I+2])[0]
-        root_name = self.payload[FTPGetDirsCmd.ROOT_NAME_LEN_I + 2: FTPGetDirsCmd.ROOT_NAME_LEN_I + 2 + fname_len].decode('utf-8')
+        root_name = self.payload[FTPGetDirsCmd.ROOT_NAME_LEN_I + 2: FTPGetDirsCmd.ROOT_NAME_LEN_I + 2 + root_name_len].decode('utf-8')
         dir_struct = self.get_dir_list(root_name)
         self.data = json.dumps(dir_struct).encode('utf8') # to raw bytes
         return True
 
-    def get_dir_list(self, name):
+    def get_dir_list(self, root_name):
         # directory structure as list of dictionary elements
         try:
             d = []
-            for root, subdirs, files in walk('" + rootPath + "'):
+            for root, subdirs, files in walk(root_name):
                 d.append({'root':root, 'subdirs':subdirs, 'files': files})
         except Exception as e:
-            print("Cmd.FTPGetDirList failed %s" % e)
+            print("Cmd.FTPGetDirsCmd failed %s" % e)
         return d
 
 class CmdManager:
