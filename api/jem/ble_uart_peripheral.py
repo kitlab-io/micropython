@@ -1,6 +1,6 @@
 # Peripheral implementing the BLE UART Service
 from network import Bluetooth
-import time
+import time, json
 import binascii
 _UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 _UART_RX_UUID =      "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -20,8 +20,16 @@ class BLEMANAGER(object):
             print('Creating the BLEMANAGER object')
             cls._instance = super(BLEMANAGER, cls).__new__(cls)
             print("BLEMANAGER: init")
+            name = "JEM"
+            try:
+                with open("jem_config.json", "r") as f:
+                    json_str = f.read()
+                    json_config = json.loads(json_str)
+                    name = json_config['ble']['name'] #get ble adv name
+            except Exception as e:
+                print("BLEMANAGER: Failed to load jem_config.json: %s" % e)
             cls._instance.ble = Bluetooth()
-            cls._instance.ble.set_advertisement(name='JEM', service_uuid=uuid2bytes(_UART_SERVICE_UUID))
+            cls._instance.ble.set_advertisement(name=name, service_uuid=uuid2bytes(_UART_SERVICE_UUID))
             cls._instance.ble.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED, handler=cls._instance.connected_callback)
             cls._instance._connected_handlers = []
             # Put any initialization here.
