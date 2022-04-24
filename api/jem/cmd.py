@@ -3,21 +3,18 @@ import os, sys, json
 # FTP helpers used to parse incoming BLE UART FTP Commands for File i/o
 
 OS_IS_DIR_NUM  = 0x4000
+def path_join(p1, p2):
+    return p1.rstrip("/") + "/" + p2.lstrip("/")
 
-def walk(root, dirs=[], files=[]):
+def get_dir_tree(root, tree):
     for f in os.listdir(root):
-        p = os.path.join(root,f)
-        if os.stat(p)[0] == OS_IS_DIR_NUM:
-            if not dirs:
-                dirs = []
-            dirs.append(f)
-        else:
-            if not files:
-                files = []
-            files.append(f)
-    yield root, dirs, files
-    for d in dirs:
-        yield from walk(root + '/' + d)
+        path = path_join(root,f)
+        is_dir = (os.stat(path)[0] == 0x4000)
+        ftype = 'tree' if is_dir else 'blob'
+        tree.append({'path': path, 'type': ftype})
+        if is_dir:
+            get_dir_tree(path, tree)
+    return tree
 
 class CmdMsg:
     START = bytearray([1,2]) #SOH, STX ascii
@@ -257,13 +254,13 @@ class FTPGetDirsCmd(Cmd):
 
     def get_dir_list(self, root_name):
         # directory structure as list of dictionary elements
+        tree = None
         try:
-            d = []
-            for root, subdirs, files in walk(root_name):
-                d.append({'root':root, 'subdirs':subdirs, 'files': files})
+            t=[{'path': root_name, 'type':'tree'}]
+            tree=get_dir_tree(root=root_name, tree=t)
         except Exception as e:
             print("Cmd.FTPGetDirsCmd failed %s" % e)
-        return d
+        return tree
 
 class CmdManager:
     def __init__(self):
