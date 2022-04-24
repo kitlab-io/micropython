@@ -1,5 +1,21 @@
 import struct
+import os, sys, json
 # FTP helpers used to parse incoming BLE UART FTP Commands for File i/o
+
+OS_IS_DIR_NUM  = 0x4000
+def path_join(p1, p2):
+    return p1.rstrip("/") + "/" + p2.lstrip("/")
+
+def get_dir_tree(root, tree):
+    for f in os.listdir(root):
+        path = path_join(root,f)
+        is_dir = (os.stat(path)[0] == 0x4000)
+        ftype = 'tree' if is_dir else 'blob'
+        tree.append({'path': path, 'type': ftype})
+        if is_dir:
+            get_dir_tree(path, tree)
+    return tree
+
 class CmdMsg:
     START = bytearray([1,2]) #SOH, STX ascii
     START_I = 0
@@ -70,7 +86,9 @@ class Cmd:
     FAIL_RESP = 6
     #generic cmd ids
     EXE_CODE = 7 # execute some code, used for general cmds not ftp
-    CMD_ID_LIST = [READ_FILE, WRITE_FILE, FILE_CHECKSUM, FAIL_RESP, EXE_CODE]
+    #get directory structure
+    GET_DIRS = 8
+    CMD_ID_LIST = [READ_FILE, WRITE_FILE, FILE_CHECKSUM, FAIL_RESP, EXE_CODE, GET_DIRS]
     def __init__(self, id, payload):
         self.id = id
         if type(payload) == str:
@@ -89,7 +107,8 @@ class Cmd:
     @classmethod
     def create(cls, id, payload):
         CMD_ID_MAP = {Cmd.READ_FILE: FTPReadCmd, Cmd.WRITE_FILE: FTPWriteCmd,
-        Cmd.FILE_CHECKSUM: FTPChecksumCmd, Cmd.FAIL_RESP: FTPFailCmd, Cmd.EXE_CODE: CodeCmd}
+        Cmd.FILE_CHECKSUM: FTPChecksumCmd, Cmd.FAIL_RESP: FTPFailCmd, Cmd.EXE_CODE: CodeCmd,
+        Cmd.GET_DIRS: FTPGetDirsCmd }
 
         if id in Cmd.CMD_ID_LIST:
             return CMD_ID_MAP[id](id, payload)
@@ -215,6 +234,33 @@ class FTPChecksumCmd(Cmd):
         except Exception as e:
             print("Cmd.get_checksum failed %s" % e)
         return c, l
+
+class FTPGetDirsCmd(Cmd):
+    ROOT_NAME_LEN_I = 0
+
+    def __init__(self, id, payload):
+        super().__init__(id, payload)
+        self.data = ""
+
+    def resp(self):
+        return CmdMsg(self.id, self.data).msg()
+
+    def execute(self):
+        root_name_len = struct.unpack("<H",self.payload[FTPGetDirsCmd.ROOT_NAME_LEN_I : FTPGetDirsCmd.ROOT_NAME_LEN_I+2])[0]
+        root_name = self.payload[FTPGetDirsCmd.ROOT_NAME_LEN_I + 2: FTPGetDirsCmd.ROOT_NAME_LEN_I + 2 + root_name_len].decode('utf-8')
+        dir_struct = self.get_dir_list(root_name)
+        self.data = json.dumps(dir_struct).encode('utf8') # to raw bytes
+        return True
+
+    def get_dir_list(self, root_name):
+        # directory structure as list of dictionary elements
+        tree = None
+        try:
+            t=[{'path': root_name, 'type':'tree'}]
+            tree=get_dir_tree(root=root_name, tree=t)
+        except Exception as e:
+            print("Cmd.FTPGetDirsCmd failed %s" % e)
+        return tree
 
 class CmdManager:
     def __init__(self):
