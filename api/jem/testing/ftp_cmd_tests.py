@@ -148,3 +148,11 @@ def test_checksum_file_cmd():
     chk_cmd = Cmd.create(Cmd.FILE_CHECKSUM, payload)
     assert(chk_cmd.execute() == True)
     return chk_cmd
+
+def test_getdir_cmd():
+    print("FTPGetDirsCmd test")
+    root_name = b'.'
+    msg = struct.pack("<H", len(root_name))
+    payload = msg + root_name
+    cmd = Cmd.create(Cmd.GET_DIRS, payload)
+    return cmd
