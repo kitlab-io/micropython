@@ -449,6 +449,7 @@ a, a:hover {
 </style>
 
 <style lang="scss">
+@import 'nes.scss';
 $px: 2px;
 
 #remote-control-window {
