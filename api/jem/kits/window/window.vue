@@ -448,7 +448,7 @@ a, a:hover {
 }
 </style>
 
-<style lang="scss">
+<style scoped lang="scss">
 @import 'nes.scss';
 $px: 2px;
 
