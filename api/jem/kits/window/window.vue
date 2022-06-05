@@ -65,13 +65,13 @@ module.exports = {
     prepareKit(){
       //disable any leds examples running on kit (like button triggered led thread)
       console.log("prepareKit!!!!")
-      this.device.rcService.sendCommand("kit._run = False");
+      this.parent.device.rcService.sendCommand("kit._run = False");
     },
 
     clearDisplay(){
         //clear_display
-        if(this.device.isConnected()){
-          this.device.rcService.sendCommand(`kit.neopixel.clear_display()`);
+        if(this.parent.device.isConnected()){
+          this.parent.device.rcService.sendCommand(`kit.neopixel.clear_display()`);
         }
     },
 
@@ -93,7 +93,7 @@ module.exports = {
       console.log("sendPixel: " + parseInt(id));
       //console.log(rgb_color);
       //TODO: send color to JEM over ble
-      if(this.device.isConnected()){
+      if(this.parent.device.isConnected()){
         if(!this.kitReady){
           this.prepareKit();
           this.kitReady = true;
