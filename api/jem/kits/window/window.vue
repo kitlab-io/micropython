@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { Device } from '../store/projects.js';
+//import { Device } from '../store/projects.js';
 module.exports = {
   name: 'window-kit',
   props: ['parent', 'response', 'auxResponse'],
@@ -29,7 +29,6 @@ module.exports = {
     size: 8,
     color: "#FF00FF",
     index: 0,
-    device: Device,
     kitReady: false,
     prevId: null,
     prevRgbColor: null,
@@ -103,8 +102,7 @@ module.exports = {
         let g = parseInt(rgb_color[1]);
         let b = parseInt(rgb_color[2]);
         //let hexColor = this.rgbToHex(r, g, b); //ex: [1,2,3] => '0x010203'
-        //this.device.rcService.sendCommand(`kit.jem.led.set_color(${hexColor})`); //ex: set_color(0x110022)       
-        this.device.rcService.sendCommand(`kit.neopixel.set_pixel(${id}, (${r}, ${g}, ${b}))`);
+        this.parent.Device.rcService.sendCommand(`kit.neopixel.set_pixel(${id}, (${r}, ${g}, ${b}))`);
       }else {
         console.warn("sendPixel ignored - Device not connected");
       }
