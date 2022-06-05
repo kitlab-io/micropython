@@ -145,7 +145,7 @@ module.exports = {
 }
 </script>
 
-<style>
+<style scoped>
 #RCWindow
 {
     cursor: pointer;
