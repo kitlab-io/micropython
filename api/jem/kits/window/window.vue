@@ -1,3 +1,29 @@
+<style scoped>
+#RCWindow
+{
+    cursor: pointer;
+}
+table, th, td {
+  border: 1px solid rgb(247, 241, 241);
+}
+th, td {
+  background-color: #96D4D4;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.disable-select {
+    user-select: none; /* supported by Chrome and Opera */
+   -webkit-user-select: none; /* Safari */
+   -khtml-user-select: none; /* Konqueror HTML */
+   -moz-user-select: none; /* Firefox */
+   -ms-user-select: none; /* Internet Explorer/Edge */
+}
+
+</style>
+
 <template>
   <div id="RCWindow">
   <p>WindowKit</p>
@@ -145,29 +171,4 @@ module.exports = {
 }
 </script>
 
-<style scoped>
-#RCWindow
-{
-    cursor: pointer;
-}
-table, th, td {
-  border: 1px solid rgb(247, 241, 241);
-}
-th, td {
-  background-color: #96D4D4;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-.disable-select {
-    user-select: none; /* supported by Chrome and Opera */
-   -webkit-user-select: none; /* Safari */
-   -khtml-user-select: none; /* Konqueror HTML */
-   -moz-user-select: none; /* Firefox */
-   -ms-user-select: none; /* Internet Explorer/Edge */
-}
-
-</style>
 
