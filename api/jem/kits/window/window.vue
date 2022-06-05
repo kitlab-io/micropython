@@ -4,14 +4,14 @@
   <v-color-picker dot-size="25" swatches-max-height="200" v-model="color"></v-color-picker>
     <table class="disable-select">
       <tr v-for="(row) in rows" :key="row">
-        <td v-bind:class="getClassNameFromRow(row, 0)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
-        <td v-bind:class="getClassNameFromRow(row, 1)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
-        <td v-bind:class="getClassNameFromRow(row, 2)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
-        <td v-bind:class="getClassNameFromRow(row, 3)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
-        <td v-bind:class="getClassNameFromRow(row, 4)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
-        <td v-bind:class="getClassNameFromRow(row, 5)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
-        <td v-bind:class="getClassNameFromRow(row, 6)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
-        <td v-bind:class="getClassNameFromRow(row, 7)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
+        <td v-bind:class="getClassNameFromRow(row, 0)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">1</td>
+        <td v-bind:class="getClassNameFromRow(row, 1)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">2</td>
+        <td v-bind:class="getClassNameFromRow(row, 2)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">3</td>
+        <td v-bind:class="getClassNameFromRow(row, 3)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">4</td>
+        <td v-bind:class="getClassNameFromRow(row, 4)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">5</td>
+        <td v-bind:class="getClassNameFromRow(row, 5)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">6</td>
+        <td v-bind:class="getClassNameFromRow(row, 6)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">7</td>
+        <td v-bind:class="getClassNameFromRow(row, 7)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">8</td>
       </tr>
     </table>
   </div>
