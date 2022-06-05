@@ -102,7 +102,7 @@ module.exports = {
         let g = parseInt(rgb_color[1]);
         let b = parseInt(rgb_color[2]);
         //let hexColor = this.rgbToHex(r, g, b); //ex: [1,2,3] => '0x010203'
-        this.parent.Device.rcService.sendCommand(`kit.neopixel.set_pixel(${id}, (${r}, ${g}, ${b}))`);
+        this.parent.device.rcService.sendCommand(`kit.neopixel.set_pixel(${id}, (${r}, ${g}, ${b}))`);
       }else {
         console.warn("sendPixel ignored - Device not connected");
       }
