@@ -79,13 +79,13 @@ module.exports = {
     prepareKit(){
       //disable any leds examples running on kit (like button triggered led thread)
       console.log("prepareKit!!!!")
-      this.this.parent.device.rcService.sendCommand("kit._run = False");
+      this.parent.device.rcService.sendCommand("kit._run = False");
     },
 
     clearDisplay(){
         //clear_display
-        if(this.this.parent.device.isConnected()){
-          this.this.parent.device.rcService.sendCommand(`kit.neopixel.clear_display()`);
+        if(this.parent.device.isConnected()){
+          this.parent.device.rcService.sendCommand(`kit.neopixel.clear_display()`);
         }
     },
 
@@ -107,7 +107,7 @@ module.exports = {
       console.log("sendPixel: " + parseInt(id));
       //console.log(rgb_color);
       //TODO: send color to JEM over ble
-      if(this.this.parent.device.isConnected()){
+      if(this.parent.device.isConnected()){
         if(!this.kitReady){
           this.prepareKit();
           this.kitReady = true;
@@ -116,8 +116,8 @@ module.exports = {
         let g = parseInt(rgb_color[1]);
         let b = parseInt(rgb_color[2]);
         //let hexColor = this.rgbToHex(r, g, b); //ex: [1,2,3] => '0x010203'
-        //this.this.parent.device.rcService.sendCommand(`kit.jem.led.set_color(${hexColor})`); //ex: set_color(0x110022)       
-        this.this.parent.device.rcService.sendCommand(`kit.neopixel.set_pixel(${id}, (${r}, ${g}, ${b}))`);
+        //this.parent.device.rcService.sendCommand(`kit.jem.led.set_color(${hexColor})`); //ex: set_color(0x110022)       
+        this.parent.device.rcService.sendCommand(`kit.neopixel.set_pixel(${id}, (${r}, ${g}, ${b}))`);
       }else {
         console.warn("sendPixel ignored - this.parent.device not connected");
       }
