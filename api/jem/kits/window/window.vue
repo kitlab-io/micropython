@@ -1,43 +1,17 @@
-<style scoped>
-#RCWindow
-{
-    cursor: pointer;
-}
-table, th, td {
-  border: 1px solid rgb(247, 241, 241);
-}
-th, td {
-  background-color: #96D4D4;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-.disable-select {
-    user-select: none; /* supported by Chrome and Opera */
-   -webkit-user-select: none; /* Safari */
-   -khtml-user-select: none; /* Konqueror HTML */
-   -moz-user-select: none; /* Firefox */
-   -ms-user-select: none; /* Internet Explorer/Edge */
-}
-
-</style>
-
 <template>
-  <div id="RCWindow">
-  <p>WindowKit</p>
+  <div id="RCWindow" :style="{'cursor': 'pointer'}">
+  <p>RCWindow</p>
   <v-color-picker dot-size="25" swatches-max-height="200" v-model="color"></v-color-picker>
-    <table class="disable-select">
+    <table :style="tableStyleObject">
       <tr v-for="(row) in rows" :key="row">
-        <td v-bind:class="getClassNameFromRow(row, 0)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">1</td>
-        <td v-bind:class="getClassNameFromRow(row, 1)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">2</td>
-        <td v-bind:class="getClassNameFromRow(row, 2)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">3</td>
-        <td v-bind:class="getClassNameFromRow(row, 3)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">4</td>
-        <td v-bind:class="getClassNameFromRow(row, 4)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">5</td>
-        <td v-bind:class="getClassNameFromRow(row, 5)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">6</td>
-        <td v-bind:class="getClassNameFromRow(row, 6)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">7</td>
-        <td v-bind:class="getClassNameFromRow(row, 7)" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel">8</td>
+        <td v-bind:class="getClassNameFromRow(row, 0)" :style="cellStyleObject" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
+        <td v-bind:class="getClassNameFromRow(row, 1)" :style="cellStyleObject" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
+        <td v-bind:class="getClassNameFromRow(row, 2)" :style="cellStyleObject" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
+        <td v-bind:class="getClassNameFromRow(row, 3)" :style="cellStyleObject" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
+        <td v-bind:class="getClassNameFromRow(row, 4)" :style="cellStyleObject" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
+        <td v-bind:class="getClassNameFromRow(row, 5)" :style="cellStyleObject" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
+        <td v-bind:class="getClassNameFromRow(row, 6)" :style="cellStyleObject" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
+        <td v-bind:class="getClassNameFromRow(row, 7)" :style="cellStyleObject" @mousedown="mouseDown" @mousemove="mouseMove" @mouseup="mouseUp" v-on:click="clickPixel"></td>
       </tr>
     </table>
   </div>
@@ -46,7 +20,7 @@ th, td {
 <script>
 //import { Device } from '../store/projects.js';
 module.exports = {
-  name: 'window-kit',
+  name: 'WindowKit',
   props: ['parent', 'response', 'auxResponse'],
   components: {
     // GithubCorner
@@ -55,12 +29,28 @@ module.exports = {
     size: 8,
     color: "#FF00FF",
     index: 0,
+    device: Device,
     kitReady: false,
     prevId: null,
     prevRgbColor: null,
     painting: false,
     pixelPadNbsp: "&nbsp;&nbsp;&nbsp;&nbsp;",
     rows: [0, 1, 2, 3, 4, 5, 6, 7],
+    cellStyleObject: {
+      'background-color': '#96D4D4',
+      'padding-top' : '10px',
+      'padding-bottom' : '10px',
+      'padding-left' : '10px',
+      'padding-right' : '10px'
+    },
+    tableStyleObject: {
+      border: '1px solid rgb(247, 241, 241)',
+      'user-select' : 'none', /* supported by Chrome and Opera */
+      '-webkit-user-select' : 'none', /* Safari */
+      '-khtml-user-select' : 'none', /* Konqueror HTML */
+      '-moz-user-select' : 'none', /* Firefox */
+      '-ms-user-select' : 'none', /* Internet Explorer/Edge */
+    }
   }),
 
   methods: {
@@ -91,13 +81,13 @@ module.exports = {
     prepareKit(){
       //disable any leds examples running on kit (like button triggered led thread)
       console.log("prepareKit!!!!")
-      this.parent.device.rcService.sendCommand("kit._run = False");
+      this.device.rcService.sendCommand("kit._run = False");
     },
 
     clearDisplay(){
         //clear_display
-        if(this.parent.device.isConnected()){
-          this.parent.device.rcService.sendCommand(`kit.neopixel.clear_display()`);
+        if(this.device.isConnected()){
+          this.device.rcService.sendCommand(`kit.neopixel.clear_display()`);
         }
     },
 
@@ -119,7 +109,7 @@ module.exports = {
       console.log("sendPixel: " + parseInt(id));
       //console.log(rgb_color);
       //TODO: send color to JEM over ble
-      if(this.parent.device.isConnected()){
+      if(this.device.isConnected()){
         if(!this.kitReady){
           this.prepareKit();
           this.kitReady = true;
@@ -128,7 +118,8 @@ module.exports = {
         let g = parseInt(rgb_color[1]);
         let b = parseInt(rgb_color[2]);
         //let hexColor = this.rgbToHex(r, g, b); //ex: [1,2,3] => '0x010203'
-        this.parent.device.rcService.sendCommand(`kit.neopixel.set_pixel(${id}, (${r}, ${g}, ${b}))`);
+        //this.device.rcService.sendCommand(`kit.jem.led.set_color(${hexColor})`); //ex: set_color(0x110022)       
+        this.device.rcService.sendCommand(`kit.neopixel.set_pixel(${id}, (${r}, ${g}, ${b}))`);
       }else {
         console.warn("sendPixel ignored - Device not connected");
       }
@@ -170,5 +161,4 @@ module.exports = {
   }
 }
 </script>
-
 
