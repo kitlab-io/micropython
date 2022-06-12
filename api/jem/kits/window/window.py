@@ -1,7 +1,7 @@
 # demo.py
 # run some example code to demonstrate JEM features
 from drivers.neopixel import Neopixel
-from jem.jemimu import JemIMU
+from jemimu import JemIMU
 import _thread
 import time
 
@@ -15,7 +15,8 @@ class Window:
         self.imu = JemIMU()
 
     def start(self):
-        self.start_main_thread()
+        #self.start_main_thread()
+        print("window kit started without main thread")
 
     def leveler(self, prev_roll, roll):
         c=(127, 127, 127)
