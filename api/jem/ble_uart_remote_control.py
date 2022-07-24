@@ -114,11 +114,14 @@ class BLEUARTREMOTECONTROL:
         return
 
     def _flush(self):
-        data = self._tx_buf[0:self.tx_max_len]
-        self._tx_buf = self._tx_buf[self.tx_max_len:]
-        self._uart.write(data)
-        if self._tx_buf:
-            self.schedule_tx()
+        try:
+            data = self._tx_buf[0:self.tx_max_len]
+            self._tx_buf = self._tx_buf[self.tx_max_len:]
+            self._uart.write(data)
+            if self._tx_buf:
+                self.schedule_tx()
+        except Exception as e:
+            print("_flush failed: %s" % e)
 
     def _aux_flush(self):
         try:
