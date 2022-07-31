@@ -25,6 +25,7 @@ class BLEUARTREMOTECONTROL:
         self.cmd_manager = CmdManager()
         self._uart.set_rx_notify_callback(self.rx_notification)
         self._uart.set_aux_callback(uuid=RC_SYNC_UUID, callback=self.sync_callback, trigger_type=Bluetooth.CHAR_WRITE_EVENT)
+        self._exec_cmd = self.schedule_exec_cmd
 
     def sync_callback(self, chr, data=None):
         try:
@@ -35,6 +36,11 @@ class BLEUARTREMOTECONTROL:
                     self._cmd_queue.clear()
                 if sync_type == 'r':
                     self.cmd_manager.reset()
+                if sync_type == 'e':
+                    self._exec_cmd = self.schedule_eval_cmd
+                if sync_type == 'x':
+                    self._exec_cmd = self.schedule_exec_cmd
+
         except Exception as e:
             print("sync_callback failed: %s" % e)
 
@@ -75,7 +81,7 @@ class BLEUARTREMOTECONTROL:
             resp = "ok"
             code = data.decode("utf-8") # convert to string instead of byte array
             self._cmd_queue.append(code)
-            self.schedule_exec_cmd()
+            self._exec_cmd()
         except Exception as e:
             resp = "queue_cmd failed: %s" % e
             print(resp)
