@@ -3,21 +3,25 @@
 # The Mobile app will read this file and generate a button for you
 
 import json
-features = { "buttons": {}, "sliders": {} }
+features = { "buttons": [], "sliders": [] }
 
 # pulse button
-features["buttons"]["pulse"] = {}
-features["buttons"]["pulse"]["func"] = "button_sparkle"
-features["buttons"]["pulse"]["title"] = "Sparkle"
-features["buttons"]["pulse"]["desc"] = "Create random sparkle"
+button = {}
+button["func"] = "button_sparkle"
+button["title"] = "Sparkle"
+button["desc"] = "Create random sparkle"
+
+features["buttons"].append(button)
 
 # slider
-features["sliders"]["intensity"] = {}
-features["sliders"]["intensity"]["func"] = "slider_intensity"
-features["sliders"]["intensity"]["title"] = "intensity"
-features["sliders"]["intensity"]["desc"] = "Set led intensity 1 - 100%"
-features["sliders"]["intensity"]["min"] = 1
-features["sliders"]["intensity"]["max"] = 100
+slider = {}
+slider["func"] = "slider_intensity"
+slider["title"] = "intensity"
+slider["desc"] = "Set led intensity 1 - 100%"
+slider["min"] = 1
+slider["max"] = 100
+
+features["sliders"].append(slider)
 
 features_json = json.dumps(features)
 
