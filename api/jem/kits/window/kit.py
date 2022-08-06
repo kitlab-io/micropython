@@ -2,14 +2,14 @@
 # Add your custom code here
 # The Mobile app will read this file and generate a button for you
 
-import json
+import json, pycom
 features = { "buttons": [], "sliders": [] }
 
 # pulse button
 button = {}
-button["func"] = "button_sparkle"
-button["title"] = "Sparkle"
-button["desc"] = "Create random sparkle"
+button["func"] = "button_toggle_led"
+button["title"] = "Toggle LED"
+button["desc"] = "Toggle rgb led"
 
 features["buttons"].append(button)
 
@@ -24,14 +24,21 @@ slider["max"] = 100
 features["sliders"].append(slider)
 
 features_json = json.dumps(features)
+g_led_on = False
 
 # Make a custom button - must include button_somename
-def button_sparkle():
+def button_toggle_led():
+    global g_led_on
     try:
-        kit.neopixel.sparkle(count=10, random_color=False)
+        if g_led_on:
+            pycom.rgbled(0x000000)
+            g_led_on = False
+        else:
+            pycom.rgbled(0x440000)
+            g_led_on = True
         return True
     except Exception as e:
-        print("button_sparkle failed: %s" % e)
+        print("button_toggle_led failed: %s" % e)
         return False
 
 # Make custom slider - must include slider_somename
