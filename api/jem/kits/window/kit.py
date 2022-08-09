@@ -18,6 +18,7 @@ slider = {}
 slider["func"] = "slider_intensity"
 slider["title"] = "intensity"
 slider["desc"] = "Set led intensity 1 - 100%"
+slider["value"] = 50
 slider["min"] = 1
 slider["max"] = 100
 
@@ -44,6 +45,7 @@ def button_toggle_led():
 # Make custom slider - must include slider_somename
 def slider_intensity(value):
     try:
+        printf("slider_intensity: %s" % value)
         intensity = int(value)
         kit.neopixel.chain.intensity = intensity/100.0
     except Exception as e:
