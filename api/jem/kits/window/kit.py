@@ -45,9 +45,10 @@ def button_toggle_led():
 # Make custom slider - must include slider_somename
 def slider_intensity(value):
     try:
-        printf("slider_intensity: %s" % value)
+        print("slider_intensity: %s" % value)
         intensity = int(value)
-        kit.neopixel.chain.intensity = intensity/100.0
+        rgb_val = (intensity/100)*0x440000
+        pycom.rgbled(int(rgb_val))
     except Exception as e:
         print("feature 2 failed: %s" % e)
 
