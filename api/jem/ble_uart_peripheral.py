@@ -32,6 +32,7 @@ class BLEMANAGER(object):
             cls._instance.ble.set_advertisement(name=name, service_uuid=uuid2bytes(_UART_SERVICE_UUID))
             cls._instance.ble.callback(trigger=Bluetooth.CLIENT_CONNECTED | Bluetooth.CLIENT_DISCONNECTED, handler=cls._instance.connected_callback)
             cls._instance._connected_handlers = []
+            cls._connected = False
             # Put any initialization here.
         cls._instance.ble.advertise(True)
         return cls._instance
@@ -48,6 +49,14 @@ class BLEMANAGER(object):
         if self._connected_handlers:
             for handler in self._connected_handlers:
                 handler(events)
+                
+        if  events & Bluetooth.CLIENT_CONNECTED:
+            self._connected = True
+        elif events & Bluetooth.CLIENT_DISCONNECTED:
+            self._connected = False
+
+    def is_connected(self):
+        return self._connected
 
 
 class BLEUART:

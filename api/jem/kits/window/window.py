@@ -1,95 +1,70 @@
-# demo.py
-# run some example code to demonstrate JEM features
-from drivers.neopixel import Neopixel
-from jemimu import JemIMU
-import _thread
-import time
+# User kit code
+# Add your custom code here
+# The Mobile app will read this file and generate a button
 
-WINDOW_PIXEL_COUNT = 8*8 # 64 pixels
-# Window Kit
-class Window:
-    def __init__(self, neopixel_leds=WINDOW_PIXEL_COUNT, rc_ble_service=None):
-        self.neopixel = Neopixel(num_leds=neopixel_leds)
-        self._run = False
-        self._rc_ble_service = rc_ble_service
-        self.imu = JemIMU()
+import json, pycom, time
+from kits.window.kit_helper import *
+running = True # set this to False to stop the run method below
 
-    def start(self):
-        #self.start_main_thread()
-        print("window kit started without main thread")
+features = { "buttons": [], "sliders": [] }
 
-    def leveler(self, prev_roll, roll):
-        c=(127, 127, 127)
-        max_pixels = self.neopixel.num_leds
-        max_roll = 90.0
-        first_pixel = int(max_pixels/2)
-        last_pixel = int(first_pixel + roll * (max_pixels/2)/max_roll)
-        prev_last_pixel = int(first_pixel + prev_roll * (max_pixels/2)/max_roll)
-        dir = 1
-        if last_pixel < prev_last_pixel:
-            dir = -1
-            c = (0,0,0)
-        self.neopixel.set_pixels(start_pixel=prev_last_pixel, end_pixel=last_pixel, c=c, dir=dir)
+# buttons
+button = {}
+button["func"] = "button_toggle_led"
+button["title"] = "Toggle LED"
+button["desc"] = "Toggle rgb led"
 
-    def _leveler_with_motion(self):
-        prev_roll = 0
-        roll = self.imu.orientation['roll']
-        while self._run:
-            self.leveler(prev_roll, roll)
-            prev_roll = roll
-            roll = self.imu.orientation['roll']
-            time.sleep(0.01)
+features["buttons"].append(button)
 
-    def _sparkle_with_motion(self, rainbow=False, count=10):
-        # don't call this directly!
-        # use the start_sparkle_motion_thread
-        diff_roll = 0.0
-        prev_roll = self.imu.orientation['roll']
-        while self._run:
-            if diff_roll >= 0.5:
-                self.neopixel.sparkle(count=count, random_color=rainbow)
-            time.sleep(0.01)
+# slider
+slider = {}
+slider["func"] = "slider_intensity"
+slider["title"] = "intensity"
+slider["desc"] = "Set led intensity 1 - 100%"
+slider["value"] = 50
+slider["min"] = 1
+slider["max"] = 100
 
-            new_roll = self.imu.orientation['roll']
-            diff_roll = abs(new_roll - prev_roll)
-            prev_roll = new_roll
+features["sliders"].append(slider)
 
-    def start_sparkle_motion_thread(self, rainbow=True, count=100):
-        self._run = True
-        _thread.start_new_thread(self._sparkle_with_motion, (rainbow, count))
+features_json = json.dumps(features)
+g_led_on = False
 
-    def start_leveler_motion_thread(self, rainbow=True, count=100):
-        self._run = True
-        _thread.start_new_thread(self._leveler_with_motion, ())
+# Make a custom button - must include button_somename
+def button_toggle_led():
+    global g_led_on
+    try:
+        if g_led_on:
+            kit_helper.board.led.set_color(0x000000)
+            g_led_on = False
+        else:
+            kit_helper.board.led.set_color(0x440000)
+            g_led_on = True
+        return True
+    except Exception as e:
+        print("button_toggle_led failed: %s" % e)
+        return False
 
-    def stop_sparkle_motion_thread(self):
-        self._run = False
+# Make custom slider - must include slider_somename
+def slider_intensity(value):
+    try:
+        print("slider_intensity: %s" % value)
+        intensity = int(value)
+        rgb_val = (intensity/100)*0x440000
+        kit_helper.board.led.set_color(int(rgb_val))
+    except Exception as e:
+        print("feature 2 failed: %s" % e)
 
-    def stop_leveler_motion_thread(self):
-        self._run = False
+# Default behavior - tell kit what to do when not connected to the mobile app
 
-    def _main_thread(self):
-        # put stuff that you want to run in the background here
-        print("Window Kit main thread started")
-        if not self._rc_ble_service:
-            print("_main_thread failed: _rc_ble_service not set")
-            return
-        try:
-            prev_roll = None
-            while self._main_run:
-                time.sleep(0.1)
-                if not self._rc_ble_service.is_connected():
-                    continue
-                roll = self.imu.orientation['roll']
-                if prev_roll != roll:
-                    s = b"roll = %s" % roll
-                    self._rc_ble_service.write_aux(s)
-                    prev_roll = roll
-        except Exception as e:
-            print("_main_thread failed: %s" % e)
-        print("Window Kit main thread stopped")
-
-    def start_main_thread(self):
-        print("start_main_thread")
-        self._main_run = True
-        _thread.start_new_thread(self._main_thread, ())
+def run():
+    global running
+    try:
+        while running:
+            while (kit_helper.connected() == False) and running:
+                time.sleep(5)
+                print("waiting")
+            while kit_helper.connected() and running:
+                time.sleep(1) # do whatever here while connected to app
+    except Exception as e:
+        print("run failed: %s" % e)
