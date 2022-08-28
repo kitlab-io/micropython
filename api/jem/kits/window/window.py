@@ -59,8 +59,12 @@ def slider_intensity(value):
 
 def run():
     global running
-    while (kit_helper.connected() == False) and running:
-        time.sleep(5)
-        print("waiting")
-    while kit_helper.connected() and running:
-        time.sleep(1) # do whatever here while connected to app
+    try:
+        while running:
+            while (kit_helper.connected() == False) and running:
+                time.sleep(5)
+                print("waiting")
+            while kit_helper.connected() and running:
+                time.sleep(1) # do whatever here while connected to app
+    except Exception as e:
+        print("run failed: %s" % e)
