@@ -2,18 +2,11 @@
 #from kits import kit_main
 #kit_main.load_kit()]
 from jemwifi import *
+
 global wlan
 wlan = setup_wifi()
 
-from kits import kit_main
-kit = None
+from kits.kit import Kit
 
-if kit_main.kit_available:
-    kit = kit_main.load_kit(rc=rc, kit='demo')
-
-"""
-import time
-from kits.lantern.matrix_demo import MatrixDemo
-d = MatrixDemo()
-time.sleep(1)
-"""
+kit = Kit()
+kit.start()
