@@ -2,6 +2,7 @@
 #from kits import kit_main
 #kit_main.load_kit()]
 from jemwifi import *
+from jem_help import jem_help
 
 global wlan
 wlan = setup_wifi()
