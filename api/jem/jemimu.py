@@ -72,3 +72,11 @@ class JemIMU(BNO055):
             return {'yaw':d[0], 'roll':d[1], 'pitch':d[2]}
         except Exception as e:
             print("orientation failed - from {0} device - {1}".format(self.pn, e))
+
+if __name__ == "__main__":
+    import time
+    imu = JemIMU()
+    # move your hand up / down over the range sensor to see distance change
+    for i in range(10): # run for 10 seconds
+        print("orientation: %s" % imu.orientation)
+        time.sleep(1)

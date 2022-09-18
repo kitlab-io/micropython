@@ -16,3 +16,11 @@ class JemRange(VL53L0X):
     def __init__(self, i2c=None):
         """Initialize JemDevice parent class and then init vl53l0x driver"""
         super(JemRange, self).__init__(i2c=i2c, address=VL53L0X.I2C_ADDRESS, io_timeout_s=0)
+
+if __name__ == "__main__":
+    import time
+    sensor = JemRange()
+    # move your hand up / down over the range sensor to see distance change
+    for i in range(10): # run for 15 seconds
+        print("distance: %s" % sensor.distance)
+        time.sleep(1.5)

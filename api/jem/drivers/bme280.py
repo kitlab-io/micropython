@@ -116,7 +116,7 @@ class BME280:
                 this to read out the sensor without allocating heap memory
 
             Returns:
-                array with temperature, pressure, humidity. Will be the one
+                array with temperature (deg C), pressure (hPa), humidity. Will be the one
                 from the result parameter if not None
         """
         self.read_raw_data(self._l3_resultarray)
