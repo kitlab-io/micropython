@@ -6,7 +6,7 @@ class JemLed:
     RED = 0x880000 # red, green blue
     GREEN = 0x008800
     BLUE = 0x000088
-    
+
     def __init__(self):
         self.color = JemLed.RED
         self.heartbeat_disabled = False
@@ -25,11 +25,10 @@ class JemLed:
 if __name__ == "__main__":
     import time
     led = JemLed()
-
     red = 0xFF0000
-    print("turn on led")
-    led.set_color(red) # set color to red
-    print("sleep")
-    time.sleep(3) # wait 3 seconds
-    print("turn off led")
-    led.off() # turn off the led
+
+    for i in range(10):
+        led.set_color(red) # set color to red
+        time.sleep(0.5) # wait 1/2 second
+        led.off() # turn off the led
+        time.sleep(0.5) # wait 1/2 second

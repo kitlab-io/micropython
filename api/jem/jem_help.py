@@ -33,7 +33,7 @@ def jem_help(file_name=None):
     if not file_name:
         print("\n# example using jem_help:\n")
         for k in JEM_HELP_MAP:
-            ex_help = "jem_help(%s)" % k
+            ex_help = "jem_help('%s')" % k
             print(ex_help)
         return
 

@@ -59,3 +59,13 @@ class JemBattery(BQ27441):
             return result
         except Exception as e:
             print ("Failed to get state of health (soh): %s" % e )
+
+if __name__ == "__main__":
+    import time
+    batt = JemBattery()
+    for i in range(10): # run for 10 seconds
+        current_average = batt.current_average
+        soc = batt.state_of_charge
+        print("soc (percent): %s" % soc)
+        print("current (mA): %s" % current_average)
+        time.sleep(1)
