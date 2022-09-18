@@ -22,3 +22,12 @@ class JemLight(TEMT6000):
     def __init__(self):
         """Initialize JemDevice parent class and then init temt6000 driver"""
         super(JemLight, self).__init__()
+
+
+if __name__ == "__main__":
+    import time
+    sensor = JemLight()
+    # move your hand up / down over the light sensor to see value change
+    for i in range(10): # run for 15 seconds
+        print("light intensity: %s" % sensor.intensity)
+        time.sleep(1.5)
