@@ -28,6 +28,12 @@ JEM_HELP_MAP = {
                 'jembuzzer': None, 'jembattery': None, 'jemwifi': None
                 }
 
+def jem_help_get_all():
+    for k in JEM_HELP_MAP:
+        ex_code = jem_help_get(k)
+        JEM_HELP_MAP[k] = ex_code # save so we don't do this again
+    return JEM_HELP_MAP
+
 def jem_help(file_name=None):
     """ prints out the example code in the file_name python file"""
     if not file_name:
@@ -41,21 +47,28 @@ def jem_help(file_name=None):
         if file_name in JEM_HELP_MAP and JEM_HELP_MAP[file_name]:
             ex_code = JEM_HELP_MAP[file_name] # already saved ex from prev read
         else:
-            ex_code = "\n# %s: example code \n" % file_name
-            py_file = file_name + ".py"
-            with open(py_file, "r") as f: # opens and then closes file after done
-                d = f.read()
-                match_str = 'if __name__ == "__main__":'
-                str_len = len(match_str)
-                i = d.find(match_str)
-                if i >= 0:
-                    ex_code += d[i + str_len:]
-                    if file_name in JEM_HELP_MAP:
-                        JEM_HELP_MAP[file_name] = ex_code # save so we don't do this again
+            ex_code = jem_help_get(file_name)
+            if file_name in JEM_HELP_MAP:
+                JEM_HELP_MAP[file_name] = ex_code # save so we don't do this again
         print(ex_code)
     except Exception as e:
         print("jem_help(%s) failed: %s" % (file_name, e))
 
+def jem_help_get(file_name):
+    try:
+        ex_code = "\n# %s: example code \n" % file_name
+        py_file = file_name + ".py"
+        with open(py_file, "r") as f: # opens and then closes file after done
+            d = f.read()
+            match_str = 'if __name__ == "__main__":'
+            str_len = len(match_str)
+            i = d.find(match_str)
+            if i >= 0:
+                ex_code += d[i + str_len:]
+    except Exception as e:
+        print("jem_help_get failed: %s" % e)
+
+    return ex_code
 
 if __name__ == "__main__":
     ex = jem_help("jemled")
