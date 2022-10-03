@@ -55,6 +55,40 @@ def slider_intensity(value):
     except Exception as e:
         print("feature 2 failed: %s" % e)
 
+class UI_KitElement():
+    BUTTON = 'buttons'
+    SLIDER = 'sliders'
+
+    # singletone class
+    _elements = [] # we add the button, sliders ..etc class instances here
+
+    @staticmethod
+    def get_all():
+        elements_dict = { "buttons": [], "sliders": [] }
+        for el in UI_KitElement._elements:
+            elements_dict[el.ui_type].append(el.get_dict())
+        return elements_dict
+
+    def __init__(self, ui_type, name, func, params=None):
+        self.name = name
+        self.func = func
+        self.params = params
+        self.ui_type = ui_type
+        UI_KitElement._elements.append(self)
+
+    def get_dict(self):
+        d = {"func": self.func.__name__, "name": self.name, "params": self.params}
+        return d
+
+
+class UI_KitButton(UI_KitElement):
+    def __init__(self, name, func):
+        params = {"desc": "this is a button"}
+        super(UI_KitButton, self).__init__(ui_type=UI_KitElement.BUTTON, name=name, func=func, params=params)
+
+
+#led_btn = UI_KitButton(name="LED Toggle", func=button_toggle_led)
+
 # Default behavior - tell kit what to do when not connected to the mobile app
 
 def run():
