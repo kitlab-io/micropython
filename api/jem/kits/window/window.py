@@ -4,30 +4,8 @@
 
 import json, pycom, time
 from kits.window.kit_helper import *
+from kits.ui import *
 running = True # set this to False to stop the run method below
-
-features = { "buttons": [], "sliders": [] }
-
-# buttons
-button = {}
-button["func"] = "button_toggle_led"
-button["title"] = "Toggle LED"
-button["desc"] = "Toggle rgb led"
-
-features["buttons"].append(button)
-
-# slider
-slider = {}
-slider["func"] = "slider_intensity"
-slider["title"] = "intensity"
-slider["desc"] = "Set led intensity 1 - 100%"
-slider["value"] = 50
-slider["min"] = 1
-slider["max"] = 100
-
-features["sliders"].append(slider)
-
-features_json = json.dumps(features)
 g_led_on = False
 
 # Make a custom button - must include button_somename
@@ -54,6 +32,9 @@ def slider_intensity(value):
         kit_helper.board.led.set_color(int(rgb_val))
     except Exception as e:
         print("feature 2 failed: %s" % e)
+
+led_btn = UI_KitButton(name="LED Toggle", func=button_toggle_led)
+slider = UI_KitSlider(name="LED Slider", func=slider_intensity, max=100, min=0, start=50)
 
 # Default behavior - tell kit what to do when not connected to the mobile app
 
