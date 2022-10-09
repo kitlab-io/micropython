@@ -8,7 +8,7 @@ Micropython code for JEM core with WindowKit python kit code installed
    + Used by Atom to talk to JEM Micropython
 
 ### Flash latest Kitlab JEM Micropython to board
-- Download / unzip latest Kitlab JEM micropython [release](https://github.com/kitlab-io/micropython/releases)
+- Download / unzip latest [window-kit release](https://github.com/kitlab-io/micropython/releases/tag/window-kit-v1.0.0)
 - Open Atom IDE and open directory **./micropython/api/jem**
 - Turn on JEM board
 - Open Pymakr terminal which will appear at bottom of Atom IDE
