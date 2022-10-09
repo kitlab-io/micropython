@@ -48,31 +48,6 @@ Micropython code for JEM core
 >> demo.stop_sparkle_motion_thread()
 ```
 
-### Lantern Kit
-- Lantern Kit uses code from: https://github.com/noahwilliamsson/lamatrix
-- Initially JEM is set to use Demo Kit, but you can easily switch
-- Open main.py in Atom editor and update the code to say kit='lantern' instead of kit='demo':
-```python
-# main.py
-# change kit from 'demo' to 'lantern'
-if kit_main.kit_available:
-    kit = kit_main.load_kit(rc=rc, kit='lantern')
-```
-- Then re-flash the code to JEM
-- Wait for JEM to finish initializing before trying the following commands in Atom Pymakr terminal
-
-```bash
-kit.start_fire_scene()
-# note, if you want to use the weather scene, you will need to add your home router ssid / password to config.js in /api/jem/kits/demo/config.js
-# also, if you use the weather scene, your wifi repl won't work anymore (will fix later)
-# stop the scene from running over and over
-kit.stop_render()
-# add a bunch of scenes that will loop over and over (you can change scene timeout in config.js
-kit.start_fire_scene()
-kit.start_demo_scene()
-kit.start_animation_scene()
-```
-
 ## Advanced
 Users can control JEM gpio, pwm, adc, dac, uart and read from sensors
 
