@@ -29,10 +29,10 @@
     <!---- features buttons ------>
     <v-btn v-for="button in buttons" :key="button.title" v-on:click="callFeatureButton(button.func)">{{ button.title }}</v-btn>
     <v-slider v-for="slider in sliders" :key="slider.title"
-            v-model="slider.value"
+            v-model="slider.params.value"
             @change="slider.onChange"
-            :min="slider.min"
-            :max="slider.max"
+            :min="slider.params.min"
+            :max="slider.params.max"
             :label="slider.title"
             >
     </v-slider>
@@ -126,8 +126,8 @@ module.exports = {
     },
 
     async getKitFeatures(){
-      await this.sendCommand('from kits.window.window import *');
-      await this.parent.device.rcService.sendEvalCommand('features_json');
+      await this.sendCommand('from kits.ui import UI_KitElement; from kits.window.window import *; ui_json = UI_KitElement.get_all()');
+      await this.parent.device.rcService.sendEvalCommand('ui_json');
     },
 
     async callFeatureButton(func_name){
@@ -232,7 +232,6 @@ module.exports = {
     prepareKit(){
       //import kit functions to micropython runtime if not done already
       if(this.parent.device.isConnected()){
-        this.parent.device.rcService.sendCommand('from kits.window.window import *');
       }
     },
 
