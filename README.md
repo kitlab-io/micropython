@@ -1,4 +1,4 @@
-# JEM Micropython with WindowKit
+# WindowKit
 Micropython code for JEM core with WindowKit python kit code installed
 
 ## Quickstart
