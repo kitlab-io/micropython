@@ -1,5 +1,5 @@
-# JEM Micropython
-Micropython code for JEM core
+# JEM Micropython with WindowKit
+Micropython code for JEM core with WindowKit python kit code installed
 
 ## Quickstart
 ### Install Atom IDE + Pymakr plugin
@@ -16,37 +16,12 @@ Micropython code for JEM core
 - Click 'Connect' to talk to JEM
 - Click 'Upload' to flash latest code to JEM
 
-### Run Demo application
-- JEM Micropython code comes installed with a simple demo app
-   + After power up it takes about 10 seconds for JEM to initialize
-   + Then you can press the JEM user button and the RGB LED should turn green
-- If you want to play around with the Demo, connect micro usb to JEM and open Pymakr terminal
-- Interact with JEM Demo App using following micropython commands from REPL
-```bash
-# initially a button press thread is running that turns led green if pressed
-# you can stop this by doing
->> kit._run = False #
-# you can also stop the main demo thread that is collecting imu data to send to app by doing this
->> kit._main_thread = False
-# now you can mess around
->> kit.jem.led.set_color(0x880000) # jem red rgb led
->> kit.jem.led.set_color(0x000088) # jem blue rgb led
->> kit.jem.imu.orientation # show roll, pitch, yaw degrees
->> kit.jem.buzzer.start(freq_hz = 100) # make buzzer sound
->> kit.jem.buzzer.stop()
->> kit.neopixel.sparkle(count=10) # randomly turns on ten leds, default color is white but you can change
->> kit.neopixel.sparkle(count=10, c=(127,0,0)) # sparkle red
->> kit.neopixel.sparkle(count=10, c=(0,0,127)) # sparkle blue
->> kit.neopixel.rainbow() # do some fancy lantern led show (take about 15 seconds)
->> kit.jem.btn.read() # read button value
-```
+### Run WindowKit without mobile app
+- TODO
 
-### Demo Application using Neopixel + IMU
-```bash
->> kit.start_sparkle_motion_thread(count=25, rainbow=True)
->> # now move the jem around a bit (around the roll axis is best)
->> demo.stop_sparkle_motion_thread()
-```
+### Run WindowKit with mobile app
+- Install kitlab ios app on phone and connect to JEM over BLE
+- Navigate to the 'RC' tab and start interacting with WindowKit
 
 ## Advanced
 Users can control JEM gpio, pwm, adc, dac, uart and read from sensors
