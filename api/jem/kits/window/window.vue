@@ -1,6 +1,6 @@
 <template>
   <div id="WindowKit" :style="{'cursor': 'pointer'}">
-  <p>WindowKit</p>
+  <p>Mike's WindowKit</p>
   <v-color-picker dot-size="25" swatches-max-height="200" v-model="color"></v-color-picker>
     <table :style="tableStyleObject" ref="pixelTable">
       <tr v-for="(row) in rows" :key="row">
