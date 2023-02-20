@@ -76,7 +76,7 @@ class Neopixel:
                     except: # if i+q is out of the list then ignore
                         pass
 
-    def theater_chase_rainbow(self, wait=DEFAULT_WAIT_MS):
+    def theater_chase_rainbow(self, jemOS=None, wait=DEFAULT_WAIT_MS):
         for j in range(0, 256, 1):     # cycle all 256 colors in the wheel
             for q in range(0, 3, 1):
                 for i in range(0, self.num_leds, 3):
@@ -85,6 +85,9 @@ class Neopixel:
                     except: # if i+q is out of the list then ignore
                         pass
                 self.chain.show( self.data )
+                if jemOS is not None:
+                    if jemOS.exit_current_mode == True:
+                        return
                 utime.sleep_ms(wait)
 
                 for i in range(0, self.num_leds, 3):

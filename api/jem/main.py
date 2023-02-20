@@ -26,7 +26,7 @@ pixel = 0
 global color
 color = [100, 0, 0]
 global brightness
-brightness = 100.0
+brightness = 1.0
 
 # kit = Kit()
 # kit.start()
@@ -60,7 +60,8 @@ def run_set_pixel(pixel, color):
 
 
 def run_theather_chase_rainbow():
-    thread_id = _thread.start_new_thread(helper.neopixel.theater_chase_rainbow, ())
+    DEFAULT_WAIT_MS = 10
+    thread_id = _thread.start_new_thread(helper.neopixel.theater_chase_rainbow, (jemOS, DEFAULT_WAIT_MS))
     print(thread_id)
     thread_id = _thread.get_ident()
     print(thread_id)
@@ -102,7 +103,7 @@ class JemOS:
         self.is_button_pressed = False
         self.sleep_input = 500
         self.modes = [
-            None,
+            # None,
             "rainbowCycle",
             "theaterChaseRainbow"
         ]
@@ -116,15 +117,29 @@ class JemOS:
         print(**kwargs)
 
         if thread_id == "listen_button":
-            print(self.current_mode)
-            self.activate_mode(self.modes[self.current_mode])
+            self.cycle_mode()
+
+
+    def cycle_mode(self):
+        self.current_mode += 1
+        if self.current_mode >= len(self.modes):
+            self.current_mode = 0
+
+        print(self.current_mode)
+        self.activate_mode(self.modes[self.current_mode])
 
 
     def activate_mode(self, mode):
-        print(mode)
+        print("activate_mode: " + mode)
         self.exit_current_mode = True
-        utime.sleep_ms(300)
+        utime.sleep_ms(300) # wait for current mode to exit
+
         self.exit_current_mode = False
+
+        if mode == "rainbowCycle":
+            run_rainbowCycle()
+        elif mode == "theaterChaseRainbow":
+            run_theather_chase_rainbow()
 
 
 listen_button = True
