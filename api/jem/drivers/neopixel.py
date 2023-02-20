@@ -3,10 +3,16 @@ import utime
 import uos as os
 import pycom
 
+import framebuf
+
+# https://docs.micropython.org/en/latest/esp8266/tutorial/neopixel.html
+# https://docs.micropython.org/en/latest/library/neopixel.html?highlight=2812#module-neopixel
+
 #######################################################
 ### Animation Functions -- edit at your own risk!   ###
 ### Scroll down for the Main Loop to edit           ###
 #######################################################
+
 
 
 # wheel: Input a value 0 to 255 to get a color value.
@@ -23,6 +29,89 @@ def wheel(wheel_pos):
     wheel_pos -= 170
     return (wheel_pos * 3, 255 - wheel_pos * 3, 0)
 
+
+pixel_frame_8x8 = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+]
+
+pixel_frame_8x8_catalog = {
+    "A":[
+        [7, 7, 7, 7, 7, 7, 7, 7],
+        [7, 7, 7, 0, 0, 7, 7, 7],
+        [7, 7, 0, 7, 7, 0, 7, 7],
+        [7, 7, 0, 7, 7, 0, 7, 7],
+        [7, 7, 0, 0, 0, 0, 7, 7],
+        [7, 7, 0, 7, 7, 0, 7, 7],
+        [7, 7, 0, 7, 7, 0, 7, 7],
+        [7, 7, 7, 7, 7, 7, 7, 7]
+    ],
+}
+
+
+def read_framebuf(fbuffer, width, height):
+    # FrameBuffer.pixel(x, y[, c])
+    # If c is not given, get the color value of the specified pixel.
+    # If c is given, set the specified pixel to the given color.
+
+    for y in range(height):
+        for x in range(width):
+            pixel_color = fbuffer.pixel(x,y)
+            print(pixel_color)
+
+
+def rgb888_to_rgb565(pixel):
+    r, g, b = pixel
+    # Shift and mask the R, G, and B values to convert to RGB565 format
+    r5 = (r * 31 + 127) // 255
+    g6 = (g * 63 + 127) // 255
+    b5 = (b * 31 + 127) // 255
+    rgb565 = (r5 << 11) | (g6 << 5) | b5
+    return rgb565
+
+# >>> pixel888 = (255, 128, 64)
+# >>> pixel565 = rgb888_to_rgb565(pixel888)
+# >>> print(hex(pixel565))
+# 0xFD60
+
+def rgb565_to_rgb888(pixel):
+    # Extract the R, G, and B components from the RGB565 pixel value
+    r5 = (pixel >> 11) & 0x1f
+    g6 = (pixel >> 5) & 0x3f
+    b5 = pixel & 0x1f
+    # Expand the R, G, and B components to 8 bits each
+    r8 = (r5 * 255 + 15) // 31
+    g8 = (g6 * 255 + 31) // 63
+    b8 = (b5 * 255 + 15) // 31
+    return (r8, g8, b8)
+
+# >>> pixel565 = 0xFD60
+# >>> pixel888 = rgb565_to_rgb888(pixel565)
+# >>> print(pixel888)
+# (255, 128, 63)
+
+
+def convert_to_neopixel_frame(fbuffer, width, height, pixels_frame):
+    num_pixels = width * height
+    # pixels_frame = [(0,0,0)] * num_pixels
+    pixel_index = 0
+
+    for y in range(height):
+        for x in range(width):
+            pixel565 = fbuffer.pixel(x,y)
+            pixel888 = rgb565_to_rgb888(pixel565)
+            pixels_frame[pixel_index] = pixel888
+            pixel_index += 1
+
+    return pixels_frame
+
+
 class Neopixel:
     DEFAULT_WAIT_MS = 10
     def __init__(self, num_leds=64, brightness=0.05):
@@ -30,6 +119,64 @@ class Neopixel:
         self.chain = WS2812(num_leds=num_leds, brightness=brightness, data_pin='P11' )
         self.num_leds = num_leds
         self.data = [(0,0,0)] * num_leds
+
+    # scrolling text 8x8 matrix neopixel micropython
+    # https://github.com/dsiee/CircuitPython_NeopixelMatrix_Text
+    # https://github.com/dborne/scroll_text/blob/main/scroll_text.py
+    # https://learn.adafruit.com/adafruit-neopixel-featherwing
+
+    def scroll_text(self, jemOS=None, text="test"):
+        print("scroll_text: " + text)
+        # classframebuf.FrameBuffer(buffer, width, height, format, stride=width, /)
+        # FrameBuffer needs 2 bytes for every RGB565 pixel
+        width = 8
+        height = 8
+        buffer = bytearray(width * height * 2)
+        format = framebuf.RGB565
+        stride = 8
+        fbuf = framebuf.FrameBuffer(buffer, width, height, format, stride)
+
+        pixel888 = (255, 128, 64)
+        pixel565 = rgb888_to_rgb565(pixel888)
+        print(pixel565)
+        print(hex(pixel565))
+
+        fbuf.fill(0)
+        # fbuf.text('a', 0, 0, hex(pixel565))
+        fbuf.text('a', 0, 0, pixel565)
+
+        # fbuf.hline(0, 8, 1, 0xffff)
+        scroll_step = 5
+        scroll_wait = 100
+
+        for s in range(scroll_step):
+            # read_framebuf(fbuf, width, height)
+            # self.data = convert_to_neopixel_frame(fbuf, width, height)
+            convert_to_neopixel_frame(fbuf, width, height, self.data)
+            self.chain.show( self.data )
+
+            xstep = scroll_step
+            ystep = 0
+            fbuf.scroll(xstep, ystep)
+            # Shift the contents of the FrameBuffer by the given vector.
+            # This may leave a footprint of the previous colors in the FrameBuffer.
+
+            utime.sleep_ms(scroll_wait)
+
+
+
+        # TODO translate RGB565 to RGB888
+        # http://www.fabglib.org/structfabgl_1_1_r_g_b888.html
+        # https://github.com/CommanderRedYT/rgb565-converter
+        pass
+
+
+
+
+    def write_frame(self):
+        self.clear_display()
+
+
 
     # Cycles all the lights through rainbow colors
     def rainbow(self, wait=DEFAULT_WAIT_MS):
@@ -144,12 +291,14 @@ class Neopixel:
         self.chain.show( self.data )
         utime.sleep_ms(wait)
 
+
     def set_pixels(self, start_pixel, end_pixel, c=(127,127,127), dir=1):
         for i in range(start_pixel, end_pixel, dir):
             if i >= self.num_leds or i < 0:
                 continue
             self.data[i] = c
         self.chain.show( self.data )
+
 
     def set_pixel(self, pixel, color):
         #color (r,g,b) = (126,126,45) for example

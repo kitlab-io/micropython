@@ -217,9 +217,22 @@ def run_listen_button():
     print(thread_id)
 
 
+def run_scroll_text():
+    # text = "a"
+    # text = "Hi, I'm JEM. Your STEM AI companion ;)"
+    text = "JEM"
+    # helper.neopixel.scroll_text()
+    thread_id = _thread.start_new_thread(helper.neopixel.scroll_text, (jemOS, text))
+    print(thread_id)
+    thread_id = _thread.get_ident()
+    print(thread_id)
+
+
 def main():
     setup_neopixel(brightness)
     run_listen_button()
+    run_scroll_text()
+    # helper.neopixel.scroll_text()
 
 
 main()
