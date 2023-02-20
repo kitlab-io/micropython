@@ -40,11 +40,15 @@ class Neopixel:
             utime.sleep_ms(wait)
 
     # Slightly different, this makes the rainbow equally distributed throughout
-    def rainbowCycle(self, wait=DEFAULT_WAIT_MS):
+    def rainbowCycle(self, jemOS=None, wait=DEFAULT_WAIT_MS):
         for j in range (0,256,1):
             for i in range (0,self.num_leds,1):
                 self.data[i] = wheel(int((i * 256 / self.num_leds) + j) & 255)
             self.chain.show( self.data )
+
+            if jemOS is not None:
+                if jemOS.exit_current_mode == True:
+                    return
             utime.sleep_ms(wait)
 
     # Fill the dots one after the other with a color
@@ -98,7 +102,7 @@ class Neopixel:
                 utime.sleep_ms(wait)
 
     # sparkle the LEDs to the set color or random
-    def sparkle(self, c=(127, 127, 127), wait=DEFAULT_WAIT_MS, count=2, random_color=False):
+    def sparkle(self, c=(127, 127, 127), wait=DEFAULT_WAIT_MS, count=64, random_color=False):
         pixels = [0]*count
         for i in range(len(pixels)):
             pixels[i] = int.from_bytes(os.urandom(1), "big") % self.num_leds
