@@ -127,13 +127,20 @@ class Neopixel:
 
     def scroll_text(self, jemOS=None, text="test"):
         print("scroll_text: " + text)
-        # classframebuf.FrameBuffer(buffer, width, height, format, stride=width, /)
+        # class framebuf
+        # FrameBuffer(buffer, width, height, format, stride=width, /)
         # FrameBuffer needs 2 bytes for every RGB565 pixel
-        width = 8
-        height = 8
+
+        letter_width = 8 # every letter is 8x8 px
+        display_height = 8
+        display_width = 8
+
+        # width = 8
+        width = len(text) * letter_width
+        height = display_height
         buffer = bytearray(width * height * 2)
         format = framebuf.RGB565
-        stride = 8
+        stride = width
         fbuf = framebuf.FrameBuffer(buffer, width, height, format, stride)
 
         pixel888 = (255, 128, 64)
@@ -143,19 +150,34 @@ class Neopixel:
 
         fbuf.fill(0)
         # fbuf.text('a', 0, 0, hex(pixel565))
-        fbuf.text('a', 0, 0, pixel565)
+        fbuf.text(text, 0, 0, pixel565)
+
+        # convert_to_neopixel_frame(fbuf, width, height, self.data)
+        # self.chain.show( self.data )
 
         # fbuf.hline(0, 8, 1, 0xffff)
-        scroll_step = 5
-        scroll_wait = 100
+        # scroll_step should be set based on lenghth of text
+        scroll_step = len(text) * letter_width
+        # scroll_step = 5
+        scroll_wait = 4
+        scroll_x = -2
 
         for s in range(scroll_step):
+
+            if jemOS is not None:
+                if jemOS.exit_current_mode == True:
+                    return
             # read_framebuf(fbuf, width, height)
             # self.data = convert_to_neopixel_frame(fbuf, width, height)
-            convert_to_neopixel_frame(fbuf, width, height, self.data)
+            convert_to_neopixel_frame(fbuf, display_width, display_height, self.data)
             self.chain.show( self.data )
 
-            xstep = scroll_step
+            # positive xstep scrolls to the right
+            # negative xstep scrolls to the left
+            # !!! WARNING: if (positive xstep) scrolling to the right past the first text letter,
+            # !!! can crash the program. Cause unknown...
+
+            xstep = scroll_x
             ystep = 0
             fbuf.scroll(xstep, ystep)
             # Shift the contents of the FrameBuffer by the given vector.

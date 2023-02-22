@@ -12,7 +12,7 @@ from kits.window.kit_helper import *
 helper = KitHelper()
 
 global wlan
-wlan = setup_wifi()
+# wlan = setup_wifi()
 
 # from kits.kit import Kit
 
@@ -104,8 +104,9 @@ class JemOS:
         self.sleep_input = 500
         self.modes = [
             # None,
+            "scrollText",
             "rainbowCycle",
-            "theaterChaseRainbow"
+            "theaterChaseRainbow",
         ]
         self.current_mode = 0
         self.exit_current_mode = False
@@ -140,6 +141,8 @@ class JemOS:
             run_rainbowCycle()
         elif mode == "theaterChaseRainbow":
             run_theather_chase_rainbow()
+        elif mode == "scrollText":
+            run_scroll_text()
 
 
 listen_button = True
@@ -219,20 +222,122 @@ def run_listen_button():
 
 def run_scroll_text():
     # text = "a"
-    # text = "Hi, I'm JEM. Your STEM AI companion ;)"
-    text = "JEM"
+    text = "Hi, I'm JEM! "
+    # text = "JEM "
     # helper.neopixel.scroll_text()
     thread_id = _thread.start_new_thread(helper.neopixel.scroll_text, (jemOS, text))
     print(thread_id)
     thread_id = _thread.get_ident()
     print(thread_id)
 
+import time
+from jembuzzer import JemBuzzer
+
+# reference for audio helper library
+# https://microbit-micropython.readthedocs.io/en/v2-docs/audio.html
+
+# https://github.com/fruch/micropython-buzzer/blob/master/buzzer/__init__.py
+# https://github.com/cjbarnes18/micropython-midi
+
+# https://www.cantorsparadise.com/the-mathematical-nature-of-musical-scales-f0a6536bca5d
+
+from math import pow
+note_names = ("c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b")
+
+A4 = 440
+C0 = A4 * pow(2, -4.75)
+
+def note_freq(note, o=4):
+    print("note_freq: " + note)
+    # n, o = note[:-1], int(note[-1])
+    n = note
+    # o = 4
+    index = note_names.index(n)
+    return int(round(pow(2, (float(o * 12 + index) / 12.0)) * C0, 2))
+
+
+def run_buzzer():
+    freq_hz = 100
+
+    # try:
+    #     buzz = JemBuzzer()
+    #     for i in range(5): # run for 5 seconds
+    #         print("buzz freq (hz): %s" % freq_hz)
+    #         buzz.start(freq_hz)
+    #         time.sleep(1)
+    #         freq_hz += 100 # increase hz by 100
+    # except Exception as e:
+    #     print("failed: %s" % e)
+    #
+    # buzz.stop() # always make sure to stop or battery runs out FAST
+
+    buzz = JemBuzzer()
+    for n in range(len(note_names)):
+        freq_hz = note_freq(note_names[n])
+        buzz.start(freq_hz)
+        time.sleep(1)
+
+    buzz.stop() # always make sure to stop or battery runs out FAST
+
+
+    pass
+
+import ujson
+
+def read_json_file(filename):
+    with open(filename, 'r') as f:
+        data = f.read()
+        json_dict = ujson.loads(data)
+        return json_dict
+
+
+def run_play_pixel_frames():
+
+# green
+# 112, 190, 168
+# 70BE44
+#
+# purple
+# 137, 80, 159
+# 89509F
+#
+# blue/cyan
+# 0, 182, 218
+# 00B6DA
+#
+# magenta
+# 232, 21, 128
+# E81580
+#
+# yellow
+# 248, 255, 13
+# F8E10D
+    pass
+
+
+def load_pixel_frame(frame_data, width=8, height=8):
+
+    color = ()
+
+    for y in range(height):
+        for x in range(width):
+            px = (y * height) + x
+
+    pass
+
 
 def main():
     setup_neopixel(brightness)
     run_listen_button()
-    run_scroll_text()
-    # helper.neopixel.scroll_text()
+
+    json_data = read_json_file('kits/window/pixeldata.json')
+    print(json_data)
+
+    # run_scroll_text()
+    # text = "JEM "
+    # helper.neopixel.scroll_text(jemOS, text)
+
+    run_buzzer()
 
 
 main()
