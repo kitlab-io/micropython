@@ -76,7 +76,7 @@ class JemIMU(BNO055):
 if __name__ == "__main__":
     import time
     imu = JemIMU()
-    # move your hand up / down over the range sensor to see distance change
+    # rotate JEM to see orientation 
     for i in range(10): # run for 10 seconds
         print("orientation: %s" % imu.orientation)
         time.sleep(1)

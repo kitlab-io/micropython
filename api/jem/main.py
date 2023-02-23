@@ -326,6 +326,110 @@ def load_pixel_frame(frame_data, width=8, height=8):
     pass
 
 
+from jemrange import JemRange
+
+# maximum range ~ 14 inches
+# distance: 363
+
+# beyond max range
+# distance: 8190 || 8191
+
+# minimum distance:
+# distance: 30
+
+range_global = [30, 8191]
+
+def get_range_segment(raw_range):
+
+    pass
+
+def run_rangesensor():
+    sensor = JemRange()
+    # move your hand up / down over the range sensor to see distance change
+    for i in range(10): # run for 15 seconds
+        print("distance: %s" % sensor.distance)
+        time.sleep(1.5)
+
+
+from jemimu import JemIMU
+
+# orientation guide
+# JEM is docked to window kit
+
+# JEM lying down, display down
+
+# USB port FRONT / FACING YOU
+# Pixel Display DOWN
+# this is the neutral position for IMU (roll 0, yaw 0, pitch 0)
+# orientation: {'roll': -3.0, 'yaw': 3.9375, 'pitch': 11.5}
+
+
+
+# roll
+# rotating around X axis, angle in the Z plane
+# 0+ roll rotation upwards from neutral
+# 360- roll rotating downwards from neutral
+# 0- roll rotating downwards from neutral
+
+# pitch
+# rotating around Z axis, angle in the Y plane
+# 0+ pitch rotation Counter Clock Wise from neutral
+# 360- pitch rotation Clock Wise from neutral
+
+# yaw
+# rotating around Y axis, angle in the X plane
+# 0+ yaw rotation flat left from neutral
+# 360- yaw rotating flat right from neutral
+
+# JEM Window standing up, facing you
+
+# USB port UP
+# Pixel Display FRONT / FACING YOU
+# orientation: {'roll': -83.125, 'yaw': 0.1875, 'pitch': 121.3125}
+
+# USB port RIGHT
+# Pixel Display FRONT / FACING YOU
+# orientation: {'roll': 0.5, 'yaw': 248.4375, 'pitch': -86.25}
+
+# USB port LEFT
+# Pixel Display FACING YOU
+# orientation: {'roll': 0.9375, 'yaw': 97.5, 'pitch': 83.37501}
+
+# USB port DOWN
+# Pixel Display FACING YOU
+# orientation: {'roll': 87.25, 'yaw': 115.5, 'pitch': 0.1875}
+
+
+# JEM Window lying down, display up:
+
+
+# USB port BACK / AWAY FROM YOU
+# Pixel Display UP
+# orientation: {'roll': 6.9375, 'yaw': 264.8125, 'pitch': -175.1875}
+
+
+# USB port RIGHT
+# Pixel Display UP
+# orientation: {'roll': 5.8125, 'yaw': 14.0, 'pitch': 177.5}
+
+# USB port LEFT
+# Pixel Display UP
+# orientation: {'roll': -3.8125, 'yaw': 172.75, 'pitch': 178.25}
+
+# USB port FRONT / FACING YOU
+# Pixel Display UP
+# orientation: {'roll': -0.3125, 'yaw': 331.25, 'pitch': 178.5625}
+
+
+def run_imu():
+    imu = JemIMU()
+    # move your hand up / down over the range sensor to see distance change
+    for i in range(10): # run for 10 seconds
+        print("orientation: %s" % imu.orientation)
+        time.sleep(1)
+    pass
+
+
 def main():
     setup_neopixel(brightness)
     run_listen_button()
@@ -333,11 +437,11 @@ def main():
     json_data = read_json_file('kits/window/pixeldata.json')
     print(json_data)
 
-    # run_scroll_text()
-    # text = "JEM "
-    # helper.neopixel.scroll_text(jemOS, text)
+    run_scroll_text()
 
-    run_buzzer()
+    # run_buzzer()
+    # run_rangesensor()
+    # run_imu()
 
 
 main()
