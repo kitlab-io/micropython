@@ -247,13 +247,71 @@ note_names = ("c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b")
 A4 = 440
 C0 = A4 * pow(2, -4.75)
 
-def note_freq(note, o=4):
+def note_freq(note, octave=4):
     print("note_freq: " + note)
-    # n, o = note[:-1], int(note[-1])
+    print(octave)
+    # n = "c"
     n = note
-    # o = 4
+    o = octave
+    # o = 4 $ default octave
+    # n -> c4
+    
+    # if octave defined with note: "c4" 
+    try:
+        # try converting to integer
+        o = int(note[-1])
+        n = note[:-1]
+        # n, o = note[:-1], int(note[-1])
+    except ValueError:
+        pass
+    
     index = note_names.index(n)
     return int(round(pow(2, (float(o * 12 + index) / 12.0)) * C0, 2))
+
+
+def play_note(note_name, duration_sec=1):
+    print("play note: "+note_name)
+    frequency = note_freq(note_name)
+    buzz = JemBuzzer()
+    buzz.start(frequency)
+    time.sleep(duration_sec)
+    buzz.stop()
+    pass
+
+
+# notes in scientific pitch notation
+# https://en.wikipedia.org/wiki/Scientific_pitch_notation#/media/File:Piano_Frequencies.svg
+def play_song(song_name, beats_per_minute=60):
+    
+    melody = [("c4",0.25)]
+    
+    if song_name == "preludeOfLight":
+        # melody = [
+        #     ("d5",0.25), ("a4",0.5), 
+        #     ("d5",0.125), ("a4",0.125), ("b4",0.125), ("d5",0.125)]
+        melody = [
+            ("d6",0.25), ("a5",0.5), 
+            ("d6",0.125), ("a5",0.125), ("b5",0.125), ("d6",0.125)]
+    
+    # whole note = 1
+    # quarter note = 0.25
+    # eighth note = 0.125
+
+    # quarter note = 1 beat
+    for note in melody:
+        note_duration = (60 / beats_per_minute) * (4 * note[1])
+        note_name = note[0]
+        # note_hz = note_freq(note[0])
+        print(note_duration)
+        print(note_name)
+        play_note(note_name, note_duration)
+
+    pass
+
+
+def run_play_song():
+    play_song("preludeOfLight", 180)
+    pass
 
 
 def run_buzzer():
@@ -281,6 +339,8 @@ def run_buzzer():
 
 
     pass
+
+
 
 import ujson
 
@@ -437,9 +497,13 @@ def main():
     json_data = read_json_file('kits/window/pixeldata.json')
     print(json_data)
 
-    run_scroll_text()
-
+    run_play_song()
     # run_buzzer()
+
+    # run_scroll_text()
+    run_rainbowCycle()
+
+    
     # run_rangesensor()
     # run_imu()
 
