@@ -1,27 +1,16 @@
 # FTP over BLE UART
-from machine import Timer
-from ble_uart_peripheral import BLEUART
+from ble_uart_peripheral import schedule_in
 from cmd import *
 
 class BLEUARTFTP:
-    def __init__(self, uart=None):
-        if uart is None:
-            uart = BLEUART(name="BLEUARTFTP", service_uuid = "6E400001-B5A3-F393-E0A9-E50E24DCCA77", rx_uuid = "6E400002-B5A3-F393-E0A9-E50E24DCCA77", tx_uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA77")
+    def __init__(self, tmr, uart):
         self._uart = uart
         self._tx_buf = bytearray()
         self.tx_max_len = 100
         self.tx_delay_ms = 20
-        self._uart.set_connect_handler(self.on_connect_status_changed)
-        self.prev_term = None
-        self._timer = None
-        self._uart.set_rx_notify_callback(self.rx_notification)
+        self._timer = tmr
+        self._uart.irq(self._on_rx)
         self.ftp_cmd_manager = CmdManager()
-
-    def _wrap_flush(self, alarm):
-        self._flush()
-
-    def schedule_tx(self):
-        self._timer = Timer.Alarm(self._wrap_flush, ms=self.tx_delay_ms, periodic=False)
 
     def on_connect_status_changed(self, is_connected):
         if is_connected:
@@ -32,7 +21,7 @@ class BLEUARTFTP:
     def read(self, sz=None):
         return self._uart.read(sz)
 
-    def rx_notification(self):
+    def _on_rx(self):
         # we got some data!
         try:
             data = self.read()
@@ -51,10 +40,10 @@ class BLEUARTFTP:
         self._tx_buf = self._tx_buf[self.tx_max_len:]
         self._uart.write(data)
         if self._tx_buf:
-            self.schedule_tx()
+            schedule_in(self._timer, self._flush, self.tx_delay_ms)
 
     def write(self, buf):
         empty = not self._tx_buf
         self._tx_buf += buf
         if empty:
-            self.schedule_tx()
+            schedule_in(self._timer, self._flush, self.tx_delay_ms)

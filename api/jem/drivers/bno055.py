@@ -316,12 +316,12 @@ class BNO055:
     I2C_ADDRESS_A = 0x28
     I2C_ADDRESS_B = 0x29
     I2C_ADDRESS = I2C_ADDRESS_A  # address depends on pull of COM3 on BNO055 chip
-    RST_PIN = 'P23'
-    INT_IMU = 'P13' # interrupt pin
-    I2C_BUS = 2 # different from JEM I2C Default Bus
+    RST_PIN = 12
+    INT_IMU = 34 # interrupt pin
+    I2C_BUS = 1 # JEM-2: P25 SCL, P26 SDA
     UART_BUS = 1 # software i2c
-    I2C_PINS = ('P4', 'P3') #SDA, SCL
-    UART_PINS = ('P3', 'P4') #TX, RX
+    I2C_PINS = {'scl': 25, 'sda': 26} #SDA, SCL
+    UART_PINS = {'tx': 25, 'rx': 26} #TX, RX
     UART_BAUDRATE = 115200
     BAUDRATE = 100000 # 100KHz works with software i2c, if using hw i2c can only use 10KHz (some issue with clock stretching)
 
@@ -345,13 +345,15 @@ class BNO055:
         # Can use i2c or uart, but uart is default and works best
         if use_default_i2c or i2c is not None:
             if i2c is None:
-                i2c = I2C(BNO055.I2C_BUS, I2C.MASTER, pins=BNO055.I2C_PINS, baudrate=BNO055.BAUDRATE)
-            self._i2c = JemI2C(i2c,address)
+                i2c = I2C(BNO055.I2C_BUS, freq=BNO055.BAUDRATE)
+
+            self._i2c = JemI2C(i2c, address)
         elif uart is not None:
             self._serial = BNO055_SerialComm(uart=uart)
         else:
             rx_timeout_chars = 255 # this is a must, bno055 will fail if we don't use a rx timeout
-            uart = UART(BNO055.UART_BUS, pins=BNO055.UART_PINS, baudrate=BNO055.UART_BAUDRATE, timeout_chars=rx_timeout_chars)
+            uart = UART(BNO055.UART_BUS, tx=BNO055.UART_PINS['tx'], rx=BNO055.UART_PINS['rx'],
+                    baudrate=BNO055.UART_BAUDRATE, timeout_chars=rx_timeout_chars)
             self._serial = BNO055_SerialComm(uart=uart)
 
         self.power_up()
@@ -360,14 +362,14 @@ class BNO055:
         if self._rst is not None:
             self._rst.value(0)  # keep low first
         elif self._rst_pin is not None:
-            self._rst = Pin(self._rst_pin, mode=Pin.OPEN_DRAIN)
+            self._rst = Pin(self._rst_pin, mode=Pin.OUT)
             self._rst.value(0)  # keep low first
 
     def power_up(self):
         if self._rst is not None:
             self._rst.value(1)  # keep low first
         elif self._rst_pin is not None:
-            self._rst = Pin(self._rst_pin, mode=Pin.OPEN_DRAIN)
+            self._rst = Pin(self._rst_pin, mode=Pin.OUT)
             time.sleep(0.010)
             self._rst.value(1)  # keep high
         time.sleep(0.65)

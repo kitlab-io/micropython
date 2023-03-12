@@ -1,36 +1,30 @@
 # Kit Remote Control over BLE
 from machine import Timer
-from ble_uart_peripheral import BLEUART, Bluetooth
+
+from ble_uart_peripheral import schedule_in, IRQ_GATTS_WRITE
 from cmd import *
 
-RC_AUX_UUID = 0xCD33
-RC_SYNC_UUID = 0xCF33
-
 class BLEUARTREMOTECONTROL:
-    def __init__(self, uart=None):
-        if uart is None:
-            uart = BLEUART(name="BLEUARTREMOTECONTROL", service_uuid = 0xCA33, rx_uuid = 0xCB33, tx_uuid = 0xCC33, aux_uuids = [RC_AUX_UUID, RC_SYNC_UUID])
+    def __init__(self, tmr, uart, sync_uuid = 0xCF33):            
         self._uart = uart
         self._tx_buf = bytearray()
-        self._aux_tx_buf = bytearray() # used for sending extra data from Kit to App (like asynchronous sensor data)
         self.tx_max_len = 100
         self.tx_delay_ms = 20
         self.cmd_delay_ms = 1
-        self._uart.set_connect_handler(self.on_connect_status_changed)
+        self._uart.irq(self._on_rx)
         self.prev_term = None
-        self._timer = None
-        self._aux_timer = None
-        self._cmd_timer = None
         self._cmd_queue = []
+        self._timer = tmr
         self.cmd_manager = CmdManager()
-        self._uart.set_rx_notify_callback(self.rx_notification)
-        self._uart.set_aux_callback(uuid=RC_SYNC_UUID, callback=self.sync_callback, trigger_type=Bluetooth.CHAR_WRITE_EVENT)
         self._exec_cmd = self.schedule_exec_cmd
+        
+        # add new characteristic to uart service
+        self.sync_char = self._uart.service.characteristic(uuid=sync_uuid, buf_size=20)
+        self.sync_char.callback(None, self.sync_callback)
 
     def sync_callback(self, chr, data=None):
         try:
-            events = chr.events()
-            if events & Bluetooth.CHAR_WRITE_EVENT:
+            if IRQ_GATTS_WRITE == chr.event():
                 sync_type = chr.value().decode('utf-8').lower()
                 if sync_type == 'c':
                     self._cmd_queue.clear()
@@ -44,28 +38,13 @@ class BLEUARTREMOTECONTROL:
         except Exception as e:
             print("sync_callback failed: %s" % e)
 
-    def _wrap_flush(self, alarm):
+    def _wrap_flush(self):
         self._flush()
-
-    def _wrap_aux_flush(self, alarm):
-        self._aux_flush()
-
-    def schedule_tx(self):
-        self._timer = Timer.Alarm(self._wrap_flush, ms=self.tx_delay_ms, periodic=False)
-
-    def schedule_aux_tx(self):
-        self._aux_timer = Timer.Alarm(self._wrap_aux_flush, ms=self.tx_delay_ms, periodic=False)
-
-    def on_connect_status_changed(self, is_connected):
-        if is_connected:
-            print("BLEUARTREMOTECONTROL - CONNECTED")
-        else:
-            print("BLEUARTREMOTECONTROL - DISCONNECTED")
-
+        
     def read(self, sz=None):
         return self._uart.read(sz)
 
-    def rx_notification(self):
+    def _on_rx(self):
         # we got some data!
         try:
             data = self.read()
@@ -88,10 +67,10 @@ class BLEUARTREMOTECONTROL:
         return resp
 
     def schedule_eval_cmd(self):
-        self._cmd_timer = Timer.Alarm(self._wrap_eval_cmd, ms=self.cmd_delay_ms, periodic=False)
+        schedule_in(self._timer, self._wrap_eval_cmd, self.cmd_delay_ms)
 
     def schedule_exec_cmd(self):
-        self._cmd_timer = Timer.Alarm(self._wrap_exec_cmd, ms=self.cmd_delay_ms, periodic=False)
+        schedule_in(self._timer, self._wrap_exec_cmd, self.cmd_delay_ms)
 
     def _wrap_eval_cmd(self, alarm):
         self._execute_next_cmd(eval_cmd=True)
@@ -127,32 +106,15 @@ class BLEUARTREMOTECONTROL:
             self._tx_buf = self._tx_buf[self.tx_max_len:]
             self._uart.write(data)
             if self._tx_buf:
-                self.schedule_tx()
+                schedule_in(self._timer, self._wrap_flush, self.tx_delay_ms)
         except Exception as e:
             print("_flush failed: %s" % e)
-
-    def _aux_flush(self):
-        try:
-            data = self._aux_tx_buf[0:self.tx_max_len]
-            self._aux_tx_buf = self._aux_tx_buf[self.tx_max_len:]
-            if self.is_connected():
-                self._uart.aux_chars[RC_AUX_UUID].value(data)
-            if self._aux_tx_buf:
-                self.schedule_aux_tx()
-        except Exception as e:
-            print("_aux_flush failed: %s" % e)
 
     def write(self, buf):
         empty = not self._tx_buf
         self._tx_buf += buf
         if empty:
-            self.schedule_tx()
-
-    def write_aux(self, buf):
-        empty = not self._aux_tx_buf
-        self._aux_tx_buf += buf
-        if empty:
-            self.schedule_aux_tx()
+            schedule_in(self._timer, self._wrap_flush, self.tx_delay_ms)
 
     def is_connected(self):
         return self._uart.is_connected()

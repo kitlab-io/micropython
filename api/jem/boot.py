@@ -1,7 +1,5 @@
-
-from ble_uart_repl import BLEUARTStream
-from ble_uart_ftp import BLEUARTFTP
-from ble_uart_remote_control import BLEUARTREMOTECONTROL
-rc = BLEUARTREMOTECONTROL()
-ftp = BLEUARTFTP()
-repl = BLEUARTStream()
+# This file is executed on every boot (including wake-boot from deepsleep)
+#import esp
+#esp.osdebug(None)
+#import webrepl
+#webrepl.start()

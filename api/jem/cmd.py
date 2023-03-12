@@ -255,6 +255,7 @@ class FTPGetDirsCmd(Cmd):
     def get_dir_list(self, root_name):
         # directory structure as list of dictionary elements
         tree = None
+        print("get_dir_list root: %s" % root_name)
         try:
             t=[{'path': root_name, 'type':'tree'}]
             tree=get_dir_tree(root=root_name, tree=t)
