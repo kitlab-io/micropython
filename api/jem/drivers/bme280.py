@@ -12,6 +12,7 @@ import time
 from ustruct import unpack, unpack_from
 from array import array
 from drivers.peripherals import I2C, JEM_DEFAULT_I2C_BUS, JEM_DEFAULT_I2C_PINS, JEM_DEFAULT_I2C_BAUDRATE
+from machine import Pin
 
 # Operating Modes
 BME280_OSAMPLE_1 = 1
@@ -42,7 +43,9 @@ class BME280:
         self.address = address
 
         if i2c is None:
-            self.i2c = I2C(JEM_DEFAULT_I2C_BUS, I2C.MASTER, pins=JEM_DEFAULT_I2C_PINS, baudrate=JEM_DEFAULT_I2C_BAUDRATE)
+            sda=Pin(JEM_DEFAULT_I2C_PINS['sda'])
+            scl=Pin(JEM_DEFAULT_I2C_PINS['scl'])
+            self.i2c = I2C(JEM_DEFAULT_I2C_BUS, sda=sda, scl=scl, freq=JEM_DEFAULT_I2C_BAUDRATE)
         else:
             self.i2c = i2c
 

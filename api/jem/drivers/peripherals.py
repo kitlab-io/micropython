@@ -7,25 +7,10 @@ from ustruct import pack
 Key number is the JEM Hardware Pin # shown on enclosure
 The first element in the list is the actual MCU pin number
 """
-JEM_AVAILABLE_MCU_PINS = {0: ["P0", "GPIO3", "U0RXD", "CLKOUT2", "RX0"],
-                      1: ["P1", "GPIO1", "EMACRXD2", "U0TXD", "CLKOUT3", "TX0"],
-                      2: ["P11", "GPIO22", "EMACTXD1", "U0RTS", "VSPIWP", "MOSI"],
-                      3: ["P12", "GPIO21", "EMACRXEN", "VSPIHD", "MISO"],
-                      4: ["P23", "GPIO14", "EMACTXD2", "ADC2_6", "RTCIO16", "TOUCH6", "MTMS", "HSPICLK", "SDCLK", "HS2CLK"],
-                      5: ["P22", "GPIO25", "EMACRXD0", "ADC2_8", "RTCIO6", "DAC_1"],
-                      6: ["P21", "GPIO26", "EMACRXD1", "ADC2_9", "RTCIO7", "DAC_2"],
-                      7: ["P20", "GPIO33", "ADC1_5", "RTCIO8", "TOUCH8", "XTAL32"],
-                      8: ["P19", "GPIO32", "ADC1_4", "RTCIO9", "TOUCH9", "XTAL32"],
-                      9: ["P18", "GPIO34", "ADC1_6", "RTCIO4", "VDET1"],
-                      10: ["P17", "GPIO35", "ADC1_7", "RTCIO5", "VDET2"],
-                      11: ["P16", "GPIO39", "ADCPA", "ADC1_3", "RTCIO3", "SENSVN"],
-                      12: ["P15", "GPIO38", "ADC1_2", "RTCIO2"],
-                      13: ["P14", "GPIO37", "ADC1_1", "RTCIO1"],
-                      14: ["P13", "GPIO36", "ADCPA", "ADC1_0", "RTCIO0", "SENSVP"]
-                      }
+JEM_AVAILABLE_MCU_PINS = {0: ["IO0"]}
 
 JEM_DEFAULT_I2C_BUS = 0
-JEM_DEFAULT_I2C_PINS = ('P9', 'P10') #p9 = SDA, p10 = SCL (defaults)
+JEM_DEFAULT_I2C_PINS = {'scl':18, 'sda': 19}
 JEM_DEFAULT_I2C_BAUDRATE = 40000 #should be 100KHz but i2c clk stretching issues with bq27441, so use 40KHz for now
 
 class JemI2C(object):
