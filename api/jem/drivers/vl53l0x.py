@@ -171,7 +171,9 @@ class VL53L0X:
         # pylint: disable=too-many-statements
         self.pn = "VL53L0X"
         if i2c is None:
-            i2c = I2C(JEM_DEFAULT_I2C_BUS, I2C.MASTER, pins=JEM_DEFAULT_I2C_PINS, baudrate=JEM_DEFAULT_I2C_BAUDRATE)
+            sda=Pin(JEM_DEFAULT_I2C_PINS['sda'])
+            scl=Pin(JEM_DEFAULT_I2C_PINS['scl'])
+            i2c = I2C(JEM_DEFAULT_I2C_BUS, sda=sda, scl=scl, freq=JEM_DEFAULT_I2C_BAUDRATE)
             i2cHelper = I2CHelper(i2c, address)
         elif type(i2c) == I2C:
             i2cHelper = I2CHelper(i2c, address)
