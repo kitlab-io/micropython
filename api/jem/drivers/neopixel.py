@@ -25,7 +25,8 @@ def wheel(wheel_pos):
 
 class Neopixel:
     DEFAULT_WAIT_MS = 10
-    def __init__(self, num_leds=64, brightness=0.05):
+    # NOTE: brightness = 0.1 is 10% 
+    def __init__(self, num_leds=64, brightness=0.1):
         pycom.heartbeat(False) # disable pycom heartbeat for now, might not need to do this
         self.chain = WS2812(num_leds=num_leds, brightness=brightness, data_pin='P11' )
         self.num_leds = num_leds

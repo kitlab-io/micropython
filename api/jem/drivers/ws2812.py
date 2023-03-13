@@ -8,10 +8,8 @@
 # Adapted for JEM WiPy only by @jbthompson.eng@gmail.com
 
 import gc
-from machine import SPI
-from machine import Pin
-from machine import disable_irq
-from machine import enable_irq
+import machine
+import neopixel
 
 class WS2812:
     """
@@ -19,8 +17,8 @@ class WS2812:
     of LEDs.
 
     Example of use:
-
-        chain = WS2812(spi_bus=1, led_count=4)
+        from drivers.ws2812 import *
+        chain = WS2812(data_pin=0, num_leds=4)
         data = [
             (255, 0, 0),    # red
             (0, 255, 0),    # green
@@ -29,11 +27,15 @@ class WS2812:
         ]
         chain.show(data)
 
-    Version: 1.0
+    Or use raw neopixel driver
+    chain = WS2812(spi_data_pin=0, led_count=4)
+    np = chain.np
+    np[0] = (20, 0, 0)
+    np.write() # this will write red to first led
     """
     buf_bytes = (0x88, 0x8e, 0xe8, 0xee)
 
-    def __init__(self, num_leds=4, brightness=1, data_pin='P11'):
+    def __init__(self, data_pin=0, num_leds=4, brightness=1):
         """
         Params:
         * spi_bus = SPI bus ID (1 or 2)
@@ -44,15 +46,11 @@ class WS2812:
         self.intensity = brightness
 
         # prepare SPI data buffer (4 bytes for each color)
-        self.buf_length = self.led_count * 3 * 4
-        self.buf = bytearray(self.buf_length)
-
-        # SPI init
-        #self.spi = pyb.SPI(spi_bus, pyb.SPI.MASTER, baudrate=3200000, polarity=0, phase=1)
-        self.spi = SPI(0, SPI.MASTER, baudrate=3200000, polarity=0, phase=1)
-
+        self.buf_length = self.led_count
+        self.np = neopixel.NeoPixel(machine.Pin(data_pin), num_leds)
+        # micropython machine neopixel is for controlling ws2812 type rgb led using single wire
         # turn LEDs off
-        self.show([])
+        #self.show([])
 
     def show(self, data):
         """
@@ -65,11 +63,9 @@ class WS2812:
 
     def send_buf(self):
         """
-        Send buffer over SPI.
+        Send buffer over neopixel driver bistream / single wire spi like driver
         """
-        #disable_irq()
-        self.spi.write(self.buf)
-        #enable_irq()
+        self.np.write()
         gc.collect()
 
     def update_buf(self, data, start=0):
@@ -86,8 +82,7 @@ class WS2812:
         beated purity of code.
         """
 
-        buf = self.buf
-        buf_bytes = self.buf_bytes
+        buf = self.np
         intensity = self.intensity
 
         mask = 0x03
@@ -96,25 +91,11 @@ class WS2812:
             red = int(red * intensity)
             green = int(green * intensity)
             blue = int(blue * intensity)
+            buf[index] = (red, green, blue)
 
-            buf[index] = buf_bytes[green >> 6 & mask]
-            buf[index+1] = buf_bytes[green >> 4 & mask]
-            buf[index+2] = buf_bytes[green >> 2 & mask]
-            buf[index+3] = buf_bytes[green & mask]
+            index += 1
 
-            buf[index+4] = buf_bytes[red >> 6 & mask]
-            buf[index+5] = buf_bytes[red >> 4 & mask]
-            buf[index+6] = buf_bytes[red >> 2 & mask]
-            buf[index+7] = buf_bytes[red & mask]
-
-            buf[index+8] = buf_bytes[blue >> 6 & mask]
-            buf[index+9] = buf_bytes[blue >> 4 & mask]
-            buf[index+10] = buf_bytes[blue >> 2 & mask]
-            buf[index+11] = buf_bytes[blue & mask]
-
-            index += 12
-
-        return index // 12
+        return index
 
     def fill_buf(self, data):
         """
@@ -125,10 +106,9 @@ class WS2812:
         end = self.update_buf(data)
 
         # turn off the rest of the LEDs
-        buf = self.buf
-        off = self.buf_bytes[0]
-        for index in range(end * 12, self.buf_length):
-            buf[index] = off
+        buf = self.np
+        for index in range(end, self.buf_length):
+            buf[index] = (0,0,0)
             index += 1
 
     def set_brightness(self, brightness):
@@ -136,8 +116,9 @@ class WS2812:
 
     def clear(self):
 		# turn off the rest of the LEDs
-        buf = self.buf
-        off = self.buf_bytes[0]
+        buf = self.np
         for index in range(self.buf_length):
-            buf[index] = off
+            buf[index] = (0,0,0)
             index += 1
+
+        self.send_buf()
