@@ -125,7 +125,7 @@ class Neopixel:
     # https://github.com/dborne/scroll_text/blob/main/scroll_text.py
     # https://learn.adafruit.com/adafruit-neopixel-featherwing
 
-    def scroll_text(self, jemOS=None, text="test"):
+    def scroll_text(self, signals, text="test"):
         print("scroll_text: " + text)
         # class framebuf
         # FrameBuffer(buffer, width, height, format, stride=width, /)
@@ -163,10 +163,11 @@ class Neopixel:
         scroll_x = -2
 
         for s in range(scroll_step):
-
-            if jemOS is not None:
-                if jemOS.exit_current_mode == True:
+            # exit this mode from a signal (in another thread)
+            if signals is not None:
+                if signals.exit:
                     return
+
             # read_framebuf(fbuf, width, height)
             # self.data = convert_to_neopixel_frame(fbuf, width, height)
             convert_to_neopixel_frame(fbuf, display_width, display_height, self.data)
@@ -209,15 +210,20 @@ class Neopixel:
             utime.sleep_ms(wait)
 
     # Slightly different, this makes the rainbow equally distributed throughout
-    def rainbowCycle(self, jemOS=None, wait=DEFAULT_WAIT_MS):
+    def rainbowCycle(self, signals, wait=DEFAULT_WAIT_MS):
+        print("start rainbowCycle")
         for j in range (0,256,1):
             for i in range (0,self.num_leds,1):
                 self.data[i] = wheel(int((i * 256 / self.num_leds) + j) & 255)
             self.chain.show( self.data )
 
-            if jemOS is not None:
-                if jemOS.exit_current_mode == True:
+            # exit this mode from a signal (in another thread)
+            if signals is not None:
+                if signals.exit:
+                    self.clear_display()
+                    print("exit rainbowCycle")
                     return
+            
             utime.sleep_ms(wait)
 
     # Fill the dots one after the other with a color
@@ -245,7 +251,7 @@ class Neopixel:
                     except: # if i+q is out of the list then ignore
                         pass
 
-    def theater_chase_rainbow(self, jemOS=None, wait=DEFAULT_WAIT_MS):
+    def theater_chase_rainbow(self, signals=None, wait=DEFAULT_WAIT_MS):
         for j in range(0, 256, 1):     # cycle all 256 colors in the wheel
             for q in range(0, 3, 1):
                 for i in range(0, self.num_leds, 3):
@@ -254,9 +260,11 @@ class Neopixel:
                     except: # if i+q is out of the list then ignore
                         pass
                 self.chain.show( self.data )
-                if jemOS is not None:
-                    if jemOS.exit_current_mode == True:
+                # exit this mode from a signal (in another thread)
+                if signals is not None:
+                    if signals.exit:
                         return
+
                 utime.sleep_ms(wait)
 
                 for i in range(0, self.num_leds, 3):
