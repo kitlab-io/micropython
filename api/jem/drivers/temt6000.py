@@ -11,25 +11,26 @@ GND     <<< >>> GND
 P18     <<< >>> SIG
 
 USAGE
-print("Intensity =", shine.get_analog_value())    # returns value 0-4095
+>> from drivers.temt6000 import *
+>> light = TEMPT6000()
+print("Intensity =", light.get_analog_value())    # returns value 0-4095
 """
 
-from machine import ADC
+from machine import ADC, Pin
 
 
 class TEMT6000:
-    ADC_GPIO_PIN = 'P18'
+    # jem-2 esp32 IO36 is SENSOR_VP
+    ADC_GPIO_PIN = 36
 
     def __init__(self, pin_num=ADC_GPIO_PIN):
-        self.adc = ADC()
         self.pin_num = pin_num
-        # init pin and attenuation value of 11DB (increases adc max input ability to 3.3V)
-        self.apin = self.adc.channel(pin=self.pin_num, attn=ADC.ATTN_11DB)
-        
+        self.adc = ADC(Pin(self.pin_num, Pin.IN)) # 12 bit
+        self.adc.init(atten=ADC.ATTN_11DB) # 11dB attenuation (150mV - 2450mV)
+
     def get_analog_value(self):
-        """returns value 0 - 4095"""
-        an = self.apin()
-        return an
+        """returns 12 bit value 0 - 4095"""
+        return self.adc.read()
 
     def get_voltage(self):
         """returns voltage 0 - 3.3V"""
