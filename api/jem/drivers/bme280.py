@@ -6,6 +6,11 @@ Desc: Bosch bme280 Barometric pressure, humidity and temperature sensor
 Communication Interface:   I2C
 
 Source: Edited from - https://github.com/robert-hh/BME280
+
+ex:
+>> from drivers.bme280 import BME280
+>> bme = BME280()
+>> print(bme.data)
 """
 
 import time

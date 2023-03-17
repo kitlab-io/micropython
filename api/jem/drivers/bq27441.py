@@ -2,6 +2,7 @@
 
 Driver: bq27441
 USAGE
+from drivers.bq27441 import BQ27441
 fg = BQ27441()
 print("State of Charge:", fg.stateOfCharge(),"%")
 print("Battery Voltage:", fg.voltage(),"mV")
@@ -21,14 +22,14 @@ P22(G9)  <<<        >>>    GPOUT
 P21(G8)  <<<        >>>    !CE
 Source: Modified from - https://github.com/sparkfun/SparkFun_BQ27441_Arduino_Library
 """
-from utime import sleep_ms
+from utime import sleep_ms, ticks_ms
 import struct
 from machine import Pin
 from drivers.peripherals import JemI2C, I2C, JEM_DEFAULT_I2C_BUS, JEM_DEFAULT_I2C_BAUDRATE, JEM_DEFAULT_I2C_PINS
 from helpers.helpers import constrain
 
 ##### Lipo Battery Capacity
-JEM_LIPO_BATTERY_CAPACITY = 1000 # 850 mAh
+JEM_LIPO_BATTERY_CAPACITY = 650 # 850 mAh
 #####
 
 ###########/
@@ -184,7 +185,7 @@ BQ27441_OPCONFIG_RMFCC    = (1<<4)
 BQ27441_OPCONFIG_BATLOWEN = (1<<2)
 BQ27441_OPCONFIG_TEMPS    = (1<<0)
 
-BQ72441_I2C_TIMEOUT = 2000
+BQ27441_I2C_TIMEOUT      = 2000 # ms
 
 # Parameters for the current() function, to specify which current to read
 # current_measure types
@@ -249,37 +250,39 @@ class BQ27441:
     the fuel gauge ic"""
 
     I2C_ADDRESS = 0x55  # Default I2C address of the BQ27441-G1A
-    GPOUT_PIN  = "P7" #only use if buzzer disabled
 
-    def __init__(self, i2c=None, address=I2C_ADDRESS, use_gpout=False):
+    def __init__(self, capacity_mAh=JEM_LIPO_BATTERY_CAPACITY, i2c=None, address=I2C_ADDRESS, gpout_pin=None):
         self._i2c = JemI2C(i2c,address)
         self.gpout = None
         self._shutdown_en = False
         self._userConfigControl = False
         self._sealFlag = False
-        self.use_gpout = use_gpout #only use P7 if disconnected from buzzer on pcb (JEM v5.1.0 or newer)
-
+        self.gpout_pin = gpout_pin
+        self.capacity_mAh = capacity_mAh
         self.configure_gpout_input()
 
         if i2c is None:
-            i2c = I2C(JEM_DEFAULT_I2C_BUS, I2C.MASTER, pins=JEM_DEFAULT_I2C_PINS, baudrate=JEM_DEFAULT_I2C_BAUDRATE)
+            sda=Pin(JEM_DEFAULT_I2C_PINS['sda'])
+            scl=Pin(JEM_DEFAULT_I2C_PINS['scl'])
+            i2c = I2C(JEM_DEFAULT_I2C_BUS, sda=sda, scl=scl, freq=JEM_DEFAULT_I2C_BAUDRATE)
         self._i2c = JemI2C(i2c,address)
-        self.power_up()
+        print("call power_up after init to use")
+        #self.power_up()
 
     def configure_gpout_input(self):
-        if self.use_gpout:
-            self.gpout = Pin(BQ27441.GPOUT_PIN, mode=Pin.IN, pull=Pin.PULL_UP)
+        if self.gpout_pin:
+            self.gpout = Pin(gpout_pin, mode=Pin.IN, pull=Pin.PULL_UP)
 
     def configure_gpout_output(self):
-        if self.use_gpout:
-            self.gpout = Pin(BQ27441.GPOUT_PIN, mode=Pin.OUT)
+        if self.gpout_pin:
+            self.gpout = Pin(gpout_pin, mode=Pin.OUT)
 
     def power_up(self):
         """Wake up fuel gauge ic if in shutdown mode"""
         self.disable_shutdown_mode()
         sleep_ms(10)
         try:
-            self.set_capacity(JEM_LIPO_BATTERY_CAPACITY)
+            self.set_capacity(self.capacity_mAh)
         except Exception as e:
             print(e)
 
@@ -297,9 +300,11 @@ class BQ27441:
         self.configure_gpout_input()
         self.enable_shutdown_mode()
         self.executeControlWord(BQ27441_CONTROL_SHUTDOWN)
+        print("WARNING: will need to power cycle board in order to use FuelGauge again")
+        print("This is a limitation on older JEM boards")
 
     def disable_shutdown_mode(self):
-        if self.use_gpout:
+        if self.gpout_pin:
             self.configure_gpout_output()
             # toggle gpout to exit shutdown mode
             self.gpout.value(0)
@@ -522,6 +527,8 @@ class BQ27441:
     def deviceType(self):
         return self.readControlWord(BQ27441_CONTROL_DEVICE_TYPE)
 
+    def get_time_ms(self):
+        return ticks_ms()
 
     # Enter configuration mode - set userControl if calling from an Arduino sketch
     # and you want control over when to exitConfig
@@ -534,15 +541,20 @@ class BQ27441:
             self._sealFlag = True
             self.unseal() # be unsealed before making changes
 
+
+
         if self.executeControlWord(BQ27441_CONTROL_SET_CFGUPDATE):
-            timeout = BQ72441_I2C_TIMEOUT
-            while (timeout) and (not(self.status() & BQ27441_FLAG_CFGUPMODE)):
-                timeout -= 1
+            start_ms = self.get_time_ms()
+            timeout = False
+            while not(self.flags() & BQ27441_FLAG_CFGUPMODE):
                 sleep_ms(1)
+                elapsed_ms = self.get_time_ms() - start_ms
+                if(elapsed_ms > BQ27441_I2C_TIMEOUT):
+                    timeout = True
+                    break
 
-            if timeout > 0:
+            if not timeout:
                 return True
-
         return False
 
     # Exit configuration mode with the option to perform a resimulation
@@ -557,13 +569,17 @@ class BQ27441:
         print("exitConfig")
         if resim:
             if self.softReset():
-                timeout = BQ72441_I2C_TIMEOUT
+                start_ms = self.get_time_ms()
+                timeout = False
 
-                while timeout and (self.flags() & BQ27441_FLAG_CFGUPMODE):
-                    timeout -= 1
+                while not(self.flags() & BQ27441_FLAG_CFGUPMODE):
                     sleep_ms(1)
+                    elapsed_ms = self.get_time_ms() - start_ms
+                    if(elapsed_ms > BQ27441_I2C_TIMEOUT):
+                        timeout = True
+                        break
 
-                if timeout > 0:
+                if not timeout:
                     if self._sealFlag:
                         self.seal() # Seal back up if we IC was sealed coming in
                     return True
@@ -776,14 +792,12 @@ class BQ27441:
 
         self._i2c.write(subAddress) # write some data to device i2c address
         result = self._i2c.read(count) # returns byte array from device i2c address
-
-        # convert bytearray to list
         return list(result)
+
 
     # Write a specified number of bytes over I2C to a given subAddress
     def i2cWriteBytes(self, subAddress, src, count):
         # self._i2c.writeto_mem(self.address, subAddress, src)
-
         # first convert data to bytearray type before write
         if type(subAddress) != list:
             subAddress = [subAddress]
@@ -792,6 +806,4 @@ class BQ27441:
 
         data = subAddress + src
         self._i2c.write(data)
-        #self._i2c.write(subAddress)
-        #self._i2c.write(src)
         return True

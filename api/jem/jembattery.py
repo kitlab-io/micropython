@@ -16,13 +16,17 @@ Example:
     >> "i2c"
 """
 
-from drivers.bq27441 import BQ27441, CurrentMeasureType, CapacityMeasureType, SohMeasureType
+from drivers.bq27441 import BQ27441, CurrentMeasureType, CapacityMeasureType, SohMeasureType, JEM_LIPO_BATTERY_CAPACITY
 
 class JemBattery(BQ27441):
-    def __init__(self, i2c=None):
+    def __init__(self, capacity_mAh=JEM_LIPO_BATTERY_CAPACITY, i2c=None):
         """Initialize JemDevice parent class and then set the comm and bq27441 driver objects"""
         print("Init BQ27441 may take up to 15 seconds")
-        super(JemBattery, self).__init__(i2c=i2c, address=BQ27441.I2C_ADDRESS)
+        super(JemBattery, self).__init__(capacity_mAh=capacity_mAh, i2c=i2c, address=BQ27441.I2C_ADDRESS)
+        try:
+            self.power_up()
+        except Exception as e:
+            print("power_up failed %s" % e)
 
     @property
     def current_average(self):
