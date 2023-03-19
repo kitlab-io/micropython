@@ -1,12 +1,12 @@
 # kit.py
 # Each kit must provide kit.py
 # main.py will look from kits/kit.py in order to run kit
-from kits.window import window
+from kits.simplebot import simplebot as kit
 import _thread
 
 class Kit:
     def __init__(self):
-        self._kit = window
+        self._kit = kit
 
     def start(self):
         self._kit.running = True
