@@ -30,8 +30,9 @@ rc_uart = BLEUART(jem_ble, service_uuid = 0xCA33, rx_chr_uuid = 0xCB33, tx_chr_u
 ble_repl = BLEUARTStream(Timer(0), repl_uart)
 ftp = BLEUARTFTP(Timer(1), ftp_uart)
 rc = BLEUARTREMOTECONTROL(Timer(2), rc_uart)
-info = BLEINFOService(jem_ble, service_uuid="ABCD")
+info = BLEINFOService(jem_ble, service_uuid=0xABCD)
 
+jem_ble.set_connect_callback(info.notify_mtu)
 jem_ble.advertise()
 
 os.dupterm(ble_repl)

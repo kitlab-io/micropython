@@ -148,6 +148,13 @@ class BLE:
         # Increase the size of the rx buffer and enable append mode.
         self._connections = set()
 
+    def set_connect_callback(self, cbk):
+        self._connect_callback = cbk
+
+    def connect_callback(self):
+        if self._connect_callback:
+            self._connect_callback()
+
     def get_mtu(self):
         return self._ble.config('mtu')
 
@@ -220,6 +227,7 @@ class BLE:
             print("irq event: IRQ_CENTRAL_CONNECT")
             conn_handle, _, _ = data
             self._connections.add(conn_handle)
+            self.connect_callback()
         elif event == IRQ_CENTRAL_DISCONNECT:
             print("irq event: IRQ_CENTRAL_DISCONNECT")
             conn_handle, _, _ = data
@@ -251,7 +259,9 @@ class BLEUART:
     def __init__(self, jem_ble, service_uuid, tx_chr_uuid, rx_chr_uuid, rxbuf=100, primary=False):
         self.ble = jem_ble # jem ble wrapper
         self.service = self.ble.service(uuid=service_uuid, isPrimary=primary)
-        self.tx_char = self.service.characteristic(uuid=tx_chr_uuid, buf_size=rxbuf)
+        self.tx_char = self.service.characteristic(uuid=tx_chr_uuid,
+
+        )
         self.rx_char = self.service.characteristic(uuid=rx_chr_uuid, buf_size=rxbuf)
         self.rx_char.callback(None, self.rx_cbk)
         self.tx_char.callback(None, self.tx_cbk)
