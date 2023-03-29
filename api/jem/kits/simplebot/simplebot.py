@@ -40,11 +40,11 @@ class FakePwm:
     def __init__(self, name):
         self.name = name
 
-    def set_duty_percent(self, duty):
-        print("%s set_duty_percent = %s" % (self.name, duty))
+    def duty(self, duty):
+        print("%s duty = %s" % (self.name, duty))
 
-    def set_freq_hz(self, freq):
-        print("%s set_freq_hz = %s" % (self.name, freq))
+    def freq(self, freq):
+        print("%s freq = %s" % (self.name, freq))
 
 global robot
 robot = SimpleBot(FakePin(), FakePwm("left"), FakePwm("right"))

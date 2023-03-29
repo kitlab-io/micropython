@@ -20,7 +20,7 @@ class Servo:
         self.forward_pw = 2.0
         self.backward_pw = 1.0
         self.period_ms = 1000.0/float(pwm_freq_hz) #if hertz 50 then period = 20 ms
-        self.pwm.set_freq_hz(pwm_freq_hz)
+        self.pwm.freq(pwm_freq_hz)
 
     def drive(self, speed):
         direction = 1
@@ -38,5 +38,6 @@ class Servo:
         # get pwm duty cycle percent (0 - 100%)
         duty = pw_ms / self.period_ms # period_ms is max period of pwm timer
         duty_percent = 100*duty
-        self.pwm.set_duty_percent(duty_percent)
+        # ex: 100% = 1023 (max of 2**10 - 1)
+        self.pwm.duty(int(duty_percent * (1023.0/100.0))) # 10 bit max (0 - 1023)))
         return duty_percent
