@@ -8,7 +8,7 @@ class BLEINFOService:
         self.ble = jem_ble # jem ble wrapper
         self.service = self.ble.service(uuid=service_uuid, isPrimary=primary)
         # mtu char can be used to tell client what mtu we agreed to
-        self.mtu_char = self.service.characteristic(uuid=0x1234, buf_size=rx_buf)
+        self.mtu_char = self.service.characteristic(uuid=0x1234, buf_size=rxbuf)
         self.mtu_char.callback(None, self.mtu_cbk)
         self._rx_buffer = bytearray()
 
