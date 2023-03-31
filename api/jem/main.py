@@ -6,6 +6,33 @@ kit = Kit()
 kit.start()
 # kit.stop()
 
+def text(text):
+    print('showText')
+    print(text)
+    kit.showText(text)
+    pass
+
+
+def color(rgb):
+    print('showColor')
+    print(rgb)
+    kit.showColor(rgb)
+    pass
+
+
+def btn():
+    print('pressBtn')
+    kit.press_virtual_button()
+    pass
+
+
+def off():
+    kit.display_off() 
+
+# test commands from companion app
+# showText('Maker Faire 2023  ')
+# showColor((255, 255, 0))
+
 
 # from kits import kit_main
 # kit_main.load_kit()
@@ -45,7 +72,7 @@ kit.start()
 
 # def setup_neopixel(_brightness):
 #     brightness = _brightness
-    
+
 #     np.chain.set_brightness(brightness)
 #     # helper.neopixel.chain.set_brightness(brightness)
 #     # np = Neopixel(brightness = brightness/100.0)
@@ -366,7 +393,7 @@ kit.start()
 # imu = JemIMU()
 
 # def run_imu():
-    
+
 #     # move your hand up / down over the range sensor to see distance change
 #     for i in range(1000): # run for 10 seconds
 #         print("raw orientation: %s" % imu.orientation)
@@ -381,7 +408,7 @@ kit.start()
 #     o = imu.orientation
 #     # X roll X
 #     # Z pitch
-#     # Y yaw 
+#     # Y yaw
 
 #     # TODO option to ignore an axis, like yaw Y
 
@@ -396,7 +423,7 @@ kit.start()
 #         if (near_orientation(o_target, o, deadzone)):
 #             print("check orientation: %s" % o_target)
 #             current_orientation = o_target
-    
+
 #     return current_orientation
 #     pass
 
@@ -425,7 +452,7 @@ kit.start()
 #     run_scroll_text()
 #     run_rainbowCycle()
 
-    
+
 #     run_rangesensor()
 #     run_imu()
 

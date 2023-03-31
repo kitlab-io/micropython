@@ -29,8 +29,8 @@ def note_freq(note, octave=4):
     o = octave
     # o = 4 $ default octave
     # n -> c4
-    
-    # if octave defined with note: "c4" 
+
+    # if octave defined with note: "c4"
     try:
         # try converting to integer
         o = int(note[-1])
@@ -38,7 +38,7 @@ def note_freq(note, octave=4):
         # n, o = note[:-1], int(note[-1])
     except ValueError:
         pass
-    
+
     index = note_names.index(n)
     return int(round(pow(2, (float(o * 12 + index) / 12.0)) * C0, 2))
 
@@ -56,20 +56,20 @@ def play_note(buzz, note_name, duration_sec=1):
 # notes in scientific pitch notation
 # https://en.wikipedia.org/wiki/Scientific_pitch_notation#/media/File:Piano_Frequencies.svg
 def play_song(buzz, song_name, beats_per_minute=60):
-    
+
     melody = [("c4",0.25)]
-    
+
     # All Ocarina of Time songs
     # https://www.youtube.com/watch?v=cd60Sgob99I
     if song_name == "preludeOfLight":
         # melody = [
-        #     ("d5",0.25), ("a4",0.5), 
+        #     ("d5",0.25), ("a4",0.5),
         #     ("d5",0.125), ("a4",0.125), ("b4",0.125), ("d5",0.125)]
         melody = [
-            ("d6",0.25), ("a5",0.5), 
+            ("d6",0.25), ("a5",0.5),
             ("d6",0.125), ("a5",0.125), ("b5",0.125), ("d6",0.125)
             ]
-    
+
     # whole note = 1
     # quarter note = 0.25
     # eighth note = 0.125
@@ -105,13 +105,13 @@ from drivers.neopixel import *
 import _thread
 
 def startup_feedback():
-    
+
     run_play_song()
 
     # buzzer = jembuzzer.JemBuzzer()
     # run_play_song(buzzer)
     # _thread.start_new_thread(run_play_song, ())
-    
+
     # setup neopixel driver
     _neopixel = Neopixel()
     brightness = 1.0
@@ -122,16 +122,21 @@ def startup_feedback():
 
     pass
 
-startup_feedback()
+# for faster developer iteration
+fast_boot = True
+# fast_boot = False
 
-from ble_uart_repl import BLEUARTStream
-from ble_uart_ftp import BLEUARTFTP
-from ble_uart_remote_control import BLEUARTREMOTECONTROL
-rc = BLEUARTREMOTECONTROL()
-ftp = BLEUARTFTP()
-repl = BLEUARTStream()
+if not fast_boot:
+    startup_feedback()
 
-signals.exit = True
+    from ble_uart_repl import BLEUARTStream
+    from ble_uart_ftp import BLEUARTFTP
+    from ble_uart_remote_control import BLEUARTREMOTECONTROL
+    rc = BLEUARTREMOTECONTROL()
+    ftp = BLEUARTFTP()
+    repl = BLEUARTStream()
+
+    signals.exit = True
 
 # NOTE: any imports / variables defined in boot.py should be available in main.py
-# the global scope persisted is particular to Micropython 
+# the global scope persisted is particular to Micropython

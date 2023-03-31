@@ -166,6 +166,7 @@ class Neopixel:
             # exit this mode from a signal (in another thread)
             if signals is not None:
                 if signals.exit:
+                    print('got exit signal')
                     return
 
             # read_framebuf(fbuf, width, height)
@@ -223,7 +224,7 @@ class Neopixel:
                     self.clear_display()
                     print("exit rainbowCycle")
                     return
-            
+
             utime.sleep_ms(wait)
 
     # Fill the dots one after the other with a color

@@ -1,10 +1,10 @@
+from drivers.neopixel import *
 import _thread
 import time
 from jem import Jem
 
 _jem = Jem()
 
-from drivers.neopixel import *
 
 # setup neopixel driver to 8x8 LED display
 _neopixel = Neopixel()
@@ -16,6 +16,7 @@ DEFAULT_WAIT_MS = 10
 # signals = {
 #        exit: exit_current_mode
 #    }
+
 
 class Signals:
     def __init__(self):
@@ -32,7 +33,7 @@ class WindowKit:
         self.current_mode_index = 0
         # self.exit_current_mode = False
 
-
+        self.auto_cycle_mode = True
         self.signals = Signals()
 
         # list of func pointers
@@ -40,19 +41,21 @@ class WindowKit:
            # None,
            ("scrollText", self.display_scroll_text),
            ("rainbowCycle", self.display_rainbow_cycle),
-           ("theaterChaseRainbow", self.display_theater_chase_rainbow)
+           ("theaterChaseRainbow", self.display_theater_chase_rainbow),
+           ("showColor", self.display_solid_color)
         ]
+
+        self.display_text = "Hi, I'm JEM! "
+        self.display_color = (255, 255, 255)
 
 # to dynamically create UI elements and call functions from REPL
 # https://github.com/kitlab-io/micropython/blob/window-kit-v1.0.0/api/jem/kits/window/window.vue#L128
-
 
     def run(self):
        print("window.py run")
        self.listen_for_input()
        self.run_window_kit_modes()
        pass
-
 
     def listen_for_input(self):
        print("listen_for_input")
@@ -61,14 +64,12 @@ class WindowKit:
        print(thread_id)
        pass
 
-
     def run_window_kit_modes(self):
        print("run_window_kit_modes")
        thread_id = _thread.start_new_thread(self.activate_window_mode, ())
        thread_id = _thread.get_ident()
        print(thread_id)
        pass
-
 
     def listen_button(self):
        print("listen_button")
@@ -115,16 +116,26 @@ class WindowKit:
           # while(button.off()): # don't do anything, just wait for button to be on
           #    pass
 
-
     def on_button_pressed(self):
        print("on_button_pressed")
-       pass
+
+       if not self.auto_cycle_mode:
+       # return to auto cyclying modes
+         self.auto_cycle_mode = True
+         self.current_mode_index = 0
+         self.run_window_kit_modes()
+         pass
+       else:
+       # virtual button press
+         self.is_button_pressed = True
+         self.signals.exit = True
+         pass
 
 
     def display_scroll_text(self):
        print("display_scroll_text")
-       text = "Hi, I'm JEM! "
-       _neopixel.scroll_text(self.signals, text)
+
+       _neopixel.scroll_text(self.signals, self.display_text)
        pass
 
 
@@ -140,14 +151,24 @@ class WindowKit:
         pass
 
 
+    def display_solid_color(self):
+        print('display_solid_color')
+        print(self.display_color)
+        _neopixel.solid(self.display_color)
+        pass
+
+
     def activate_window_mode(self):
        print("activate_window_mode")
-       while True:
+       while self.auto_cycle_mode:
           self.current_mode = self.display_modes[self.current_mode_index][1]
           # display mode is a blocking function, running the neopixel drive function
           done = self.current_mode() # neopixel rainbow (ex) will stop once signal says so
-          self.signals.exit = False
-          # display mode has exited because of stop signal
+
+          print('mode stopped')
+          # by now display mode has exited because of stop signal
+          # or mode has naturally exited
+          self.signals.exit = False # reset stop signal
 
           # get next display mode
           self.current_mode_index += 1
