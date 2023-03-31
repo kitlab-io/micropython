@@ -54,3 +54,4 @@ class Jem(object):
         self.btn = button.Button()
         self.buzzer = jembuzzer.JemBuzzer()
         self.led = jemled.JemLed()
+        # self.motors = ()

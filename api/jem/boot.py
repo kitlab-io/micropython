@@ -1,4 +1,6 @@
 print("jem/boot.py")
+
+
 # for fastest feedback after power on/reset
 import jembuzzer
 
@@ -65,7 +67,8 @@ def play_song(buzz, song_name, beats_per_minute=60):
         #     ("d5",0.125), ("a4",0.125), ("b4",0.125), ("d5",0.125)]
         melody = [
             ("d6",0.25), ("a5",0.5), 
-            ("d6",0.125), ("a5",0.125), ("b5",0.125), ("d6",0.125)]
+            ("d6",0.125), ("a5",0.125), ("b5",0.125), ("d6",0.125)
+            ]
     
     # whole note = 1
     # quarter note = 0.25
@@ -86,16 +89,19 @@ def play_song(buzz, song_name, beats_per_minute=60):
 def run_play_song():
     buzzer = jembuzzer.JemBuzzer()
     buzz = buzzer
-    play_song(buzz, "preludeOfLight", 360)
+    bpm = 720
+    play_song(buzz, "preludeOfLight", 720)
     pass
 
-from drivers.neopixel import *
 
 class Signals:
     def __init__(self):
         self.exit = False
 
 signals = Signals()
+
+from drivers.neopixel import *
+
 import _thread
 
 def startup_feedback():
@@ -126,3 +132,6 @@ ftp = BLEUARTFTP()
 repl = BLEUARTStream()
 
 signals.exit = True
+
+# NOTE: any imports / variables defined in boot.py should be available in main.py
+# the global scope persisted is particular to Micropython 

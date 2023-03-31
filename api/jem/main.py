@@ -1,9 +1,18 @@
-# #main.py
-# #from kits import kit_main
-# #kit_main.load_kit()]
-# # from jemwifi import *
-# # from jem_help import jem_help
-# # from jem import Jem
+# main.py
+print('jem/main.py')
+
+from kits.kit import Kit
+kit = Kit()
+kit.start()
+# kit.stop()
+
+
+# from kits import kit_main
+# kit_main.load_kit()
+
+# from jemwifi import *
+# from jem_help import jem_help
+# from jem import Jem
 
 # import _thread
 # import utime
@@ -16,8 +25,6 @@
 # # global wlan
 # # wlan = setup_wifi()
 
-# # from kits.kit import Kit
-
 
 
 # global np
@@ -29,9 +36,7 @@
 # global brightness
 # brightness = 1.0
 
-# # kit = Kit()
-# # kit.start()
-# # kit.stop()
+
 # from drivers.neopixel import *
 
 # # setup neopixel driver
@@ -408,22 +413,21 @@
 # def main():
 #     global j
 #     j = Jem()
-#     # run_listen_button()
+#     run_listen_button()
 
-#     # json_data = read_json_file('kits/window/pixeldata.json')
-#     # print(json_data)
+#     json_data = read_json_file('kits/window/pixeldata.json')
+#     print(json_data)
 
-#     # setup_neopixel(brightness)
+#     setup_neopixel(brightness)
 
-#     # run_buzzer()
+#     run_buzzer()
 
-#     # run_scroll_text()
-#     # run_rainbowCycle()
+#     run_scroll_text()
+#     run_rainbowCycle()
 
     
-#     # run_rangesensor()
-#     # run_imu()
+#     run_rangesensor()
+#     run_imu()
 
 
-# # main()
-print('jem/main.py')
+# main()
