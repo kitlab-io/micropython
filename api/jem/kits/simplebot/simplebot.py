@@ -1,10 +1,11 @@
 from kits.simplebot.servo import Servo
+from machine import Pin, PWM
 
 class SimpleBot:
     def __init__(self, en_pin, left_pwm, right_pwm):
         self.vcc_en = en_pin
-        self.left_motor = Servo(pwm=left_pwm, reverse=True)
-        self.right_motor = Servo(pwm=right_pwm)
+        self.left_motor = Servo(pwm=left_pwm, reverse=True, name="left")
+        self.right_motor = Servo(pwm=right_pwm, name="right")
 
     def start(self):
         self.vcc_en.value(1)
@@ -34,20 +35,33 @@ class SimpleBot:
 # put your kit main code here - it will run in parallel to the micropython repl
 class FakePin:
     def value(self, v):
-        printf("value = %s" % v)
+        print("value = %s" % v)
 
 class FakePwm:
     def __init__(self, name):
         self.name = name
 
-    def duty(self, duty):
+    def duty_percent(self, duty):
         print("%s duty = %s" % (self.name, duty))
 
     def freq(self, freq):
         print("%s freq = %s" % (self.name, freq))
 
+class PwmWrapper:
+    def __init__(self, id, pin, pwm_freq_hz=50):
+        self._pwm = PWM(id, frequency=pwm_freq_hz)
+        self.pwm_c = self._pwm.channel(id, pin=pin, duty_cycle=0.0)
+
+    def duty_percent(self, duty):
+        self.pwm_c.duty_cycle(duty/100.0) # percent at franction ex 0.3 -> 30%
+
+    def freq(self, freq):
+        print("req = %s" % (freq))
+
 global robot
-robot = SimpleBot(FakePin(), FakePwm("left"), FakePwm("right"))
+
+#robot = SimpleBot(FakePin(), FakePwm("left"), FakePwm("right"))
+robot = SimpleBot(Pin('P6', mode=Pin.OUT), PwmWrapper(id=1, pin='P11'), PwmWrapper(id=2, pin='P12'))
 
 def run():
     print("SimpleBot start, nothing to do except use the mobile App")
