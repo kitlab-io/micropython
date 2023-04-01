@@ -51,22 +51,26 @@ module.exports = {
       this.parent.stopMotion();
     },
 
-    forward(){
+    async forward(){
       console.log("forward");
-      this.sendCommand("kit._kit.robot.forward()")
+      await this.sendCommand("kit._kit.robot.start()");
+      await this.sendCommand("kit._kit.robot.forward()")
     },
 
-    backward(){
+    async backward(){
       console.log("backward");
-      this.sendCommand("kit._kit.robot.backward()")
+      await this.sendCommand("kit._kit.robot.start()");
+      await this.sendCommand("kit._kit.robot.backward()")
     },
-    left(){
+    async left(){
       console.log("left");
-      this.sendCommand("kit._kit.robot.turn_left()")
+      await this.sendCommand("kit._kit.robot.start()");
+      await this.sendCommand("kit._kit.robot.turn_left()")
     },
-    right(){
+    async right(){
       console.log("right");
-      this.sendCommand("kit._kit.robot.turn_right()")
+      await this.sendCommand("kit._kit.robot.start()");
+      await this.sendCommand("kit._kit.robot.turn_right()")
     },
 
     motionHandler: function(accelEvent){
