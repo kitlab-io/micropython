@@ -1,5 +1,6 @@
 from kits.simplebot.servo import Servo
 from machine import Pin, PWM
+import pycom
 
 class SimpleBot:
     def __init__(self, en_pin, left_pwm, right_pwm):
@@ -58,10 +59,14 @@ class PwmWrapper:
     def freq(self, freq):
         print("req = %s" % (freq))
 
+
 global robot
 
 #robot = SimpleBot(FakePin(), FakePwm("left"), FakePwm("right"))
-robot = SimpleBot(Pin('P6', mode=Pin.OUT), PwmWrapper(id=1, pin='P11'), PwmWrapper(id=2, pin='P12'))
-
-def run():
-    print("SimpleBot start, nothing to do except use the mobile App")
+try:
+    robot = SimpleBot(Pin('P6', mode=Pin.OUT), PwmWrapper(id=1, pin='P11'), PwmWrapper(id=2, pin='P12'))
+    pycom.heartbeat(False)
+    def run():
+        print("SimpleBot start, nothing to do except use the mobile App")
+except Exception as e:
+    print("simplebot.py failed to load: %s" % e)
