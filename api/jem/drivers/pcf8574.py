@@ -54,7 +54,7 @@ I2C_ADDRESS = 0x20
 """
 from machine import Pin, I2C
 
-i2c = I2C(0, scl=Pin(22), sda=Pin(21))
+i2c = I2C(0, I2C.MASTER, pins=('p9', 'p10'), baudrate=4000)
 pcf8574 = PCF8574(i2c, addr=0x20)
 
 pcf8574.outputs(0b10101010)

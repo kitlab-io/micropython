@@ -3,7 +3,6 @@
 #kit_main.load_kit()]
 from jemwifi import *
 from jem_help import jem_help
-from drivers.peripherals import JemI2C, I2C, JEM_DEFAULT_I2C_BUS, JEM_DEFAULT_I2C_BAUDRATE, JEM_DEFAULT_I2C_PINS
 
 global wlan
 wlan = setup_wifi()
@@ -12,8 +11,8 @@ from drivers.pcf8574 import *
 
 from machine import Pin, I2C
 
-# i2c = I2C(0, scl=Pin(22), sda=Pin(21))
-i2c = I2C(JEM_DEFAULT_I2C_BUS, I2C.MASTER, pins=JEM_DEFAULT_I2C_PINS, baudrate=JEM_DEFAULT_I2C_BAUDRATE)
+# p9 = sda, p10 = scl
+i2c = I2C(0, I2C.MASTER, pins=('p9', 'p10'), baudrate=4000)
 pcf8574 = PCF8574(i2c, addr=0x20)
 
 # test out different combinations of 0b10101010
