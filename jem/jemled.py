@@ -1,23 +1,24 @@
 # jemled.py
 # just a wrapper around pycom.rgbled
-import pycom
+from machine import Pin
+from neopixel import NeoPixel
 
+# for single ws2812 led
 class JemLed:
-    RED = 0x880000 # red, green blue
-    GREEN = 0x008800
-    BLUE = 0x000088
+    RED = (0x88,0x00,0x00) # red, green blue
+    GREEN = (0x00,0x88,0x00)
+    BLUE = (0x00,0x00,0x88)
 
     def __init__(self):
+        self.pin = Pin(0, Pin.OUT) # LED / BOOT PIN on JEM2 is GPIO0
+        self.np = NeoPixel(self.pin, 1)   # create NeoPixel driver on GPIO0 for 1 pixel
         self.color = JemLed.RED
-        self.heartbeat_disabled = False
 
     def set_color(self, color):
         """ ex: red color = 0x880000 or JemLed.RED """
         self.color = color
-        if not self.heartbeat_disabled:
-            pycom.heartbeat(False)
-            self.heartbeat_disabled = True
-        pycom.rgbled(self.color)
+        self.np[0] = color
+        self.np.write()
 
     def off(self):
         pycom.rgbled(0x000000)
@@ -25,7 +26,7 @@ class JemLed:
 if __name__ == "__main__":
     import time
     led = JemLed()
-    red = 0xFF0000
+    red = (0xFF, 0x00, 0x00)
 
     for i in range(10):
         led.set_color(red) # set color to red

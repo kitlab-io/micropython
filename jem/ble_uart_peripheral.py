@@ -259,9 +259,7 @@ class BLEUART:
     def __init__(self, jem_ble, service_uuid, tx_chr_uuid, rx_chr_uuid, rxbuf=100, primary=False):
         self.ble = jem_ble # jem ble wrapper
         self.service = self.ble.service(uuid=service_uuid, isPrimary=primary)
-        self.tx_char = self.service.characteristic(uuid=tx_chr_uuid,
-
-        )
+        self.tx_char = self.service.characteristic(uuid=tx_chr_uuid, buf_size=rxbuf)
         self.rx_char = self.service.characteristic(uuid=rx_chr_uuid, buf_size=rxbuf)
         self.rx_char.callback(None, self.rx_cbk)
         self.tx_char.callback(None, self.tx_cbk)
