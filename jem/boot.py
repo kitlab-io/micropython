@@ -14,7 +14,16 @@ import bluetooth
 import os
 
 esp32_ble = bluetooth.BLE()
-jem_ble = BLE(esp32_ble, name="JEM-BLE")
+name="JEM-BLE"
+try:
+    with open("jem_config.json", "r") as f:
+        json_str = f.read()
+        json_config = json.loads(json_str)
+        name = json_config['ble']['name'] #get ble adv name
+except Exception as e:
+    print("BLEMANAGER: Failed to load jem_config.json: %s" % e)
+    
+jem_ble = BLE(esp32_ble, name=name)
 
 repl_uart = BLEUART(jem_ble, service_uuid="6E400001-B5A3-F393-E0A9-E50E24DCCA9E",
                         tx_chr_uuid="6E400003-B5A3-F393-E0A9-E50E24DCCA9E",

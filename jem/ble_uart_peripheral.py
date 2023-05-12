@@ -2,7 +2,7 @@
 
 import bluetooth
 from ble_advertising import advertising_payload
-import utime
+import utime, json
 import struct
 import machine, _thread
 from micropython import const
@@ -139,9 +139,8 @@ class BLE:
         self.service_uuids = []
         self.primary_uuid = None
         self.char_handles_map = {}
-
-        self._ble.active(True)
         self._ble.config(gap_name=name)
+        self._ble.active(True)
         #self._ble.config(mtu=200)
         self._ble.irq(self._irq)
 
