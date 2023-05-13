@@ -39,6 +39,7 @@
 ```bash
 >> cd ~/Desktop
 >> git clone https://github.com/kitlab-io/micropython.git jem-micropython
+>> cd jem-micropython
 >> git fetch origin jem2
 >> git checkout jem2
 ```
