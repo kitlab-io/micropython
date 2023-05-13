@@ -1,4 +1,3 @@
-# Kit Remote Control over BLE
 from machine import Timer
 
 from ble_uart_peripheral import schedule_in, IRQ_GATTS_WRITE
@@ -67,10 +66,12 @@ class BLEUARTREMOTECONTROL:
         return resp
 
     def schedule_eval_cmd(self):
-        schedule_in(self._timer, self._wrap_eval_cmd, self.cmd_delay_ms)
+        self._wrap_eval_cmd(None)
+        #schedule_in(self._timer, self._wrap_eval_cmd, self.cmd_delay_ms)
 
     def schedule_exec_cmd(self):
-        schedule_in(self._timer, self._wrap_exec_cmd, self.cmd_delay_ms)
+        self._wrap_exec_cmd(None)
+        #schedule_in(self._timer, self._wrap_exec_cmd, self.cmd_delay_ms)
 
     def _wrap_eval_cmd(self, alarm):
         self._execute_next_cmd(eval_cmd=True)
@@ -88,6 +89,7 @@ class BLEUARTREMOTECONTROL:
                 code += code_str
             self._cmd_queue.clear()
             if eval_cmd:
+                print("eval: %s" % code)
                 resp = eval(code) # example: eval("move(50,40)") will move car left =50, right=40
                 if resp:
                     msg = CmdMsg(Cmd.EXE_CODE, str(resp)).msg()
@@ -118,3 +120,4 @@ class BLEUARTREMOTECONTROL:
 
     def is_connected(self):
         return self._uart.is_connected()
+    
