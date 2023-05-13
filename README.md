@@ -34,15 +34,22 @@
 - You can also edit files on JEM (like the WEB IDE) by navigating to the 'Editor' tab
 - Android app coming soon!
 
-### Install Atom IDE + Pymakr plugin
+### Install Vscode + Pymaker extension
+- First clone the JEM Micropython Repo and checkout jem2 branch
+```bash
+>> cd ~/Desktop
+>> git clone https://github.com/kitlab-io/micropython.git jem-micropython
+>> cd jem-micropython
+>> git fetch origin jem2
+>> git checkout jem2
+```
 - Currently, the JEM Web IDE is in early development and you can't (yet) upload or create your own projects from your PC
-- The popular ATOM IDE as a plugin called Pymakr that allows you to create JEM code on your PC and then flash to JEM
+- Vscode has a micropython development environment extension called Pymaker
    + It can be used to edit JEM code, talk to JEM repl and flash code to JEM
-- [Atom IDE Download](https://github.com/atom/atom/releases)
-- [Atom Pymakr Plugin](https://github.com/pycom/pymakr-atom/releases)
-   + Follow [Install Instructions](https://github.com/pycom/pymakr-atom#manual-install)
-   + Used by Atom to talk to JEM Micropython
-- UPDATE: Pymakr has been deprecated but can still be used without issue
+- [Install Vscode](https://code.visualstudio.com/download)
+- [Install Pymaker Extension](https://marketplace.visualstudio.com/items?itemName=pycom.Pymakr)
+   + Follow [Quickstart Instructions](https://github.com/pycom/pymakr-vsc/blob/HEAD/GET_STARTED.md)
+   + Open new project in the jem2/jem directory
 
 ### Flash latest Kitlab JEM Micropython to board
 - Download / unzip latest [release](https://github.com/kitlab-io/micropython/releases)
