@@ -146,13 +146,14 @@ class BLE:
 
         # Increase the size of the rx buffer and enable append mode.
         self._connections = set()
+        self._connect_callbacks = []
 
-    def set_connect_callback(self, cbk):
-        self._connect_callback = cbk
+    def add_connect_callback(self, cbk):
+        self._connect_callbacks.append(cbk)
 
-    def connect_callback(self):
-        if self._connect_callback:
-            self._connect_callback()
+    def connect_callback(self, connected):
+        for cbk in self._connect_callbacks:
+            cbk(connected)
 
     def get_mtu(self):
         return self._ble.config('mtu')
@@ -226,13 +227,14 @@ class BLE:
             print("irq event: IRQ_CENTRAL_CONNECT")
             conn_handle, _, _ = data
             self._connections.add(conn_handle)
-            self.connect_callback()
+            self.connect_callback(True)
         elif event == IRQ_CENTRAL_DISCONNECT:
             print("irq event: IRQ_CENTRAL_DISCONNECT")
             conn_handle, _, _ = data
             if conn_handle in self._connections:
                 self._connections.remove(conn_handle)
             # Start advertising again to allow a new connection.
+            self.connect_callback(False)
             self.advertise()
         elif event == IRQ_GATTS_WRITE or event == IRQ_GATTS_READ_REQUEST or event == IRQ_GATTS_INDICATE_DONE:
             conn_handle, value_handle = data

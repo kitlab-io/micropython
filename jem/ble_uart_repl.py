@@ -19,7 +19,13 @@ class BLEUARTStream(io.IOBase):
         self._uart.irq(self._on_rx)
         self.tx_delay_ms = 25
         self._timer = tmr # ex: machine.Timer(0)
-    
+
+    def connected_event(self, connected):
+        if connected:
+            os.dupterm(self)
+        else:
+            os.dupterm(None)
+
     def _on_rx(self):
         # Needed for ESP32.
         if hasattr(os, "dupterm_notify"):
@@ -54,4 +60,3 @@ class BLEUARTStream(io.IOBase):
         self._tx_buf += buf
         if empty:
             schedule_in(self._timer, self._flush, self.tx_delay_ms)
-

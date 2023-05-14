@@ -45,9 +45,11 @@ try:
 except Exception as e:
     print("boot failed %s" % e)
     print("Attempting to start ble anyhow")
-jem_ble.set_connect_callback(info.notify_mtu)
+
+jem_ble.add_connect_callback(ble_repl.connected_event)
+jem_ble.add_connect_callback(info.notify_mtu)
 jem_ble.advertise()
 
-os.dupterm(ble_repl)
+
 #IRQ_MTU_EXCHANGED
 print("jem ble adv!")

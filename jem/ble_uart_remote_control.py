@@ -66,17 +66,17 @@ class BLEUARTREMOTECONTROL:
         return resp
 
     def schedule_eval_cmd(self):
-        self._wrap_eval_cmd(None)
-        #schedule_in(self._timer, self._wrap_eval_cmd, self.cmd_delay_ms)
+        #self._wrap_eval_cmd(None)
+        schedule_in(self._timer, self._wrap_eval_cmd, self.cmd_delay_ms)
 
     def schedule_exec_cmd(self):
-        self._wrap_exec_cmd(None)
-        #schedule_in(self._timer, self._wrap_exec_cmd, self.cmd_delay_ms)
+        #self._wrap_exec_cmd(None)
+        schedule_in(self._timer, self._wrap_exec_cmd, self.cmd_delay_ms)
 
-    def _wrap_eval_cmd(self, alarm):
+    def _wrap_eval_cmd(self):
         self._execute_next_cmd(eval_cmd=True)
 
-    def _wrap_exec_cmd(self, alarm):
+    def _wrap_exec_cmd(self):
         self._execute_next_cmd(eval_cmd=False)
 
     def _execute_next_cmd(self, eval_cmd):

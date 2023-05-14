@@ -22,8 +22,10 @@ class BLEINFOService:
         except Exception as e:
             print("mtu_cbk failed %s" % e)
 
-    def notify_mtu(self):
+    def notify_mtu(self, connected):
         print("notify_mtu")
+        if not connected:
+            return
         try:
             mtu_size = self.ble.get_mtu()
             print("mtu_size %s" % mtu_size)
