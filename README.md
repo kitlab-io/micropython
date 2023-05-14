@@ -4,6 +4,14 @@
 - Code is written in micropython, as easy to use interpreted language
 
 ## Quickstart
+### Use Thonny Micropython IDE
+- https://thonny.org/
+- Download
+- Then open Thonny and click -> Run -> Configure Interpreter -> MicroPython (ESP32)
+- Connect your JEM device to computer via micro usb and then click on the red 'Stop' button to restart connection
+- You should see list of files / directories on your JEM
+- REPL terminal also available
+
 ### Interact with JEM via the Web IDE
 - [JEM Web IDE](https://kitlab.io/jem/ide)
    + Uses Bluetooth Low Energy (BLE) to flash code to JEM from Web Browser
@@ -34,31 +42,13 @@
 - You can also edit files on JEM (like the WEB IDE) by navigating to the 'Editor' tab
 - Android app coming soon!
 
-### Install Vscode + Pymaker extension
-- First clone the JEM Micropython Repo and checkout jem2 branch
-```bash
->> cd ~/Desktop
->> git clone https://github.com/kitlab-io/micropython.git jem-micropython
->> cd jem-micropython
->> git fetch origin jem2
->> git checkout jem2
-```
-- Currently, the JEM Web IDE is in early development and you can't (yet) upload or create your own projects from your PC
-- Vscode has a micropython development environment extension called Pymaker
-   + It can be used to edit JEM code, talk to JEM repl and flash code to JEM
-- [Install Vscode](https://code.visualstudio.com/download)
-- [Install Pymaker Extension](https://marketplace.visualstudio.com/items?itemName=pycom.Pymakr)
-   + Follow [Quickstart Instructions](https://github.com/pycom/pymakr-vsc/blob/HEAD/GET_STARTED.md)
-   + Open new project in the jem2/jem directory
-
 ### Flash latest Kitlab JEM Micropython to board
 - Download / unzip latest [release](https://github.com/kitlab-io/micropython/releases)
-- Open Atom IDE and open directory **./micropython/api/jem**
-- Turn on JEM board
-- Open Pymakr terminal which will appear at bottom of Atom IDE
-- Set Pymakr to upload all file types (not just python) by clicking on **Pymakr -> Settings -> Global -> Upload all file types**
-- Click 'Connect' to talk to JEM
-- Click 'Upload' to flash latest code to JEM
+- Open Thonny IDE and open directory **/micropython/jem**
+- Turn on JEM board and Connect to computer
+- Restart connection on Thonny (red Stop button)
+- Now select all files in your computer **micropython/jem** directory and then right click and hit 'Upload to /'
+- This will update your JEM board with latest files
 
 ## General JEM ESP32 Micropython Tutorial
 - JEM uses the ESP32 Wrover IE with Micropython baked in
