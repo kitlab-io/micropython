@@ -8,7 +8,7 @@ from jembuzzer import *
 from jemrange import *
 
 global wlan
-wlan = setup_wifi()
+wlan = setup_wifi('purple_rain')
 
 #from kits.kit import Kit
 
@@ -17,6 +17,10 @@ wlan = setup_wifi()
 RED = 0x880000 # red, green blue
 GREEN = 0x008800
 BLUE = 0x000088
+PURPLE = 0x440088
+PINK = 0x880080
+YELLOW = 0x111100
+WHITE = 0x111111
 jem_led = JemLed()
 jem_buzz = JemBuzzer()
 jem_range = JemRange()
