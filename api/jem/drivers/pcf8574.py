@@ -4,7 +4,7 @@ from machine import I2C
 
 class PCF8574:
 # PCF8574 default address.
-I2C_ADDRESS = 0x20
+# I2C_ADDRESS = 0x20
 
     def __init__(self, i2c, addr):
         self.i2c = i2c
