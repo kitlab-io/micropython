@@ -21,7 +21,7 @@ class JemLed:
         self.np.write()
 
     def off(self):
-        pycom.rgbled(0x000000)
+        self.set_color((0,0,0))
 
 if __name__ == "__main__":
     import time
