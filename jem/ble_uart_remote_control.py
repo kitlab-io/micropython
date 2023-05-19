@@ -1,10 +1,12 @@
+# Kit Remote Control over BLE
 from machine import Timer
 
 from ble_uart_peripheral import schedule_in, IRQ_GATTS_WRITE
 from cmd import *
 
+
 class BLEUARTREMOTECONTROL:
-    def __init__(self, tmr, uart, sync_uuid = 0xCF33):            
+    def __init__(self, tmr, uart, sync_uuid=0xCF33):
         self._uart = uart
         self._tx_buf = bytearray()
         self.tx_max_len = 100
@@ -15,8 +17,7 @@ class BLEUARTREMOTECONTROL:
         self._cmd_queue = []
         self._timer = tmr
         self.cmd_manager = CmdManager()
-        self._exec_cmd = self.schedule_exec_cmd
-        
+
         # add new characteristic to uart service
         self.sync_char = self._uart.service.characteristic(uuid=sync_uuid, buf_size=20)
         self.sync_char.callback(None, self.sync_callback)
@@ -30,16 +31,16 @@ class BLEUARTREMOTECONTROL:
                 if sync_type == 'r':
                     self.cmd_manager.reset()
                 if sync_type == 'e':
-                    self._exec_cmd = self.schedule_eval_cmd
+                    self.schedule_eval_cmd()
                 if sync_type == 'x':
-                    self._exec_cmd = self.schedule_exec_cmd
+                    self.schedule_exec_cmd()
 
         except Exception as e:
             print("sync_callback failed: %s" % e)
 
     def _wrap_flush(self):
         self._flush()
-        
+
     def read(self, sz=None):
         return self._uart.read(sz)
 
@@ -57,20 +58,17 @@ class BLEUARTREMOTECONTROL:
     def queue_cmd(self, data):
         try:
             resp = "ok"
-            code = data.decode("utf-8") # convert to string instead of byte array
+            code = data.decode("utf-8")  # convert to string instead of byte array
             self._cmd_queue.append(code)
-            self._exec_cmd()
         except Exception as e:
             resp = "queue_cmd failed: %s" % e
             print(resp)
         return resp
 
     def schedule_eval_cmd(self):
-        #self._wrap_eval_cmd(None)
         schedule_in(self._timer, self._wrap_eval_cmd, self.cmd_delay_ms)
 
     def schedule_exec_cmd(self):
-        #self._wrap_exec_cmd(None)
         schedule_in(self._timer, self._wrap_exec_cmd, self.cmd_delay_ms)
 
     def _wrap_eval_cmd(self):
@@ -80,23 +78,20 @@ class BLEUARTREMOTECONTROL:
         self._execute_next_cmd(eval_cmd=False)
 
     def _execute_next_cmd(self, eval_cmd):
-        #cmd_handler is called when the RemoteControlBleService receives a valid message from the App over BLE
+        # cmd_handler is called when the RemoteControlBleService receives a valid message from the App over BLE
         try:
             if not self._cmd_queue:
                 return
             code = ""
-            for code_str in self._cmd_queue:
-                code += code_str
-            self._cmd_queue.clear()
-            if eval_cmd:
-                print("eval: %s" % code)
-                resp = eval(code) # example: eval("move(50,40)") will move car left =50, right=40
-                if resp:
-                    msg = CmdMsg(Cmd.EXE_CODE, str(resp)).msg()
-                    #self.write(bytearray(str(resp)))
-                    self.write(msg)
-            else:
-                exec(code)
+            while self._cmd_queue:
+                code = self._cmd_queue.pop()
+                if eval_cmd:
+                    resp = eval(code)  # example: eval("move(50,40)") will move car left =50, right=40
+                    if resp:
+                        msg = CmdMsg(Cmd.EXE_CODE, str(resp)).msg()
+                        self.write(msg)
+                else:
+                    exec(code)
         except Exception as e:
             print("_cmd failed: %s" % e)
             self._cmd_queue.clear()
@@ -120,4 +115,3 @@ class BLEUARTREMOTECONTROL:
 
     def is_connected(self):
         return self._uart.is_connected()
-    
