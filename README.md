@@ -109,3 +109,6 @@ btn.read() # should return 0 or 1 depending if pressed
 ## Connect over WiFi
 - Coming soon!
 
+## JEM Board
+![Image of JEM2 Board V1.0.0](docs/images/jem2-v1.0.0.png)
+
