@@ -29,6 +29,11 @@ class Car:
     def stop(self):
         self.pcf8574.outputs(0b00000000) # stop
 
+    def move(self, left_speed=0, right_speed=0):
+        self.left_motor.drive(left_speed)
+        self.right_motor.drive(right_speed)
+
+
 car = Car()
 
 
