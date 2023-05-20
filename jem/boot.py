@@ -11,20 +11,20 @@ from ble_uart_remote_control import BLEUARTREMOTECONTROL
 from ble_info_service import BLEINFOService
 from machine import Timer
 import bluetooth
-import os
-import json
+import os, json
 
 esp32_ble = bluetooth.BLE()
 name="JEM-BLE"
 try:
-    with open("jem_config.json", "r") as f:
-        json_str = f.read()
-        json_config = json.loads(json_str)
-        name = json_config['ble']['name'] #get ble adv name
+    f = open("jem_config.json", "r")
+    json_str = f.read()
+    json_config = json.loads(json_str)
+    name = json_config['ble']['name'] #get ble adv name
 except Exception as e:
     print("BLEMANAGER: Failed to load jem_config.json: %s" % e)
 
 try:
+    print("boot with ble name %s" % name)
     jem_ble = BLE(esp32_ble, name=name)
 
     repl_uart = BLEUART(jem_ble, service_uuid="6E400001-B5A3-F393-E0A9-E50E24DCCA9E",

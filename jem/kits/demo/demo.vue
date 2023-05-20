@@ -6,9 +6,7 @@
       <!---- Move Buttons ----->
       <v-btn depressed v-on:click="led_blue"> LED BLUE </v-btn>
       <v-btn depressed v-on:click="led_red"> LED RED </v-btn>
-      <v-btn depressed v-on:click="buzz_100hz"> Buzz 100 hz </v-btn>
-      <v-btn depressed v-on:click="buzz_500hz"> Buzz 500 hz </v-btn>
-  
+
     </div>
   </template>
   
@@ -42,14 +40,6 @@
       led_blue(){
         console.log("led_red");
         this.sendCommand("kit._kit.led_red()")
-      },
-      buzz_500hz(){
-        console.log("lbuzz_500hzeft");
-        this.sendCommand("kit._kit.buzz_500hz()")
-      },
-      buzz_100hz(){
-        console.log("buzz_100hz");
-        this.sendCommand("kit._kit.buzz_100hz")
       },
   
       prepareKit(){

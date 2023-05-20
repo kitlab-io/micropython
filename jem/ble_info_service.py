@@ -1,6 +1,6 @@
 
 import struct
-
+from ble_uart_peripheral import IRQ_GATTS_WRITE
 
 class BLEINFOService:
     # service that contains mtu, jem version and other useful hw info
@@ -12,10 +12,10 @@ class BLEINFOService:
         self.mtu_char.callback(None, self.mtu_cbk)
         self._rx_buffer = bytearray()
 
-    def mtu_cbk(self):
+    def mtu_cbk(self, chr):
         print("mtu_char_cbk")
         try:
-            if IRQ_GATTS_READ == chr.event():
+            if IRQ_GATTS_WRITE == chr.event():
                 mtu_size = self.ble.get_mtu()
                 data = struct.pack("<h", mtu_size)
                 self.ble.write(self.mtu_char, data)
@@ -23,13 +23,4 @@ class BLEINFOService:
             print("mtu_cbk failed %s" % e)
 
     def notify_mtu(self, connected):
-        print("notify_mtu")
-        if not connected:
-            return
-        try:
-            mtu_size = self.ble.get_mtu()
-            print("mtu_size %s" % mtu_size)
-            data = struct.pack("<h", mtu_size)
-            self.ble.write(self.mtu_char, data)
-        except Exception as e:
-            print("notify_mtu failed %s" % e)
+        print("notify_mtu ignore")
