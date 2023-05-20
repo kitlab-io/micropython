@@ -5,10 +5,10 @@
     <!---- Move Buttons ----->
     <v-btn depressed v-on:click="startMotion"> StartMotion </v-btn>
     <v-btn depressed v-on:click="stopMotion"> StopMotion </v-btn>
-    <v-btn depressed v-on:click="forward"> Forward </v-btn>
-    <v-btn depressed v-on:click="backward"> Backward </v-btn>
-    <v-btn depressed v-on:click="left"> Turn Left </v-btn>
-    <v-btn depressed v-on:click="right"> Turn Right </v-btn>
+    <v-btn depressed v-on:mousedown="forward" v-on:mouseup="stopMotion"> Forward </v-btn>
+    <v-btn depressed v-on:mousedown="backward" v-on:mouseup="stopMotion"> Backward </v-btn>
+    <v-btn depressed v-on:mousedown="left" v-on:mouseup="stopMotion"> Turn Left </v-btn>
+    <v-btn depressed v-on:mousedown="right" v-on:mouseup="stopMotion"> Turn Right </v-btn>
 
   </div>
 </template>
@@ -62,11 +62,11 @@ module.exports = {
     },
     left(){
       console.log("left");
-      this.sendCommand("kit._kit.car.turn_left()")
+      this.sendCommand("kit._kit.car.left()")
     },
     right(){
       console.log("right");
-      this.sendCommand("kit._kit.car.turn_right()")
+      this.sendCommand("kit._kit.car.right()")
     },
 
     motionHandler: function(accelEvent){
