@@ -139,8 +139,8 @@ class BLE:
         self.service_uuids = []
         self.primary_uuid = None
         self.char_handles_map = {}
+        self._ble.active(True) # call before gap_name, or name will not change
         self._ble.config(gap_name=name)
-        self._ble.active(True)
         #self._ble.config(mtu=200)
         self._ble.irq(self._irq)
 
@@ -240,9 +240,9 @@ class BLE:
             conn_handle, value_handle = data
             if conn_handle in self._connections and value_handle in self.char_handles_map:
                 # self._rx_buffer += self._ble.gatts_read(self._rx_handle)
+                char_handle = self.char_handles_map[value_handle]  # ex: self.rx_char
                 if event == IRQ_GATTS_WRITE:
                     value = self._ble.gatts_read(value_handle)
-                    char_handle = self.char_handles_map[value_handle] # ex: self.rx_char
                     char_handle.irq(event, value)
                 elif event == IRQ_GATTS_READ_REQUEST:
                     char_handle.irq(event, None)
@@ -278,7 +278,7 @@ class BLEUART:
         except Exception as e:
             print("rx_cbk failed %s" % e)
 
-    def tx_cbk(self):
+    def tx_cbk(self, chr):
         print("tx_char_cbk")
 
     def irq(self, handler):
