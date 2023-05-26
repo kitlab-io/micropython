@@ -1,111 +1,41 @@
 # JEM Micropython Overview
-- Micropython code for JEM core
-- This repo contains JEM specific drivers and libraries to interact with JEM ESP32 MCU as well as the sensors on board.
-- Code is written in micropython, as easy to use interpreted language
-
-## Quickstart
-### Use Thonny Micropython IDE
-- https://thonny.org/
-- Download
-- Then open Thonny and click -> Run -> Configure Interpreter -> MicroPython (ESP32)
-- Connect your JEM device to computer via micro usb and then click on the red 'Stop' button to restart connection
-- You should see list of files / directories on your JEM
-- REPL terminal also available
-
-### Interact with JEM via the Web IDE
-- [JEM Web IDE](https://kitlab.io/jem/ide)
-   + Uses Bluetooth Low Energy (BLE) to flash code to JEM from Web Browser
-   + Must use Google Chrome and have a computer with Bluetooth enabled (most do)
-- Step 1: Open [JEM Web IDE](https://kitlab.io/jem/ide)
-- Step 2: Make sure your JEM is turned on (Blue LED should be on)
-- Step 3: Navigate to th 'Pair' tab on the Web IDE and click 'Connect' and select JEM available
-- Step 4: Navigate to the 'REPL' tab and press enter a couple times to make sure you get a prompt '>>'
-- Step 5: Send a command to JEM
-   + Type: print("hello world") 
-   + Make sure JEM echos this back in the terminal
-- Step 6: View JEM Board Files (make sure you are connected first)
-   + Navigate to 'Editor' tab and verify you see the 'jem' folder
-   + Click on it to expand and see files and sub-directories
-   + These are files loaded directly from your board
-   + Edit main.py by adding something like print("hello world")
-   + Then click on the 'Flash' button on the bottom 
-   + Wait for flash to finish and then reconnect when prompted
-
-### Interact with JEM via iOS App
-- Go to iOS app store and search for 'KitLab.io'
-- Download App and open
-- Navigate to 'Pair' tab and click 'Connect'
-- Connect to JEM
-- Navigate to 'REPL' tab
-   + Type: print("hello world")
-   + Make sure JEM echos this back in the terminal
-- You can also edit files on JEM (like the WEB IDE) by navigating to the 'Editor' tab
-- Android app coming soon!
-
-### Flash latest Kitlab JEM Micropython to board
-- Download / unzip latest [release](https://github.com/kitlab-io/micropython/releases)
-- Open Thonny IDE and open directory **/micropython/jem**
-- Turn on JEM board and Connect to computer
-- Restart connection on Thonny (red Stop button)
-- Now select all files in your computer **micropython/jem** directory and then right click and hit 'Upload to /'
-- This will update your JEM board with latest files
-
-## General JEM ESP32 Micropython Tutorial
-- JEM uses the ESP32 Wrover IE with Micropython baked in
-- There is great documentation [here](https://docs.micropython.org/en/latest/esp32/tutorial/index.html)
-   + Shows you how to control JEM GPIO, PWM, I2C, Flash ..etc
-- We recommend this tutorial highly!
+- For general jem tutorial see the main kitlab [jem2 micropython repo readme](https://github.com/kitlab-io/micropython/tree/jem2#use-thonny-micropython-ide)
 
 
-### Simple GPIO test
-```python
-from machine import Pin
+# SimpleBot Assembly Instructions
+- Attach micro servos to each side of the SimpleBot chassis but sliding them up through the server holder and then pushing in so they are snug
+   + Note: You may have received an older SimpleBot that requires you to screw on the micro servos with provided screw
+- Attach the micro servo wheel traction rubber to each wheel
+- Press the wheel agains the micro servo axle until it fits and then use the provided screws to fasten the wheels
+- Attach the Battery pack to the end of the chassis (like shown in the diagram below) using the provided velcro strips
+- Plug in the battery pack and two servo cables into the SimpleBot daughter board PCB using the diagram below
+- Connect the JEM module to the SimpleBot daughter board so that that the JEM circular LED cutout is facing the right side of the daughter board
+   + See diagram below
+- Turn on your JEM and verify the small blue led turns on (the one on the other side of the circular RGB LED cutout)
+- Visit the kitlab [jem web ide](jem.kitlab.io) or open your kitlab jem mobile app
+- Click on the 'Load' kits button
+- Click on the JEM2 SimpleBot kit button and wait 5 - 10 sec (still need to add progress bar, sorry!)
+- Navigate to the 'Edit' tab and notice that you should see a FileExplorer on the left - click on it to view files
+- To flash the Kit code to JEM scroll down and click on the 'Flash' button and wait till you are prompted to reconnect
+   + make sure NOT to refresh your browser and turn off your JEM during this time or you will have to use a nativate micropython IDE on you computer via USB to re-flash you JEM
+- Assuming you flashed the kit code and everything worked navigate to the 'RC' tab to see the SimpleBot controller UI
+   + You can use this to control the simple bot and make it move
 
-# initialize `21` in gpio mode and make it an output
-p_out = Pin('21', mode=Pin.OUT)
-p_out.value(1)
-p_out.value(0)
-p_out.toggle()
-p_out(True)
-```
+- Make sure to turn on the SimpleBot AAA batter back before controlling the robot!
+- Extra: you can edit the kits/simplebot/simplebot.py file and add more functions and call those extra functions by editing the simplebot.vue file
+   + Then flash that code back to the JEM and you should see your updates reflected in the Web App or iOS App
+- IMPORTANT! 
+   + If at any point your JEM stop working you should power cycle it and then re-flash the code based on [jem2 instructions](https://github.com/kitlab-io/micropython/tree/jem2#use-thonny-micropython-ide)
 
-- For more examples see [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/)
+## SimpleBot chassis assembled
+![simplebot-cad](https://docs.google.com/drawings/d/e/2PACX-1vSt_QIv9TH_b58j-GVUd6zhkSzOAC-g2jr5ij1Ajra0lTEjkV_zZSMi223f85wOceEIIfac7JsKApaI/pub?w=960&h=720)
 
-### JEM Sensors
-```python
-from jemimu import JemIMU
-imu = JemIMU()
-imu.orientation
+## Servos
+![servos](https://docs.google.com/drawings/d/e/2PACX-1vQ0B1CEekowwH7LZ4TfEMPkwIZ_FuRFfY6R265BfTh7P554vkQS8akQVlRfg3sQzEHyGB88PNNMyLUf/pub?w=719&h=395)
 
-from jembattery import JemBattery
-batt = JemBattery()
-batt.state_of_charge() # 0 - 100%
+## Daughter Board
+- Board that JEM connects to and uses to control the servos
 
-from jemrange import JemRange
-range = JemRange()
-range.distance
+![daughter-board](https://docs.google.com/drawings/d/e/2PACX-1vRJJF0rhW87rzehcLenv6fP_xek2_QWFvbxtyNMfcoY4nYM9o4CxKgMo0WO4RB4PL0HWADXnWOdv92_/pub?w=702&h=685)
 
-from jemlight import JemLight
-light = JemLight()
-light.intensity()
-
-from jembarometer import JemBarometer
-bar = JemBarometer()
-bar.read()
-
-from drivers import button
-btn = button.Button()
-btn.read() # should return 0 or 1 depending if pressed
-
-# add buzzer instructions
-
-# add rgb led instructions
-```
-
-## Work with JEM ESP32 Bare Metial Firmware
-- If you want to get real fancy you can edit the ESP32 Firmware
-- See [here](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/index.html)
-
-## Connect over WiFi
-- Coming soon!
 
