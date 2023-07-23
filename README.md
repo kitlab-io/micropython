@@ -4,13 +4,14 @@
 - Code is written in micropython, as easy to use interpreted language
 
 ## Quickstart
-### Use Thonny Micropython IDE
-- https://thonny.org/
-- Download
-- Then open Thonny and click -> Run -> Configure Interpreter -> MicroPython (ESP32)
-- Connect your JEM device to computer via micro usb and then click on the red 'Stop' button to restart connection
+### Use Arduino Micropython IDE
+- Download release https://github.com/arduino/lab-micropython-editor/releases
+   + For mac, linux or windows just download the appropriate package and unzip
+- Then open Micropython IDE and click 'Connect'
+   + assuming your JEM is plugged into computer and turned ON
 - You should see list of files / directories on your JEM
 - REPL terminal also available
+- You can edit a file and click the 'Save' button to flash the code to JEM
 
 ### Interact with JEM via the Web IDE
 - [JEM Web IDE](https://kitlab.io/jem/ide)
