@@ -141,7 +141,7 @@ class BLE:
         self.char_handles_map = {}
         self._ble.active(True) # call before gap_name, or name will not change
         self._ble.config(gap_name=name)
-        #self._ble.config(mtu=512)
+        self._ble.config(mtu=256)
         self._ble.irq(self._irq)
 
         # Increase the size of the rx buffer and enable append mode.
