@@ -1,55 +1,62 @@
-# JEM Micropython
-Micropython code for JEM core
+# JEM Micropython Overview
+- Micropython code for JEM core
+- This repo contains JEM specific drivers and libraries to interact with JEM ESP32 MCU as well as the sensors on board.
+- Code is written in micropython, as easy to use interpreted language
 
 ## Quickstart
-### Install Atom IDE + Pymakr plugin
-- [Atom IDE Download](https://atom.io/)
-- [Atom Pymakr Plugin](https://atom.io/packages/pymakr)
-   + Used by Atom to talk to JEM Micropython
+### Use Arduino Micropython IDE
+- Download release https://github.com/arduino/lab-micropython-editor/releases
+   + For mac, linux or windows just download the appropriate package and unzip
+- Then open Micropython IDE and click 'Connect'
+   + assuming your JEM is plugged into computer and turned ON
+- You should see list of files / directories on your JEM
+- REPL terminal also available
+- You can edit a file and click the 'Save' button to flash the code to JEM
+
+### Interact with JEM via the Web IDE
+- [JEM Web IDE](https://kitlab.io/jem/ide)
+   + Uses Bluetooth Low Energy (BLE) to flash code to JEM from Web Browser
+   + Must use Google Chrome and have a computer with Bluetooth enabled (most do)
+- Step 1: Open [JEM Web IDE](https://kitlab.io/jem/ide)
+- Step 2: Make sure your JEM is turned on (Blue LED should be on)
+- Step 3: Navigate to th 'Pair' tab on the Web IDE and click 'Connect' and select JEM available
+- Step 4: Navigate to the 'REPL' tab and press enter a couple times to make sure you get a prompt '>>'
+- Step 5: Send a command to JEM
+   + Type: print("hello world") 
+   + Make sure JEM echos this back in the terminal
+- Step 6: View JEM Board Files (make sure you are connected first)
+   + Navigate to 'Editor' tab and verify you see the 'jem' folder
+   + Click on it to expand and see files and sub-directories
+   + These are files loaded directly from your board
+   + Edit main.py by adding something like print("hello world")
+   + Then click on the 'Flash' button on the bottom 
+   + Wait for flash to finish and then reconnect when prompted
+
+### Interact with JEM via iOS App
+- Go to iOS app store and search for 'KitLab.io'
+- Download App and open
+- Navigate to 'Pair' tab and click 'Connect'
+- Connect to JEM
+- Navigate to 'REPL' tab
+   + Type: print("hello world")
+   + Make sure JEM echos this back in the terminal
+- You can also edit files on JEM (like the WEB IDE) by navigating to the 'Editor' tab
+- Android app coming soon!
 
 ### Flash latest Kitlab JEM Micropython to board
-- Download / unzip latest Kitlab JEM micropython [release](https://github.com/kitlab-io/micropython/releases)
-- Open Atom IDE and open directory **./micropython/api/jem**
-- Turn on JEM board
-- Open Pymakr terminal which will appear at bottom of Atom IDE
-- Set Pymakr to upload all file types (not just python) by clicking on **Pymakr -> Settings -> Global -> Upload all file types**
-- Click 'Connect' to talk to JEM
-- Click 'Upload' to flash latest code to JEM
+- Download / unzip latest [release](https://github.com/kitlab-io/micropython/releases)
+- Open Thonny IDE and open directory **/micropython/jem**
+- Turn on JEM board and Connect to computer
+- Restart connection on Thonny (red Stop button)
+- Now select all files in your computer **micropython/jem** directory and then right click and hit 'Upload to /'
+- This will update your JEM board with latest files
 
-### Run Demo application
-- JEM Micropython code comes installed with a simple demo app
-   + After power up it takes about 10 seconds for JEM to initialize
-   + Then you can press the JEM user button and the RGB LED should turn green
-- If you want to play around with the Demo, connect micro usb to JEM and open Pymakr terminal
-- Interact with JEM Demo App using following micropython commands from REPL
-```bash
-# initially a button press thread is running that turns led green if pressed
-# you can stop this by doing
->> kit._run = False #
-# you can also stop the main demo thread that is collecting imu data to send to app by doing this
->> kit._main_thread = False
-# now you can mess around
->> kit.jem.led.set_color(0x880000) # jem red rgb led
->> kit.jem.led.set_color(0x000088) # jem blue rgb led
->> kit.jem.imu.orientation # show roll, pitch, yaw degrees
->> kit.jem.buzzer.start(freq_hz = 100) # make buzzer sound
->> kit.jem.buzzer.stop()
->> kit.neopixel.sparkle(count=10) # randomly turns on ten leds, default color is white but you can change
->> kit.neopixel.sparkle(count=10, c=(127,0,0)) # sparkle red
->> kit.neopixel.sparkle(count=10, c=(0,0,127)) # sparkle blue
->> kit.neopixel.rainbow() # do some fancy lantern led show (take about 15 seconds)
->> kit.jem.btn.read() # read button value
-```
+## General JEM ESP32 Micropython Tutorial
+- JEM uses the ESP32 Wrover IE with Micropython baked in
+- There is great documentation [here](https://docs.micropython.org/en/latest/esp32/tutorial/index.html)
+   + Shows you how to control JEM GPIO, PWM, I2C, Flash ..etc
+- We recommend this tutorial highly!
 
-### Demo Application using Neopixel + IMU
-```bash
->> kit.start_sparkle_motion_thread(count=25, rainbow=True)
->> # now move the jem around a bit (around the roll axis is best)
->> demo.stop_sparkle_motion_thread()
-```
-
-## Advanced
-Users can control JEM gpio, pwm, adc, dac, uart and read from sensors
 
 ### Simple GPIO test
 ```python
@@ -96,28 +103,13 @@ btn.read() # should return 0 or 1 depending if pressed
 # add rgb led instructions
 ```
 
+## Work with JEM ESP32 Bare Metial Firmware
+- If you want to get real fancy you can edit the ESP32 Firmware
+- See [here](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/index.html)
+
 ## Connect over WiFi
-- Open Atom IDE and connect to JEM over Pymakr terminal
-- In REPL type
-```bash
->> from jemwifi import *
->> wifi = setup_wifi(name="JemWifi") # can use any name you want
-```
-- Open your Wifi network and look for 'JemWifi' then connect
-- Now go back to Atom IDE and click 'Connect'
-   + select '192.168.4.1'
-   + If you don't see an IP Address option restart Atom
-- Now you can talk to JEM over Wifi and don't need USB cable
-- To keep this setting after reset, put the following code in main.py
-```python
-from jemwifi import *
-wifi = setup_wifi(name="JemWifi")
-```
-- Then 'Upload' code to board
+- Coming soon!
 
 ## JEM Board
-![Image of JEM Board V5.1.0](docs/JEM-V5.1.0-drawing.png)
+![Image of JEM2 Board V1.0.0](docs/images/jem2-v1.0.0.png)
 
-## Update JEM Pycom WIPY 3.0 firmware
-- [pycom firmware update](https://docs.pycom.io/updatefirmware/device/)
-  + Make sure to use firmware version specified in the JEM Micropython [Releases](https://github.com/kitlab-io/micropython/releases)
