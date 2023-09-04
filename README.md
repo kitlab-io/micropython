@@ -1,17 +1,27 @@
-# JEM Micropython Overview
-- Micropython code for JEM core
-- This repo contains JEM specific drivers and libraries to interact with JEM ESP32 MCU as well as the sensors on board.
+# JEM2 Micropython Overview
+- Micropython code for JEM2 core
+- This repo contains JEM2 specific drivers and libraries to interact with JEM2 ESP32 MCU as well as the sensors on board.
 - Code is written in micropython, as easy to use interpreted language
 
+## JEM2 Specs
+- Core Microcontroller: ESP32 WROVER E
+- Distance Sensor: vl53l0x
+- 9 DoF IMU (accel, magnetometer, gyro): bno055
+- Light Sensor: temt6000
+- Buzzer: smt0540s2r
+- Battery measurement sensor: bq27441
+- Pressure / Temperature/ Humidity Sensor: bme280
+- RGB LED: ws2812
+- 600 mAh LiPo battery
+- User button: For interacting with JEM
+- WiFi and Bluetooth / BLE
+
 ## Quickstart
-### Use Arduino Micropython IDE
-- Download release https://github.com/arduino/lab-micropython-editor/releases
-   + For mac, linux or windows just download the appropriate package and unzip
-- Then open Micropython IDE and click 'Connect'
-   + assuming your JEM is plugged into computer and turned ON
-- You should see list of files / directories on your JEM
-- REPL terminal also available
-- You can edit a file and click the 'Save' button to flash the code to JEM
+### Update your JEM2 with latest code over serial
+- In Google Chrome Browser (must be chrome) go to: https://jem-dev.onrender.com/
+- Connect your JEM2 to your computer via micro usb
+- Turn on the JEM2 with the side power switch
+- 
 
 ### Interact with JEM via the Web IDE
 - [JEM Web IDE](https://kitlab.io/jem/ide)
