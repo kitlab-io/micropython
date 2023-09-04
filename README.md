@@ -21,7 +21,22 @@
 - In Google Chrome Browser (must be chrome) go to: https://jem-dev.onrender.com/
 - Connect your JEM2 to your computer via micro usb
 - Turn on the JEM2 with the side power switch
-- 
+- Click on **Serial Connect** button and select the JEM port
+   + Mac / Linux: **usbserial-DP04I8FJ (Example)**
+   + Windows: **COM3 (Example)**
+![Image of JEM2 Board V1.0.0](docs/images/JEM-IDE-Connect-Serial.png)
+- Wait about 5 seconds
+- Below, click the **Load All** button next to the **Official KitLab Kits** section
+- Select the **JEM2 Demo Kit** Sync button (may take 10 seconds to sync)
+![Image of JEM2 Board V1.0.0](docs/images/JEM-IDE-LoadAll.png)
+
+- After selecting, navigate to the **Edit** tab (near lower right hand corner)
+- You should now see the **JEM2 Demo Kit** project in the File Explorer to your right
+   + If it's says something else like **MicropythonBoard** just click on that and you should see the Demo Kit option
+- Now click the **FLASH TO JEM** button and wait for prompt to reconnect to JEM2 after upload
+   + This can take anywhere from 15 seconds to a couple minutes depending on big the update is
+![Image of JEM2 Board V1.0.0](docs/images/JEM-IDE-FileExplorer.png)
+
 
 ### Interact with JEM via the Web IDE
 - [JEM Web IDE](https://kitlab.io/jem/ide)
