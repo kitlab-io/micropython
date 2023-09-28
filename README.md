@@ -34,7 +34,7 @@
 - You should now see the **JEM2 Demo Kit** project in the File Explorer to your right
    + If it's says something else like **MicropythonBoard** just click on that and you should see the Demo Kit option
 - Now click the **FLASH TO JEM** button and wait for prompt to reconnect to JEM2 after upload
-   + This can take anywhere from 15 seconds to a couple minutes depending on big the update is
+   + This can take anywhere from 15 seconds to a couple minutes depending on how big the update is
 ![Image of JEM2 Board V1.0.0](docs/images/JEM-IDE-FileExplorer.png)
 
 
