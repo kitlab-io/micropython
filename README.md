@@ -18,7 +18,7 @@
 
 ## Quickstart
 ### Update your JEM2 with latest code over serial
-- In Google Chrome Browser (must be chrome) go to: https://jem-dev.onrender.com/
+- In Google Chrome Browser (must be chrome) go to: https://jem.kitlab.io/
 - Connect your JEM2 to your computer via micro usb
 - Turn on the JEM2 with the side power switch
 - Click on **Serial Connect** button and select the JEM port
@@ -39,7 +39,7 @@
 
 
 ### Interact with JEM via the Web IDE
-- [JEM Web IDE](https://kitlab.io/jem/ide)
+- Visit: https://jem.kitlab.io/
    + Uses Bluetooth Low Energy (BLE) to flash code to JEM from Web Browser
    + Must use Google Chrome and have a computer with Bluetooth enabled (most do)
 - Step 1: Open [JEM Web IDE](https://kitlab.io/jem/ide)
