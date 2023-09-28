@@ -40,11 +40,12 @@
 
 ### Interact with JEM via the Web IDE
 - Visit: https://jem.kitlab.io/
-   + Uses Bluetooth Low Energy (BLE) to flash code to JEM from Web Browser
+   + Uses Bluetooth Low Energy (BLE) or Micro USB Connection to flash code to JEM from Web Browser
    + Must use Google Chrome and have a computer with Bluetooth enabled (most do)
-- Step 1: Open [JEM Web IDE](https://kitlab.io/jem/ide)
+- Step 1: Open https://kitlab.io/jem/ide
 - Step 2: Make sure your JEM is turned on (Blue LED should be on)
-- Step 3: Navigate to th 'Pair' tab on the Web IDE and click 'Connect' and select JEM available
+- Step 3: Navigate to th 'Pair' tab on the Web IDE and click 'BLE CONNECT' or 'SERIAL CONNECT' and select JEM available
+   + If selecting 'SERIAL CONNECT' make sure JEM is connected to your computer via micro usb cable
 - Step 4: Navigate to the 'REPL' tab and press enter a couple times to make sure you get a prompt '>>'
 - Step 5: Send a command to JEM
    + Type: print("hello world") 
@@ -68,31 +69,22 @@
 - You can also edit files on JEM (like the WEB IDE) by navigating to the 'Editor' tab
 - Android app coming soon!
 
-### Flash latest Kitlab JEM Micropython to board
-- Download / unzip latest [release](https://github.com/kitlab-io/micropython/releases)
-- Open Thonny IDE and open directory **/micropython/jem**
-- Turn on JEM board and Connect to computer
-- Restart connection on Thonny (red Stop button)
-- Now select all files in your computer **micropython/jem** directory and then right click and hit 'Upload to /'
-- This will update your JEM board with latest files
-
 ## General JEM ESP32 Micropython Tutorial
 - JEM uses the ESP32 Wrover IE with Micropython baked in
 - There is great documentation [here](https://docs.micropython.org/en/latest/esp32/tutorial/index.html)
    + Shows you how to control JEM GPIO, PWM, I2C, Flash ..etc
-- We recommend this tutorial highly!
+- We highly recommend this tutorial for beginners or advanced users
 
-
-### Simple GPIO test
+### Simple LED test
+- You can run this on the REPL tab here (https://jem.kitlab.io/)
+   + Must connect to JEM first
 ```python
-from machine import Pin
+from jemled import JemLed
 
-# initialize `21` in gpio mode and make it an output
-p_out = Pin('21', mode=Pin.OUT)
-p_out.value(1)
-p_out.value(0)
-p_out.toggle()
-p_out(True)
+led = JemLed()
+red = (0xFF, 0x00, 0x00)
+led.set_color(red) # set color to red
+led.off() # disable LED
 ```
 
 - For more examples see [Pycom Micropython API](https://docs.pycom.io/firmwareapi/pycom/machine/)
@@ -105,7 +97,7 @@ imu.orientation
 
 from jembattery import JemBattery
 batt = JemBattery()
-batt.state_of_charge() # 0 - 100%
+batt.soc() # battery life remaining 0 - 100%
 
 from jemrange import JemRange
 range = JemRange()
@@ -123,9 +115,6 @@ from drivers import button
 btn = button.Button()
 btn.read() # should return 0 or 1 depending if pressed
 
-# add buzzer instructions
-
-# add rgb led instructions
 ```
 
 ## Work with JEM ESP32 Bare Metial Firmware
