@@ -9,6 +9,7 @@ class BLEUARTREMOTECONTROL:
     def __init__(self, tmr, uart, sync_uuid=0xCF33):
         self._uart = uart
         self._tx_buf = bytearray()
+        self._tx_extra_buf = bytearray()
         self.tx_max_len = 100
         self.tx_delay_ms = 20
         self.cmd_delay_ms = 1
@@ -21,6 +22,20 @@ class BLEUARTREMOTECONTROL:
         # add new characteristic to uart service
         self.sync_char = self._uart.service.characteristic(uuid=sync_uuid, buf_size=20)
         self.sync_char.callback(None, self.sync_callback)
+
+        # add new characteristic to uart service
+        # extra ble char that user kit can use to asynchronously send data to app
+        self.extra_char = self._uart.service.characteristic(uuid=0xCD33, buf_size=200)
+        self.extra_char.callback(None, self.extra_callback)
+
+    def extra_callback(self, chr, data=None):
+        # we use this char to send data to user
+        # but if we want to update and use it for both tx and rx then update this callback
+        try:
+            if IRQ_GATTS_WRITE == chr.event():
+                pass
+        except Exception as e:
+            print("extra_callback failed %s" % e)
 
     def sync_callback(self, chr, data=None):
         try:
@@ -99,10 +114,19 @@ class BLEUARTREMOTECONTROL:
 
     def _flush(self):
         try:
-            data = self._tx_buf[0:self.tx_max_len]
-            self._tx_buf = self._tx_buf[self.tx_max_len:]
-            self._uart.write(data)
+            # check default tx 
             if self._tx_buf:
+                data = self._tx_buf[0:self.tx_max_len]
+                self._tx_buf = self._tx_buf[self.tx_max_len:]
+                self._uart.write(data)
+
+            # check extra tx
+            if self._tx_extra_buf:
+                data = self._tx_extra_buf[0:self.tx_max_len]
+                self._tx_extra_buf = self._tx_extra_buf[self.tx_max_len:]
+                self._uart.ble.write(self.extra_char, data)
+
+            if self._tx_buf or self._tx_extra_buf:
                 schedule_in(self._timer, self._wrap_flush, self.tx_delay_ms)
         except Exception as e:
             print("_flush failed: %s" % e)
@@ -113,5 +137,12 @@ class BLEUARTREMOTECONTROL:
         if empty:
             schedule_in(self._timer, self._wrap_flush, self.tx_delay_ms)
 
+    def write_extra(self, buf):
+        empty = not self._tx_extra_buf
+        self._tx_extra_buf += buf
+        if empty:
+            schedule_in(self._timer, self._wrap_flush, self.tx_delay_ms)
+
     def is_connected(self):
         return self._uart.is_connected()
+ 
