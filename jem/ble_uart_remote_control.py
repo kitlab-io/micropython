@@ -25,7 +25,7 @@ class BLEUARTREMOTECONTROL:
 
         # add new characteristic to uart service
         # extra ble char that user kit can use to asynchronously send data to app
-        self.extra_char = self._uart.service.characteristic(uuid=0xCD33, buf_size=200)
+        self.extra_char = self._uart.service.characteristic(name="extra", uuid=0xCD33, buf_size=200)
         self.extra_char.callback(None, self.extra_callback)
 
     def extra_callback(self, chr, data=None):
