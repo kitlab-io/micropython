@@ -86,13 +86,17 @@ class BleCharEvent:
         return self.v
 
 class BleCharacteristic:
-    def __init__(self, uuid, buf_size=None):
+    def __init__(self, name, uuid, buf_size=None):
         self.uuid = bluetooth.UUID(uuid)
         self.handler = None
         self.trigger = None
         self.value_handle = None # this is what we get back from ble after register services / chars
         self.buf_size = buf_size
+        self._name = name
 
+    def get_name(self):
+        return self._name
+      
     def callback(self, trigger, handler):
         # ex: rx_callback = rx_char.callback(trigger=Bluetooth.CHAR_WRITE_EVENT, handler=self.rx_cb_handler)
         self.trigger = trigger
@@ -104,13 +108,17 @@ class BleCharacteristic:
 class BleService:
     # ex: uuid = "6E400003-B5A3-F393-E0A9-E50E24DCCA77"
     DEFAULT_MTU = 23
-    def __init__(self, uuid, isPrimary=False):
+    def __init__(self, name, uuid, isPrimary=False):
         self.is_primary = isPrimary
         self.uuid = bluetooth.UUID(uuid)
         self.chr_uuids = []
         self.chrs = []
         self._mtu = BleService.DEFAULT_MTU
+        self._name = name
 
+    def get_name(self):
+        return self._name
+      
     def set_mtu(self, mtu_size):
         if mtu_size and (mtu_size >= BleService.DEFAULT_MTU):
             self._mtu = mtu_size
@@ -125,12 +133,18 @@ class BleService:
         #ex: service = ( _UART_UUID, (_UART_TX, _UART_RX), )
         return service
 
-    def characteristic(self, uuid, buf_size=None):
+    def characteristic(self, uuid, buf_size=None, name="none"):
         if uuid not in self.chr_uuids:
-            ble_char = BleCharacteristic(uuid, buf_size)
+            ble_char = BleCharacteristic(name, uuid, buf_size)
             self.chrs.append(ble_char)
             self.chr_uuids.append(uuid)
             return ble_char
+          
+    def get_char_by_name(self, name):
+        for chr in self.chrs:
+            if chr.get_name() == name:
+                return chr
+        return None
 
 class BLE:
     def __init__(self, esp32_ble, name="JEM-BLE"):
@@ -158,16 +172,22 @@ class BLE:
     def get_mtu(self):
         return self._ble.config('mtu')
 
-    def service(self, uuid, isPrimary=False, nbr_chars=0):
+    def service(self, name, uuid, isPrimary=False, nbr_chars=0):
         if uuid not in self.service_uuids:
             self.service_uuids.append(uuid)
-            service = BleService(uuid=uuid, isPrimary=isPrimary)
+            service = BleService(name=name, uuid=uuid, isPrimary=isPrimary)
             if isPrimary:
                 self.primary_uuid = uuid
             self.services.append(service)
             return service
         else:
             print("oops uuid %d already setup" % uuid)
+    
+    def get_service_by_name(self, name):
+        for sr in self.services:
+            if sr.get_name() == name:
+                return sr
+        return None
 
     def get_chr_handles(self):
         char_handles = []
@@ -256,10 +276,24 @@ class BLE:
         elif event == IRQ_MTU_EXCHANGED:
             print("IRQ_MTU_EXCHANGED: %s" % data[1])
 
+class JEMBLE(object):
+    _instance = None
+    def __new__(cls, ble_drv=None, name="JEM_BLE"):
+        # ble_drv should not be None if this is first time creating jem ble
+        if cls._instance is None:
+            print('Creating the JEMBLE object')
+            cls._instance = super(JEMBLE, cls).__new__(cls)
+            print("JEMBLE: init start")
+          
+            cls._instance.ble = BLE(ble_drv, name=name) #ble drive is esp32 mp ble module, for example
+            print("JEMBLE: init done")
+        return cls._instance.ble
+  
+    
 class BLEUART:
-    def __init__(self, jem_ble, service_uuid, tx_chr_uuid, rx_chr_uuid, rxbuf=100, primary=False):
+    def __init__(self, jem_ble, service_uuid, tx_chr_uuid, rx_chr_uuid, rxbuf=100, primary=False, name="uart"):
         self.ble = jem_ble # jem ble wrapper
-        self.service = self.ble.service(uuid=service_uuid, isPrimary=primary)
+        self.service = self.ble.service(name, uuid=service_uuid, isPrimary=primary)
         self.tx_char = self.service.characteristic(uuid=tx_chr_uuid, buf_size=rxbuf)
         self.rx_char = self.service.characteristic(uuid=rx_chr_uuid, buf_size=rxbuf)
         self.rx_char.callback(None, self.rx_cbk)
