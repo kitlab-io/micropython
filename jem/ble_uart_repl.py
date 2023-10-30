@@ -5,20 +5,16 @@
 
 import io
 import os
-import machine
-from ble_uart_peripheral import schedule_in
 
 _MP_STREAM_POLL = const(3)
 _MP_STREAM_POLL_RD = const(0x0001)
 
 # Simple buffering stream to support the dupterm requirements.
 class BLEUARTStream(io.IOBase):
-    def __init__(self, tmr, uart):
+    def __init__(self, uart):
         self._uart = uart # ble_uart_peripheral.py BLEUART object
-        self._tx_buf = bytearray()
         self._uart.irq(self._on_rx)
-        self.tx_delay_ms = 25
-        self._timer = tmr # ex: machine.Timer(0)
+        self.errors = []
 
     def connected_event(self, connected):
         if connected:
@@ -48,15 +44,8 @@ class BLEUARTStream(io.IOBase):
                 return _MP_STREAM_POLL_RD
         return 0
 
-    def _flush(self):
-        data = self._tx_buf[0:100]
-        self._tx_buf = self._tx_buf[100:]
-        self._uart.write(data)
-        if self._tx_buf:
-            schedule_in(self._timer, self._flush, self.tx_delay_ms)
-
     def write(self, buf):
-        empty = not self._tx_buf
-        self._tx_buf += buf
-        if empty:
-            schedule_in(self._timer, self._flush, self.tx_delay_ms)
+        try:
+            self._uart.t_write(buf)
+        except Exception as e:
+            self.errors.append(e)
