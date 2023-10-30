@@ -6,7 +6,8 @@ import utime, json
 import struct
 import machine, _thread
 from micropython import const
-
+import micropython
+from machine import Timer
 
 IRQ_CENTRAL_CONNECT = const(1)
 IRQ_CENTRAL_DISCONNECT = const(2)
@@ -93,6 +94,7 @@ class BleCharacteristic:
         self.value_handle = None # this is what we get back from ble after register services / chars
         self.buf_size = buf_size
         self._name = name
+        self.buff = bytearray()
 
     def get_name(self):
         return self._name
@@ -102,7 +104,8 @@ class BleCharacteristic:
         self.trigger = trigger
         self.handler = handler
 
-    def irq(self, event, value):
+    def irq(self, irq_evt):
+        event, value = irq_evt
         self.handler(BleCharEvent(event, value))
 
 class BleService:
@@ -156,12 +159,20 @@ class BLE:
         self._ble.active(True) # call before gap_name, or name will not change
         self._ble.config(gap_name=name)
         self._ble.config(mtu=256)
-        self._ble.irq(self._irq)
-
+        self._ble.irq(self._safe_irq)
+        self.tx_delay_ms = 25
+        self.tx_chrs = []
         # Increase the size of the rx buffer and enable append mode.
         self._connections = set()
         self._connect_callbacks = []
-
+        self._timer = Timer(0)
+        self._timer.init(period=self.tx_delay_ms, callback=self._flush)
+        self.errors = []
+        self._chr_events = []
+        self._running = True
+        _thread.stack_size(8*1024)
+        self._thrd_id = _thread.start_new_thread(self._chr_handler_thread, ())
+        
     def add_connect_callback(self, cbk):
         self._connect_callbacks.append(cbk)
 
@@ -231,50 +242,108 @@ class BLE:
         self.register()
         payload = self.advertising_payload()
         self._ble.gap_advertise(interval_us, adv_data=payload)
-
+	
+    def _flush(self, arg):
+        try:
+            for chr in self.tx_chrs:
+                if chr.buff:
+                    data = chr.buff[0:100]
+                    chr.buff = chr.buff[100:]
+                    self._ble.gatts_notify(self.conn_handle, chr.value_handle, data)
+        except Exception as e:
+            self.errors.append(e)
+            print("_flush failed %s" % e)
+                  
     def write(self, chr, data):
-        for conn_handle in self._connections:
-            self._ble.gatts_notify(conn_handle, chr.value_handle, data)
+        # append data to chr buffer and let the _chr_handler_thread take care of the rest
+        # _chr_handler_thread is a func run in thread on startup of JEM BLE instance
+        try:
+            for conn_handle in self._connections:
+                self.conn_handle = conn_handle #todo, only set this once
+                chr.buff += data
+                if chr not in self.tx_chrs:
+                    self.tx_chrs.append(chr)
+
+                break # only one connection
+        except Exception as e:
+          if len(self.errors) <= 50:
+              self.errors.append("write %s" % e)
 
     def close(self):
         for conn_handle in self._connections:
             self._ble.gap_disconnect(conn_handle)
         self._connections.clear()
-
+    
+    def _chr_handler_thread(self):
+        self._running = True
+        ms = 50
+        while self._running:
+            chr_evt = None
+            utime.sleep_ms(ms)
+            if len(self._chr_events):
+                chr_evt = self._chr_events[0]
+                self._chr_events = self._chr_events[1:len(self._chr_events)]
+                ms = 10 # reduce time if something found
+                char_handle = chr_evt[0]
+                (event, value) = chr_evt[1] # tuple (event, value)
+                if event == IRQ_CENTRAL_CONNECT:
+                    self.connect_callback(True)
+                    print("connected!")
+                elif event == IRQ_CENTRAL_DISCONNECT:
+                    print("disconnected!")
+                    self.connect_callback(False)
+                    self.advertise()
+                elif event == IRQ_GATTS_WRITE:
+                    char_handle.irq((event, value))
+                elif event == IRQ_GATTS_READ_REQUEST:
+                    char_handle.irq((event, None))
+                elif event == IRQ_GATTS_INDICATE_DONE:
+                    char_handle.irq((event, None))
+            else:
+                ms = 50 # set back to default
+                
+    def _safe_irq(self, event, data):
+        try:
+            self._irq(event, data)
+        except Exception as e:
+            print("ble irq failed: %s" % e)
+            
     def _irq(self, event, data):
         # Track connections so we can send notifications.
         if event == IRQ_CENTRAL_CONNECT:
             print("irq event: IRQ_CENTRAL_CONNECT")
             conn_handle, _, _ = data
             self._connections.add(conn_handle)
-            self.connect_callback(True)
+            #self.connect_callback(True)
+            self._chr_events.append((None, (event, None)))
         elif event == IRQ_CENTRAL_DISCONNECT:
             print("irq event: IRQ_CENTRAL_DISCONNECT")
             conn_handle, _, _ = data
             if conn_handle in self._connections:
                 self._connections.remove(conn_handle)
-            # Start advertising again to allow a new connection.
-            self.connect_callback(False)
-            self.advertise()
+            self._chr_events.append((None, (event, None)))
+
         elif event == IRQ_GATTS_WRITE or event == IRQ_GATTS_READ_REQUEST or event == IRQ_GATTS_INDICATE_DONE:
             conn_handle, value_handle = data
             if conn_handle in self._connections and value_handle in self.char_handles_map:
-                # self._rx_buffer += self._ble.gatts_read(self._rx_handle)
                 char_handle = self.char_handles_map[value_handle]  # ex: self.rx_char
                 if event == IRQ_GATTS_WRITE:
                     value = self._ble.gatts_read(value_handle)
-                    char_handle.irq(event, value)
+                    self._chr_events.append((char_handle, (event, value)))
                 elif event == IRQ_GATTS_READ_REQUEST:
-                    char_handle.irq(event, None)
+                    self._chr_events.append((char_handle, (event, None)))
                 elif event == IRQ_GATTS_INDICATE_DONE:
-                    char_handle.irq(event, None)
+                    #char_handle.irq((event, None))
+                    self._chr_events.append((char_handle, (event, None)))
             else:
                 print("Fail: %s not in %s" % (value_handle, self.char_handles_map))
         elif event == IRQ_GATTC_WRITE_DONE:
-            print("IRQ_GATTC_WRITE_DONE")
+            #print("IRQ_GATTC_WRITE_DONE")
+            pass
 
         elif event == IRQ_MTU_EXCHANGED:
-            print("IRQ_MTU_EXCHANGED: %s" % data[1])
+            #print("IRQ_MTU_EXCHANGED: %s" % data[1])
+            pass
 
 class JEMBLE(object):
     _instance = None
@@ -294,8 +363,8 @@ class BLEUART:
     def __init__(self, jem_ble, service_uuid, tx_chr_uuid, rx_chr_uuid, rxbuf=100, primary=False, name="uart"):
         self.ble = jem_ble # jem ble wrapper
         self.service = self.ble.service(name, uuid=service_uuid, isPrimary=primary)
-        self.tx_char = self.service.characteristic(uuid=tx_chr_uuid, buf_size=rxbuf)
-        self.rx_char = self.service.characteristic(uuid=rx_chr_uuid, buf_size=rxbuf)
+        self.tx_char = self.service.characteristic(name="uart_tx", uuid=tx_chr_uuid, buf_size=rxbuf)
+        self.rx_char = self.service.characteristic(name="uart_rx", uuid=rx_chr_uuid, buf_size=rxbuf)
         self.rx_char.callback(None, self.rx_cbk)
         self.tx_char.callback(None, self.tx_cbk)
 

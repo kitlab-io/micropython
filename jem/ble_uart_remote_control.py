@@ -1,5 +1,4 @@
 # Kit Remote Control over BLE
-from machine import Timer
 
 from ble_uart_peripheral import schedule_in, IRQ_GATTS_WRITE
 from cmd import *
@@ -8,10 +7,6 @@ from cmd import *
 class BLEUARTREMOTECONTROL:
     def __init__(self, tmr, uart, sync_uuid=0xCF33):
         self._uart = uart
-        self._tx_buf = bytearray()
-        self._tx_extra_buf = bytearray()
-        self.tx_max_len = 100
-        self.tx_delay_ms = 20
         self.cmd_delay_ms = 1
         self._uart.irq(self._on_rx)
         self.prev_term = None
@@ -52,9 +47,6 @@ class BLEUARTREMOTECONTROL:
 
         except Exception as e:
             print("sync_callback failed: %s" % e)
-
-    def _wrap_flush(self):
-        self._flush()
 
     def read(self, sz=None):
         return self._uart.read(sz)
@@ -112,36 +104,11 @@ class BLEUARTREMOTECONTROL:
             self._cmd_queue.clear()
         return
 
-    def _flush(self):
-        try:
-            # check default tx 
-            if self._tx_buf:
-                data = self._tx_buf[0:self.tx_max_len]
-                self._tx_buf = self._tx_buf[self.tx_max_len:]
-                self._uart.write(data)
-
-            # check extra tx
-            if self._tx_extra_buf:
-                data = self._tx_extra_buf[0:self.tx_max_len]
-                self._tx_extra_buf = self._tx_extra_buf[self.tx_max_len:]
-                self._uart.ble.write(self.extra_char, data)
-
-            if self._tx_buf or self._tx_extra_buf:
-                schedule_in(self._timer, self._wrap_flush, self.tx_delay_ms)
-        except Exception as e:
-            print("_flush failed: %s" % e)
-
     def write(self, buf):
-        empty = not self._tx_buf
-        self._tx_buf += buf
-        if empty:
-            schedule_in(self._timer, self._wrap_flush, self.tx_delay_ms)
+        self._uart.write(buf)
 
     def write_extra(self, buf):
-        empty = not self._tx_extra_buf
-        self._tx_extra_buf += buf
-        if empty:
-            schedule_in(self._timer, self._wrap_flush, self.tx_delay_ms)
+        self._uart.ble.write(self.extra_char, buf)
 
     def is_connected(self):
         return self._uart.is_connected()
