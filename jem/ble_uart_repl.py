@@ -46,6 +46,6 @@ class BLEUARTStream(io.IOBase):
 
     def write(self, buf):
         try:
-            self._uart.t_write(buf)
+            self._uart.write(buf)
         except Exception as e:
             self.errors.append(e)
