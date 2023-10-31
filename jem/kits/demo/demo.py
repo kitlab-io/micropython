@@ -22,7 +22,7 @@ running = True
 
 def write(data):
     global ext_char
-    ble.t_write(ext_char, data)
+    ble.write(ext_char, data)
     
 def run():
     global ext_char
