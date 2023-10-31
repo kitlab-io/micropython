@@ -1,14 +1,9 @@
 # FTP over BLE UART
-from ble_uart_peripheral import schedule_in
 from cmd import *
 
 class BLEUARTFTP:
-    def __init__(self, tmr, uart):
+    def __init__(self, uart):
         self._uart = uart
-        self._tx_buf = bytearray()
-        self.tx_max_len = 100
-        self.tx_delay_ms = 20
-        self._timer = tmr
         self._uart.irq(self._on_rx)
         self.ftp_cmd_manager = CmdManager()
 
@@ -35,15 +30,5 @@ class BLEUARTFTP:
         if resp:
             self.write(resp)
 
-    def _flush(self):
-        data = self._tx_buf[0:self.tx_max_len]
-        self._tx_buf = self._tx_buf[self.tx_max_len:]
-        self._uart.write(data)
-        if self._tx_buf:
-            schedule_in(self._timer, self._flush, self.tx_delay_ms)
-
     def write(self, buf):
-        empty = not self._tx_buf
-        self._tx_buf += buf
-        if empty:
-            schedule_in(self._timer, self._flush, self.tx_delay_ms)
+        self._uart.write(buf)
