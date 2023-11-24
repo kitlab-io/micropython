@@ -1,7 +1,7 @@
 # simple.py
 from jem import jemrange, jemled
 
-led = jemlight.JemLed()
+led = jemled.JemLed()
 range = jemrange.JemRange()
 
 running = True
