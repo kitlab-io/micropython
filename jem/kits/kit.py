@@ -1,7 +1,7 @@
 # kit.py
 # Each kit must provide kit.py
 # main.py will look from kits/kit.py in order to run kit
-from kits.demo import demo as kit
+from kits.rccar import rccar as kit
 import _thread
 
 class Kit:
