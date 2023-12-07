@@ -13,10 +13,10 @@ class Car:
         self.pwmB = PWM(Pin(14),1000)  
         self.pwmC = PWM(Pin(21),1000)  
         self.pwmD = PWM(Pin(22),1000)
-        pwmA.duty(512)
-        pwmB.duty(512)
-        pwmC.duty(512)
-        pwmD.duty(512)
+        self.pwmA.duty(512)
+        self.pwmB.duty(512)
+        self.pwmC.duty(512)
+        self.pwmD.duty(512)
     def forward(self):
         self.pcf8574.outputs(0b01011010) # forward
         print("forward")
