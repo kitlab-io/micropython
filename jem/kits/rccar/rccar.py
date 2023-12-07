@@ -1,4 +1,4 @@
-from machine import Pin, I2C
+from machine import Pin, I2C, PWM
 from drivers.pcf8574 import *
 import time
 
@@ -6,6 +6,17 @@ class Car:
     def __init__(self):
         self.i2c = I2C(0, scl=Pin(18), sda=Pin(19), freq=100000) #100khz
         self.pcf8574 = PCF8574(self.i2c, addr=0x20)
+        # Initialize PWM for motor speed control
+        # Assuming PWM capable pins are connected to L293D's enable pins
+        # Set initial PWM frequency (for example, 1000 Hz)
+        self.pwmA = PWM(Pin(4),1000)  
+        self.pwmB = PWM(Pin(14),1000)  
+        self.pwmC = PWM(Pin(21),1000)  
+        self.pwmD = PWM(Pin(22),1000)
+        pwmA.duty(512)
+        pwmB.duty(512)
+        pwmC.duty(512)
+        pwmD.duty(512)
     def forward(self):
         self.pcf8574.outputs(0b01011010) # forward
         print("forward")
