@@ -4,7 +4,7 @@ import time
 
 class Car:
     def __init__(self):
-        self.i2c = I2C(1, scl=Pin(25), sda=Pin(26), freq=100000) #100khz
+        self.i2c = I2C(0, scl=Pin(18), sda=Pin(19), freq=100000) #100khz
         self.pcf8574 = PCF8574(self.i2c, addr=0x20)
     def forward(self):
         self.pcf8574.outputs(0b01011010) # forward
