@@ -13,31 +13,40 @@ class Car:
         self.pwmB = PWM(Pin(14),1000)  
         self.pwmC = PWM(Pin(21),1000)  
         self.pwmD = PWM(Pin(22),1000)
-        self.pwmA.duty(512)
-        self.pwmB.duty(512)
-        self.pwmC.duty(512)
-        self.pwmD.duty(512)
+        self.speed=0
+    def set_speed(self, speed=512):
+        # Speed is a value between 0 and 1023 (for 10-bit resolution)
+        self.pwmA.duty(speed)
+        self.pwmB.duty(speed)
+        self.pwmC.duty(speed)
+        self.pwmD.duty(speed)
+        self.speed=speed
     def forward(self):
+        self.set_speed(self.speed)
         self.pcf8574.outputs(0b01011010) # forward
         print("forward")
         #time.sleep(2)
         #self.stop()
     def backward(self):
+      	self.set_speed(self.speed)
         self.pcf8574.outputs(0b10100101) # backward
         print("back")
         #time.sleep(2)
         #self.stop()
     def right(self):
+        self.set_speed(self.speed)
         self.pcf8574.outputs(0b01010101) # spin right
         print("right")
         #time.sleep(2)
         #self.stop()
     def left(self):
+        self.set_speed(self.speed)
         self.pcf8574.outputs(0b10101010) # spin left
         print("left")
         #time.sleep(2)
         #self.stop()
     def stop(self):
+      	self.speed=0
         self.pcf8574.outputs(0b00000000) # stop
 
 car = Car()
