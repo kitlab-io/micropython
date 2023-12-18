@@ -13,7 +13,7 @@ class Car:
         self.pwmB = PWM(Pin(14),1000)  
         self.pwmC = PWM(Pin(21),1000)  
         self.pwmD = PWM(Pin(22),1000)
-        self.speed=0
+        self.speed=512
     def set_speed(self, speed=512):
         # Speed is a value between 0 and 1023 (for 10-bit resolution)
         self.pwmA.duty(speed)
@@ -23,30 +23,65 @@ class Car:
         self.speed=speed
     def forward(self):
         self.set_speed(self.speed)
-        self.pcf8574.outputs(0b01011010) # forward
+        self.pcf8574.outputs(0b10010110) # forward
         print("forward")
         #time.sleep(2)
         #self.stop()
     def backward(self):
       	self.set_speed(self.speed)
-        self.pcf8574.outputs(0b10100101) # backward
+        self.pcf8574.outputs(0b01101001) # backward
         print("back")
         #time.sleep(2)
         #self.stop()
-    def right(self):
+    def spin_right(self):
         self.set_speed(self.speed)
         self.pcf8574.outputs(0b01010101) # spin right
         print("right")
         #time.sleep(2)
         #self.stop()
-    def left(self):
+    def spin_left(self):
         self.set_speed(self.speed)
         self.pcf8574.outputs(0b10101010) # spin left
         print("left")
         #time.sleep(2)
         #self.stop()
+    def strafe_right(self):
+        self.set_speed(self.speed)
+        self.pcf8574.outputs(0b10100101) # strafe right
+        print("strafe right")
+        #time.sleep(2)
+        #self.stop()
+    def strafe_left(self):
+        self.set_speed(self.speed)
+        self.pcf8574.outputs(0b01011010) # strafe left
+        print("strafe left")
+        #time.sleep(2)
+        #self.stop()
+    def forward_right(self):
+        self.set_speed(self.speed)
+        self.pcf8574.outputs(0b10000100) # forward right
+        print("forward right")
+        #time.sleep(2)
+        #self.stop()
+    def forward_left(self):
+        self.set_speed(self.speed)
+        self.pcf8574.outputs(0b00010010) # forward left
+        print("forward left")
+        #time.sleep(2)
+        #self.stop()
+    def backward_left(self):
+        self.set_speed(self.speed)
+        self.pcf8574.outputs(0b01001000) # backward left
+        print("backward left")
+        #time.sleep(2)
+        #self.stop()
+    def backward_right(self):
+        self.set_speed(self.speed)
+        self.pcf8574.outputs(0b00100001) # backward right
+        print("backward right")
+        #time.sleep(2)
+        #self.stop()
     def stop(self):
-      	self.speed=0
         self.pcf8574.outputs(0b00000000) # stop
 
 car = Car()
@@ -75,11 +110,11 @@ def run():
 # pcf8574.outputs(0b00000000) # stop
 # pcf8574.outputs(0b10101010) # spin left
 # pcf8574.outputs(0b01010101) # spin right
-# pcf8574.outputs(0b01011010) # forward
-# pcf8574.outputs(0b10100101) # backward
-# pcf8574.outputs(0b10010110) # strafe left
-# pcf8574.outputs(0b01101001) # strafe right
+# pcf8574.outputs(0b01011010) # strafe left
+# pcf8574.outputs(0b10100101) # strafe right
+# pcf8574.outputs(0b10010110) # forward
+# pcf8574.outputs(0b01101001) # backward
 # pcf8574.outputs(0b00010010) # forward left
-# pcf8574.outputs(0b01001000) # forward right
-# pcf8574.outputs(0b10000100) # backward left
+# pcf8574.outputs(0b10000100) # forward right
+# pcf8574.outputs(0b01001000) # backward left
 # pcf8574.outputs(0b00100001) # backward right
