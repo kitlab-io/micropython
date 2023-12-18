@@ -6,11 +6,17 @@
     <v-btn depressed v-on:click="stopMotion"> StopMotion </v-btn>
     <v-btn depressed v-on:mousedown="forward" v-on:mouseup="stopMotion"> Forward </v-btn>
     <v-btn depressed v-on:mousedown="backward" v-on:mouseup="stopMotion"> Backward </v-btn>
-    <v-btn depressed v-on:mousedown="left" v-on:mouseup="stopMotion"> Turn Left </v-btn>
-    <v-btn depressed v-on:mousedown="right" v-on:mouseup="stopMotion"> Turn Right </v-btn>
-	
+    <v-btn depressed v-on:mousedown="spin_left" v-on:mouseup="stopMotion"> Turn Left </v-btn>
+    <v-btn depressed v-on:mousedown="spin_right" v-on:mouseup="stopMotion"> Turn Right </v-btn>
+	<v-btn depressed v-on:mousedown="strafe_left" v-on:mouseup="stopMotion"> Strafe Left </v-btn>
+    <v-btn depressed v-on:mousedown="strafe_right" v-on:mouseup="stopMotion"> Strafe Right </v-btn>
+    <v-btn depressed v-on:mousedown="forward_left" v-on:mouseup="stopMotion"> Forward Left </v-btn>
+    <v-btn depressed v-on:mousedown="forward_right" v-on:mouseup="stopMotion"> Forward Right </v-btn>
+    <v-btn depressed v-on:mousedown="backward_left" v-on:mouseup="stopMotion"> Backward Left </v-btn>
+    <v-btn depressed v-on:mousedown="backward_right" v-on:mouseup="stopMotion"> Backward Right </v-btn>
+    
     <!-- Color Slider -->
-  	<input type="range" min="0" max="1023" v-model="speed" @input="setspeed"> 
+  	<input type="range" min="0" max="1023" v-model="speed" @input="setspeed">
   
   </div>
 </template>
@@ -24,7 +30,7 @@ module.exports = {
   },
   data: () => ({
     kitReady: false,
-    speed: 0,
+    speed: 512, // Initialize to the required speed
     speedTimer: null
   }),
 
@@ -67,15 +73,39 @@ module.exports = {
       console.log("backward");
       this.sendCommand("kit._kit.car.backward()")
     },
-    left(){
-      console.log("left");
-      this.sendCommand("kit._kit.car.left()")
+    spin_left(){
+      console.log("spin_left");
+      this.sendCommand("kit._kit.car.spin_left()")
     },
-    right(){
-      console.log("right");
-      this.sendCommand("kit._kit.car.right()")
+    spin_right(){
+      console.log("spin_right");
+      this.sendCommand("kit._kit.car.spin_right()")
     },
-
+	strafe_left(){
+      console.log("strafe_left");
+      this.sendCommand("kit._kit.car.strafe_left()")
+    },
+    strafe_right(){
+      console.log("strafe_right");
+      this.sendCommand("kit._kit.car.strafe_right()")
+    },
+    forward_left(){
+      console.log("forward_left");
+      this.sendCommand("kit._kit.car.forward_left()")
+    },
+    forward_right(){
+      console.log("forward_right");
+      this.sendCommand("kit._kit.car.forward_right()")
+    },
+    backward_left(){
+      console.log("backward_left");
+      this.sendCommand("kit._kit.car.backward_left()")
+    },
+    backward_right(){
+      console.log("backward_right");
+      this.sendCommand("kit._kit.car.backward_right()")
+    },
+    
     prepareKit(){
       //import kit functions to micropython runtime if not done already
       if(this.parent.device.isConnected()){
