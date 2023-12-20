@@ -1,125 +1,212 @@
 <template>
-  <div id="RCcar" :style="{'cursor': 'pointer'}">
-  <p>RC-CAR</p>
-
-    <!---- Move Buttons ----->
-    <v-btn depressed v-on:click="stopMotion"> StopMotion </v-btn>
-    <v-btn depressed v-on:mousedown="forward" v-on:mouseup="stopMotion"> Forward </v-btn>
-    <v-btn depressed v-on:mousedown="backward" v-on:mouseup="stopMotion"> Backward </v-btn>
-    <v-btn depressed v-on:mousedown="spin_left" v-on:mouseup="stopMotion"> Turn Left </v-btn>
-    <v-btn depressed v-on:mousedown="spin_right" v-on:mouseup="stopMotion"> Turn Right </v-btn>
-	<v-btn depressed v-on:mousedown="strafe_left" v-on:mouseup="stopMotion"> Strafe Left </v-btn>
-    <v-btn depressed v-on:mousedown="strafe_right" v-on:mouseup="stopMotion"> Strafe Right </v-btn>
-    <v-btn depressed v-on:mousedown="forward_left" v-on:mouseup="stopMotion"> Forward Left </v-btn>
-    <v-btn depressed v-on:mousedown="forward_right" v-on:mouseup="stopMotion"> Forward Right </v-btn>
-    <v-btn depressed v-on:mousedown="backward_left" v-on:mouseup="stopMotion"> Backward Left </v-btn>
-    <v-btn depressed v-on:mousedown="backward_right" v-on:mouseup="stopMotion"> Backward Right </v-btn>
-    
-    <!-- Color Slider -->
-  	<input type="range" min="0" max="1023" v-model="speed" @input="setspeed">
+    <div :style="joystickStyle" @mousedown="startTracking" @mouseup="stopTracking" @mouseleave="stopTracking" @mousemove="trackMovement" @touchstart="startTracking" @touchmove="trackMovement" @touchend="stopTracking">
+        <div :style="outerCircleStyle">
+        <div :style="innerCircleStyle"></div>
+      </div>
+    </div>
+  </template>
   
-  </div>
-</template>
-
-<script>
-module.exports = {
-  name: 'RCcar',
-  props: ['parent'],
-  components: {
-    // GithubCorner
-  },
-  data: () => ({
-    kitReady: false,
-    speed: 512, // Initialize to the required speed
-    speedTimer: null
-  }),
-
-  mounted(){
-    console.log('starting RCcar kit');
-    this.parent.device.rcService.handleResp = this.kitResponseHandler
-    this.prepareKit();
-  },
-
-  methods: {
-    setspeed() {
-       
-       // NOTE: make sure you include newline and carriage return \n\r in your cmd since using the REPL
-       let cmd = `kit._kit.car.set_speed(${this.speed})\n\r`; // create the micropython cmd to set buzzer
-       if(this.speed == 0){
-          cmd = `kit._kit.car.stop()\n\r`; // if freq 0 just stop buzzer
-       }
-
-       if(this.speedTimer){
-           clearTimeout(this.speedTimer); // if we already have a cmd pending, cancel it and use latest one
-       }
-       this.speedTimer = setTimeout(()=>{ this.parent.device.send(cmd) }, 100); // send raw MicroPython REPL cmd after 100 millisec
+  <script>
+  module.exports = {
+    name: 'RCcar',
+    props: ['parent'],
+    data() {
+      return {
+        tracking: false,
+        startX: 0,
+        startY: 0,
+        currentX: 0,
+        currentY: 0,
+        prevCmd: null,
+        prevIntensity: null,
+        sendTimer: null,
+        controlCmd: "kit._kit.car.stop()"
+      };
     },
-    
-    kitResponseHandler(resp){
-      console.log("kit response " + resp);
-    },
-
-    stopMotion(){
-      console.log("kit stopMotion");
-      this.sendCommand("kit._kit.car.stop()");
-    },
-
-    forward(){
-      console.log("forward");
-      this.sendCommand("kit._kit.car.forward()")
-    },
-
-    backward(){
-      console.log("backward");
-      this.sendCommand("kit._kit.car.backward()")
-    },
-    spin_left(){
-      console.log("spin_left");
-      this.sendCommand("kit._kit.car.spin_left()")
-    },
-    spin_right(){
-      console.log("spin_right");
-      this.sendCommand("kit._kit.car.spin_right()")
-    },
-	strafe_left(){
-      console.log("strafe_left");
-      this.sendCommand("kit._kit.car.strafe_left()")
-    },
-    strafe_right(){
-      console.log("strafe_right");
-      this.sendCommand("kit._kit.car.strafe_right()")
-    },
-    forward_left(){
-      console.log("forward_left");
-      this.sendCommand("kit._kit.car.forward_left()")
-    },
-    forward_right(){
-      console.log("forward_right");
-      this.sendCommand("kit._kit.car.forward_right()")
-    },
-    backward_left(){
-      console.log("backward_left");
-      this.sendCommand("kit._kit.car.backward_left()")
-    },
-    backward_right(){
-      console.log("backward_right");
-      this.sendCommand("kit._kit.car.backward_right()")
-    },
-    
-    prepareKit(){
-      //import kit functions to micropython runtime if not done already
-      if(this.parent.device.isConnected()){
+    computed: {
+      joystickStyle() {
+        return {
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '50vmin',
+          height: '50vmin',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        };
+      },
+      outerCircleStyle() {
+        return {
+          backgroundColor: 'orange',
+          borderRadius: '50%',
+          width: '25vmin',
+          height: '25vmin',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        };
+      },
+      innerCircleStyle() {
+        return {
+          backgroundColor: 'darkorange',
+          borderRadius: '50%',
+          width: '10vmin',
+          height: '10vmin',
+          transform: `translate(${this.currentX}px, ${this.currentY}px)`
+        };
       }
     },
+    methods: {
+        sendCommand(cmdStr){
+            console.log(cmdStr);
+            return this.parent.device.send(cmdStr); //this.parent.device.rcService.sendCommand(cmdStr);
+        },
+        
+        startTracking(event) {
+            this.tracking = true;
+            const rect = this.$el.getBoundingClientRect();
+            this.startX = rect.left + rect.width / 2;
+            this.startY = rect.top + rect.height / 2;
+            this.trackMovement(event);
+        },
 
-    sendCommand(cmdStr){
-      if(!this.kitReady){
-          this.prepareKit();
-          this.kitReady = true;
-      }
-      this.parent.device.rcService.sendCommand(cmdStr);
-    },
+        trackMovement(event) {
+            if (!this.tracking) return;
+            let x = (event.clientX || event.touches[0].clientX) - this.startX;
+            let y = (event.clientY || event.touches[0].clientY) - this.startY;
+            this.currentX = x;
+            this.currentY = y;
 
-  }
-}
-</script>
+            // Calculate angle in radians, then convert to degrees
+            let angleRadians = Math.atan2(y, x);
+            let angleDegrees = angleRadians * (180 / Math.PI);
+
+            // Reverse the direction (counterclockwise) and ensure the angle is within 0-360 degrees
+            let adjustedAngle = (360 - angleDegrees) % 360;
+
+            let currentRadius = Math.sqrt(x * x + y * y);
+            let maxRadius = this.$el.offsetWidth / 2; // The radius of the outer circle
+            let radiusRatio = Math.min(currentRadius / maxRadius, 1); // Ratio, capped at 1 (100%)
+            let radiusPercent = radiusRatio * 100; // Convert to percentage
+
+            let angle = adjustedAngle;
+
+            console.log('joystick-move')
+            console.log( { x, y, angle, currentRadius, radiusPercent, maxRadius });
+            let cmd = "stop()";
+            if(angle <= 22.5 || angle >= 337.5)
+            {
+                angle = 0 // strafe right
+                console.log(angle);
+                cmd = "strafe_right()";
+            }
+            else if(angle > 22.5 && angle < 67.5)
+            {
+                angle = 45; //forward right
+                cmd = "forward_right()";
+                console.log(angle);
+            }
+            else if(angle >= 67.5 && angle < 112.5)
+            {
+                angle = 90; //forward
+                console.log(angle);
+                cmd = "forward()";
+            }
+            else if(angle >= 112.5 && angle < 157.5)
+            {
+                angle = 135; // forward left
+                console.log(angle);
+                cmd = "forward_left()";
+            }
+            else if(angle >= 157.5 && angle < 202.5)
+            {
+                angle = 180; // strafe left
+                console.log(angle);
+                cmd = "strafe_left()";
+            }
+            else if(angle >= 202.5 && angle < 247.5)
+            {
+                angle = 225; // backward left
+                console.log(angle);
+                cmd = "backward_left()";
+            }
+            else if(angle >= 247.5 && angle < 292.5)
+            {
+                angle = 270; // backwards
+                console.log(angle);
+                cmd = "backwards()";
+            }
+            else if(angle >= 292.5 && angle < 337.5)
+            {
+                angle = 315; // backwards right
+                console.log(angle);
+                cmd = "backward_left()";
+            }
+            else 
+            {
+                console.log("woops");
+                cmd = "stop()";
+            }
+            let intensity = parseInt(radiusPercent); //ex 0 - 100% to control motor intensity
+            console.log("cmd: " + cmd);
+			let dirCmd = null;
+            let intensityCmd = null;
+            
+            if(this.prevIntensity != intensity)
+            {
+                this.prevIntensity = intensity;
+                console.log("sendIntensity: " + intensity);
+                if(intensity > 100)
+                {
+                    intensity = 100;
+                }
+                let pwmVal = intensity * 800/100; // max 800 since at 1023 motor starts to strain
+                intensityCmd = `kit._kit.car.set_speed(${pwmVal})`
+                this.controlCmd = intensityCmd + ";";
+            }
+            if(this.prevCmd != cmd)
+            {
+                console.log("sendDir: " + cmd);
+                this.prevCmd = cmd;
+                dirCmd = "kit._kit.car." + cmd; //ex: kit._kit.car.forward()
+                if(intensityCmd)
+                {
+                	this.controlCmd += dirCmd; //ex: kit._kit.car.set_speed(10);kit._kit.car.stop()
+                }
+                else 
+                {
+                  this.controlCmd = dirCmd;
+                }
+            }
+          	
+            if((intensityCmd || dirCmd) && this.sendTimer == null)
+            {
+              console.log("sendTimer: " + this.sendTimer);
+              this.sendTimer = setTimeout(()=>{
+                this.sendCommand(this.controlCmd).then(() => {this.sendTimer = null;});
+                
+              }, 10);
+              
+            }
+
+        },
+        stopTracking() {
+          this.tracking = false;
+          this.currentX = 0;
+          this.currentY = 0;
+          console.log("stop car");
+          let stopCmd = "kit._kit.car.stop()\n\r";
+          if(this.sendTimer)
+          {
+              clearTimeout(this.sendTimer);
+          }
+          this.sendTimer = setTimeout(()=>{
+            this.sendCommand(stopCmd).then(() => {this.sendTimer = null;});
+          }, 10);
+        }
+    }
+  };
+  </script>
+  
