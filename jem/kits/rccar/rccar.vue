@@ -1,6 +1,8 @@
 <template>
   <div id="RCcar" :style="{'cursor': 'pointer'}">
   <p>RC-CAR</p>
+    <!-- RC Car Image -->
+    <img src="@/assets/rc-car-image.png" class="rc-car-image" alt="RC Car"/>
 
     <!---- Move Buttons ----->
     <v-btn depressed v-on:click="stopMotion"> StopMotion </v-btn>
