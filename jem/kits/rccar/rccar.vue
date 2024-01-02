@@ -1,211 +1,292 @@
 <template>
-    <div :style="joystickStyle" @mousedown="startTracking" @mouseup="stopTracking" @mouseleave="stopTracking" @mousemove="trackMovement" @touchstart="startTracking" @touchmove="trackMovement" @touchend="stopTracking">
-        <div :style="outerCircleStyle">
-        <div :style="innerCircleStyle"></div>
+    <div>
+      <button @click="enableStrafe">{{ EnableStrafeMessage }}</button>
+    <div :style="joysticksContainerStyle">
+      <div :style="topJoysticksStyle">
+        <div v-for="index in [0, 1]" :key="index" :style="joystickStyle" ref="joysticks" @mousedown="startTracking(index, $event)" @mouseup="stopTracking(index)" @mousemove="trackMovement(index, $event)" @touchstart="startTracking(index, $event)" @touchmove="trackMovement(index, $event)" @touchend="stopTracking(index)">
+          <div :style="outerCircleStyle">
+            <div :style="innerCircleStyle(index)"></div>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
   </template>
   
   <script>
+  const LeftJoystickIndex = 0;
+  const RightJoystickIndex = 1;
   module.exports = {
-    name: 'RCcar',
+    name: 'Joystick',
     props: ['parent'],
     data() {
       return {
-        tracking: false,
-        startX: 0,
-        startY: 0,
-        currentX: 0,
-        currentY: 0,
-        prevCmd: null,
-        prevIntensity: null,
-        sendTimer: null,
-        controlCmd: "kit._kit.car.stop()"
+        EnableStrafeMessage: "Enable Strafe",
+        strafeEnabled: false,
+        sendControlTimer: null,
+        rightIntensity: 0,
+        forwardIntensity: 0,
+        prevRightIntensity: 0,
+        prevForwardIntensity: 0,
+        joysticks: [
+          { tracking: false, startX: 0, startY: 0, currentX: 0, currentY: 0, prevY: 0, prevX: 0 },
+          { tracking: false, startX: 0, startY: 0, currentX: 0, currentY: 0, prevY: 0, prevX: 0 },
+        ]
       };
     },
     computed: {
+      joysticksContainerStyle() {
+        return {
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+        };
+      },
+      topJoysticksStyle() {
+        return {
+          display: 'flex',
+          justifyContent: 'space-around',
+          width: '100%',
+          marginBottom: '15%',
+        };
+      },
+      bottomJoystickStyle() {
+        return {
+          display: 'flex',
+          justifyContent: 'center',
+        };
+      },
       joystickStyle() {
         return {
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
           width: '50vmin',
           height: '50vmin',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
         };
       },
       outerCircleStyle() {
         return {
-          backgroundColor: 'orange',
+          backgroundColor: 'green',
           borderRadius: '50%',
           width: '25vmin',
           height: '25vmin',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
         };
       },
       innerCircleStyle() {
-        return {
-          backgroundColor: 'darkorange',
+        return index => ({
+          backgroundColor: 'grey',
           borderRadius: '50%',
           width: '10vmin',
           height: '10vmin',
-          transform: `translate(${this.currentX}px, ${this.currentY}px)`
-        };
+          transform: `translate(${this.joysticks[index].currentX}px, ${this.joysticks[index].currentY}px)`,
+        });
       }
     },
     methods: {
-        sendCommand(cmdStr){
-            console.log(cmdStr);
-            return this.parent.device.send(cmdStr); //this.parent.device.rcService.sendCommand(cmdStr);
-        },
-        
-        startTracking(event) {
-            this.tracking = true;
-            const rect = this.$el.getBoundingClientRect();
-            this.startX = rect.left + rect.width / 2;
-            this.startY = rect.top + rect.height / 2;
-            this.trackMovement(event);
-        },
-
-        trackMovement(event) {
-            if (!this.tracking) return;
-            let x = (event.clientX || event.touches[0].clientX) - this.startX;
-            let y = (event.clientY || event.touches[0].clientY) - this.startY;
-            this.currentX = x;
-            this.currentY = y;
-
-            // Calculate angle in radians, then convert to degrees
-            let angleRadians = Math.atan2(y, x);
-            let angleDegrees = angleRadians * (180 / Math.PI);
-
-            // Reverse the direction (counterclockwise) and ensure the angle is within 0-360 degrees
-            let adjustedAngle = (360 - angleDegrees) % 360;
-
-            let currentRadius = Math.sqrt(x * x + y * y);
-            let maxRadius = this.$el.offsetWidth / 2; // The radius of the outer circle
-            let radiusRatio = Math.min(currentRadius / maxRadius, 1); // Ratio, capped at 1 (100%)
-            let radiusPercent = radiusRatio * 100; // Convert to percentage
-
-            let angle = adjustedAngle;
-
-            console.log('joystick-move')
-            console.log( { x, y, angle, currentRadius, radiusPercent, maxRadius });
-            let cmd = "stop()";
-            if(angle <= 22.5 || angle >= 337.5)
-            {
-                angle = 0 // strafe right
-                console.log(angle);
-                cmd = "strafe_right()";
-            }
-            else if(angle > 22.5 && angle < 67.5)
-            {
-                angle = 45; //forward right
-                cmd = "forward_right()";
-                console.log(angle);
-            }
-            else if(angle >= 67.5 && angle < 112.5)
-            {
-                angle = 90; //forward
-                console.log(angle);
-                cmd = "forward()";
-            }
-            else if(angle >= 112.5 && angle < 157.5)
-            {
-                angle = 135; // forward left
-                console.log(angle);
-                cmd = "forward_left()";
-            }
-            else if(angle >= 157.5 && angle < 202.5)
-            {
-                angle = 180; // strafe left
-                console.log(angle);
-                cmd = "strafe_left()";
-            }
-            else if(angle >= 202.5 && angle < 247.5)
-            {
-                angle = 225; // backward left
-                console.log(angle);
-                cmd = "backward_left()";
-            }
-            else if(angle >= 247.5 && angle < 292.5)
-            {
-                angle = 270; // backwards
-                console.log(angle);
-                cmd = "backwards()";
-            }
-            else if(angle >= 292.5 && angle < 337.5)
-            {
-                angle = 315; // backwards right
-                console.log(angle);
-                cmd = "backward_left()";
-            }
-            else 
-            {
-                console.log("woops");
-                cmd = "stop()";
-            }
-            let intensity = parseInt(radiusPercent); //ex 0 - 100% to control motor intensity
-            console.log("cmd: " + cmd);
-			let dirCmd = null;
-            let intensityCmd = null;
-            
-            if(this.prevIntensity != intensity)
-            {
-                this.prevIntensity = intensity;
-                console.log("sendIntensity: " + intensity);
-                if(intensity > 100)
-                {
-                    intensity = 100;
-                }
-                let pwmVal = intensity * 800/100; // max 800 since at 1023 motor starts to strain
-                intensityCmd = `kit._kit.car.set_speed(${pwmVal})`
-                this.controlCmd = intensityCmd + ";";
-            }
-            if(this.prevCmd != cmd)
-            {
-                console.log("sendDir: " + cmd);
-                this.prevCmd = cmd;
-                dirCmd = "kit._kit.car." + cmd; //ex: kit._kit.car.forward()
-                if(intensityCmd)
-                {
-                	this.controlCmd += dirCmd; //ex: kit._kit.car.set_speed(10);kit._kit.car.stop()
-                }
-                else 
-                {
-                  this.controlCmd = dirCmd;
-                }
-            }
-          	
-            if((intensityCmd || dirCmd) && this.sendTimer == null)
-            {
-              console.log("sendTimer: " + this.sendTimer);
-              this.sendTimer = setTimeout(()=>{
-                this.sendCommand(this.controlCmd).then(() => {this.sendTimer = null;});
-                
-              }, 10);
-              
-            }
-
-        },
-        stopTracking() {
-          this.tracking = false;
-          this.currentX = 0;
-          this.currentY = 0;
-          console.log("stop car");
-          let stopCmd = "kit._kit.car.stop()\n\r";
-          if(this.sendTimer)
-          {
-              clearTimeout(this.sendTimer);
-          }
-          this.sendTimer = setTimeout(()=>{
-            this.sendCommand(stopCmd).then(() => {this.sendTimer = null;});
-          }, 10);
+      enableStrafe()
+      {
+        console.log("Enable Strafe")
+        if(this.EnableStrafeMessage == "Enable Strafe")
+        {
+          this.EnableStrafeMessage = "Disable Strafe"
+          this.strafeEnabled = true;
         }
+        else 
+        {
+          this.EnableStrafeMessage = "Enable Strafe"
+          this.strafeEnabled = false;
+        }
+      },
+
+      async startSendControlCmd()
+      {
+        let frwd = this.forwardIntensity;
+        let right = this.rightIntensity;
+        if(frwd!= this.prevForwardIntensity || right != this.prevRightIntensity)
+        {
+            console.log("send f: " + frwd);
+            console.log("send r: " + right);
+            this.prevRightIntensity = right;
+            this.prevForwardIntensity = frwd;
+            let cmd = this.controlMotors(frwd, right);//this.controlMotors(frwd, right);
+            this.parent.device.send(cmd);
+            //this.parent.device.send(`frwd=${frwd};right=${right}\n\r`);
+        }
+        this.sendControlTimer = setTimeout(() => {this.startSendControlCmd();}, 100);
+      },
+
+controlMotors(forwardIntensity, rightIntensity) {
+    console.log("strafe: %s, %s" % (forwardIntensity, rightIntensity));
+    // Ensure intensities are within the allowed range
+    forwardIntensity = Math.max(-100, Math.min(100, forwardIntensity));
+    rightIntensity = Math.max(-100, Math.min(100, rightIntensity));
+    // Initialize wheel speeds
+    let leftWheelSpeed = 0;
+    let rightWheelSpeed = 0;
+
+    if (forwardIntensity !== 0 && rightIntensity === 0) {
+        // Move forward or backward without turning
+        leftWheelSpeed = rightWheelSpeed = forwardIntensity;
+    } else if (forwardIntensity === 0 && rightIntensity !== 0) {
+        // Turn in place
+        leftWheelSpeed = rightIntensity;
+        rightWheelSpeed = -rightIntensity;
+    } else if (forwardIntensity !== 0 && rightIntensity !== 0) {
+        // Move and turn
+        leftWheelSpeed = Math.min(100, Math.max(-100, forwardIntensity + rightIntensity));
+        rightWheelSpeed = Math.min(100, Math.max(-100, forwardIntensity - rightIntensity));
+    }
+
+    // Create the controls object
+    let controls = null;
+    if(this.strafeEnabled)
+    {
+      controls = {
+          'left_back_motor': forwardIntensity - rightIntensity,
+          'right_front_motor': forwardIntensity - rightIntensity,
+          'left_front_motor': forwardIntensity + rightIntensity,
+          'right_back_motor': forwardIntensity + rightIntensity
+      };
+    }
+    else 
+    {
+      controls = {
+        'left_back_motor': leftWheelSpeed,
+        'right_front_motor': rightWheelSpeed,
+        'left_front_motor': leftWheelSpeed,
+        'right_back_motor': rightWheelSpeed
+    };
+    }
+
+    let left_back_motor = controls['left_back_motor'] >= 0 ? 0b00010000 : 0b00100000;
+    let right_front_motor = controls['right_front_motor'] >= 0  ?  0b00000010 : 0b00000001;
+    let left_front_motor = controls['left_front_motor'] >= 0  ? 0b00000100 : 0b00001000;
+    let right_back_motor = controls['right_back_motor'] >= 0 ? 0b10000000 : 0b01000000;
+
+
+    let pwmC = Math.abs(controls['left_back_motor']);//controls['left_back_motor']['speed'];
+    let pwmB = Math.abs(controls['right_front_motor']);//controls['right_front_motor']['speed'];
+    let pwmA = Math.abs(controls['left_front_motor']);//controls['left_front_motor']['speed'];
+    let pwmD = Math.abs(controls['right_back_motor'] );//controls['right_back_motor']['speed'];
+
+    let driverOutput = left_back_motor | right_front_motor | left_front_motor | right_back_motor;
+
+    // Return the controls object
+    let cmd = `kit._kit.car.update(${driverOutput}, ${pwmA}, ${pwmB}, ${pwmC}, ${pwmD})\n\r`;
+    function dec2bin(dec) {
+      return (dec >>> 0).toString(2);
+    }
+    console.log(dec2bin(driverOutput));
+    console.log(cmd);
+    return cmd;
+},
+
+
+      getClientPosition(event) {
+        if (event.type.startsWith('touch')) {
+          return {
+            clientX: event.touches[0].clientX,
+            clientY: event.touches[0].clientY
+          };
+        }
+        return {
+          clientX: event.clientX,
+          clientY: event.clientY
+        };
+      },
+
+      startTracking(index, event) {
+        const { clientX, clientY } = this.getClientPosition(event);
+        const joystickRef = this.$refs.joysticks[index] || this.$refs.joystick2;
+        const rect = joystickRef.getBoundingClientRect();
+        this.joysticks[index].startX = clientX;
+        this.joysticks[index].startY = clientY;
+        this.joysticks[index].tracking = true;
+        this.trackMovement(index, event);
+      },
+      trackMovement(index, event) {
+        if (!this.joysticks[index].tracking) return;
+        const { clientX, clientY } = this.getClientPosition(event);
+        const joystickRef = this.$refs.joysticks[index] || this.$refs.joystick2;
+        const rect = joystickRef.getBoundingClientRect();
+  
+        // Calculate the relative position within the joystick
+        let deltaX = clientX - rect.left - rect.width / 2;
+        let deltaY = clientY - rect.top - rect.height / 2;
+  
+        // Apply constraints to keep the inner circle within the joystick bounds
+        let maxRadius = rect.width / 2;
+        let distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        if (distance > maxRadius) {
+          let angle = Math.atan2(deltaY, deltaX);
+          deltaX = Math.cos(angle) * maxRadius;
+          deltaY = Math.sin(angle) * maxRadius;
+        }
+  
+        this.joysticks[index].prevX = this.joysticks[index].currentX;
+        this.joysticks[index].prevY = this.joysticks[index].currentY;
+        this.joysticks[index].currentX = deltaX;
+        this.joysticks[index].currentY = deltaY;
+        this.updateJoystick(index);
+      },
+      updateJoystick(index) {
+
+        const joystickRef = this.$refs.joysticks[index];
+        let angleRadians = Math.atan2(this.joysticks[index].currentY, this.joysticks[index].currentX);
+        let angleDegrees = angleRadians * (180 / Math.PI);
+        let adjustedAngle = (360 - angleDegrees) % 360;
+        let currentRadius = Math.sqrt(this.joysticks[index].currentX * this.joysticks[index].currentX + this.joysticks[index].currentY * this.joysticks[index].currentY);
+        let maxRadius = joystickRef.offsetWidth / 4;
+        let radiusRatio = Math.min(currentRadius / maxRadius, 1);
+        let radiusPercent = radiusRatio * 100;
+        let data = { x: this.joysticks[index].currentX, y: this.joysticks[index].currentY, angle: adjustedAngle, radius: currentRadius};
+        let xPercent = parseInt(100 * this.joysticks[index].currentX/maxRadius);
+        let yPercent = parseInt(100 * this.joysticks[index].currentY/maxRadius);
+        let diffX = Math.abs(parseInt(this.joysticks[index].prevX - this.joysticks[index].currentX));
+        let diffY = Math.abs(parseInt(this.joysticks[index].prevY - this.joysticks[index].currentY));
+        let changed = false;
+
+        if(diffY && index == LeftJoystickIndex)
+        {
+            // forward/backward control is left joystick
+            changed = true;
+            let sign = Math.sign(yPercent);
+            this.forwardIntensity = Math.abs(yPercent) >= 100 ? sign * 100 : yPercent; 
+            console.log({ x: this.joysticks[index].currentX, max: maxRadius, angle: adjustedAngle, radius: currentRadius, radiusPercent });
+        }
+        else if(diffX && index == RightJoystickIndex)
+        {
+            // left/right control is right joystick
+            changed = true;
+            let sign = Math.sign(xPercent);
+            this.rightIntensity = Math.abs(xPercent) >= 100 ? sign * 100 : xPercent; 
+            console.log({ x: this.joysticks[index].currentX, max: maxRadius, angle: adjustedAngle, radius: currentRadius, radiusPercent });
+        }
+
+        if(changed && this.sendControlTimer == null)
+        {
+            this.startSendControlCmd();
+        }
+      },
+      stopTracking(index) {
+        this.joysticks[index].tracking = false;
+        this.joysticks[index].currentX = 0;
+        this.joysticks[index].currentY = 0;
+        if(index == LeftJoystickIndex)
+        {
+            this.forwardIntensity = 0; 
+        }
+        else if(index == RightJoystickIndex)
+        {
+            this.rightIntensity = 0; 
+        }
+      }
     }
   };
   </script>

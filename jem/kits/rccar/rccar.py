@@ -14,6 +14,15 @@ class Car:
         self.pwmC = PWM(Pin(21),1000)  
         self.pwmD = PWM(Pin(22),1000)
         self.speed=512
+        
+    def update(self, output, pwma, pwmb, pwmc, pwmd):
+        #print("output: %s, a: %s, b: %s, c: %s, d: %s" % (output, pwma, pwmb, pwmc, pwmd))
+        #time.sleep(0.1)
+        self.pcf8574.outputs(output) # output binary ex: 0b00000000
+        self.pwmA.duty(int(pwma*1023/100.0)) #pwma ex: 0 - 100%, 50 -> 1023 * 1/2 = 511
+        self.pwmB.duty(int(pwmb*1023/100.0))
+        self.pwmC.duty(int(pwmc*1023/100.0))
+        self.pwmD.duty(int(pwmd*1023/100.0))
 
     def set_speed(self, speed=512):
         # Speed is a value between 0 and 1023 (for 10-bit resolution)
