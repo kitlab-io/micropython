@@ -1,6 +1,9 @@
 <template>
   <div>
     <button @click="enableStrafe">{{ EnableStrafeMessage }}</button>
+    <button @click="toggleMotion">{{ PhoneMotionMessage }}</button>
+    <div>{{ motionX }}</div>
+    <div>{{ motionY }}</div>
   <div :style="joysticksContainerStyle">
     <div :style="topJoysticksStyle">
       <div v-for="index in [0]" :key="index" :style="joystickStyle" ref="joysticks" @mousedown="startTracking(index, $event)" @mouseup="stopTracking(index)" @mousemove="trackMovement(index, $event)" @touchstart="startTracking(index, $event)" @touchmove="trackMovement(index, $event)" @touchend="stopTracking(index)">
@@ -21,7 +24,11 @@ module.exports = {
   props: ['parent'],
   data() {
     return {
+      motionX: 0,
+      motionY: 0,
       EnableStrafeMessage: "Enable Strafe",
+      PhoneMotionMessage: "Enable Phone Motion",
+      phoneMotionEn: false,
       strafeEnabled: false,
       sendControlTimer: null,
       rightIntensity: 0,
@@ -59,8 +66,8 @@ module.exports = {
     },
     joystickStyle() {
       return {
-        width: '50vmin',
-        height: '50vmin',
+        width: '100vmin',
+        height: '100vmin',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -69,9 +76,9 @@ module.exports = {
     outerCircleStyle() {
       return {
         backgroundColor: 'green',
-        borderRadius: '50%',
-        width: '25vmin',
-        height: '25vmin',
+        borderRadius: '100%',
+        width: '50vmin',
+        height: '50vmin',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -87,7 +94,36 @@ module.exports = {
       });
     }
   },
-  methods: {
+  methods: {    
+    toggleMotion()
+    {
+      if(!this.phoneMotionEn)
+      {
+        console.log("kit startMotion");
+        this.parent.startMotion(this.motionHandler);
+        this.PhoneMotionMessage = "Disable Phone Motion";
+        this.phoneMotionEn = true;
+        if(this.sendControlTimer == null)
+        {
+          this.startSendControlCmd();
+        }
+      }
+      else 
+      {
+        console.log("kit stopMotion");
+        this.parent.stopMotion();
+        this.PhoneMotionMessage = "Enable Phone Motion";
+        this.phoneMotionEn = false;
+        clearTimeout(this.sendControlTimer);
+        this.sendControlTimer = null;
+      }
+    },
+    
+    motionHandler: function(accelEvent){
+        let gScale = 9.81; // gravity = 9.81 m/s^2
+        this.motionX = 100 * accelEvent.accelerationIncludingGravity.x / gScale; //ex: 9.81/9.81 * 100 = 100%
+        this.motionY = -1 * 100 * accelEvent.accelerationIncludingGravity.y / gScale;
+    },
     enableStrafe()
     {
       console.log("Enable Strafe")
@@ -107,21 +143,26 @@ module.exports = {
     {
       let frwd = this.forwardIntensity;
       let right = this.rightIntensity;
-      if(frwd!= this.prevForwardIntensity || right != this.prevRightIntensity)
+      
+      if(this.phoneMotionEn)
+      {
+        let cmd = this.controlMotors(this.motionX, this.motionY);
+        this.parent.device.send(cmd);
+        console.log("phone send");
+      }
+      else if(frwd!= this.prevForwardIntensity || right != this.prevRightIntensity)
       {
           console.log("send f: " + frwd);
           console.log("send r: " + right);
           this.prevRightIntensity = right;
           this.prevForwardIntensity = frwd;
-          let cmd = this.controlMotors(frwd, right);//this.controlMotors(frwd, right);
+          let cmd = this.controlMotors(frwd, right);
           this.parent.device.send(cmd);
-          //this.parent.device.send(`frwd=${frwd};right=${right}\n\r`);
       }
       this.sendControlTimer = setTimeout(() => {this.startSendControlCmd();}, 100);
     },
 
   controlMotors(forwardIntensity, rightIntensity) {
-    console.log("strafe: %s, %s" % (forwardIntensity, rightIntensity));
     // Ensure intensities are within the allowed range
     forwardIntensity = Math.max(-100, Math.min(100, forwardIntensity));
     rightIntensity = Math.max(-100, Math.min(100, rightIntensity));
@@ -281,6 +322,11 @@ module.exports = {
       this.joysticks[index].currentY = 0;
       this.forwardIntensity = 0; 
       this.rightIntensity = 0; 
+      if(!this.phoneMotionEn)
+      {
+        clearTimeout(this.sendControlTimer);
+        this.sendControlTimer = null;
+      }
     }
   }
 };
