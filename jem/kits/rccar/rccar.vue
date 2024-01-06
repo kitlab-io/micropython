@@ -27,7 +27,7 @@ module.exports = {
       motionX: 0,
       motionY: 0,
       EnableStrafeMessage: "Enable Strafe",
-      PhoneMotionMessage: "Enable Phone Motion",
+      PhoneMotionMessage: "Phone Motion",
       phoneMotionEn: false,
       strafeEnabled: false,
       sendControlTimer: null,
@@ -105,6 +105,7 @@ module.exports = {
         this.phoneMotionEn = true;
         if(this.sendControlTimer == null)
         {
+          clearTimeout(this.sendControlTimer);
           this.startSendControlCmd();
         }
       }
@@ -113,16 +114,24 @@ module.exports = {
         console.log("kit stopMotion");
         this.parent.stopMotion();
         this.PhoneMotionMessage = "Enable Phone Motion";
+        this.motionX = 0;
+        this.motionY = 0; 
+        this.startSendControlCmd(true);
         this.phoneMotionEn = false;
-        clearTimeout(this.sendControlTimer);
-        this.sendControlTimer = null;
       }
     },
     
     motionHandler: function(accelEvent){
-        let gScale = 9.81; // gravity = 9.81 m/s^2
-        this.motionX = 100 * accelEvent.accelerationIncludingGravity.x / gScale; //ex: 9.81/9.81 * 100 = 100%
-        this.motionY = -1 * 100 * accelEvent.accelerationIncludingGravity.y / gScale;
+      if(this.phoneMotionEn)
+      {
+          let gScale = 9.81; // gravity = 9.81 m/s^2
+          this.motionX = 100 * accelEvent.accelerationIncludingGravity.x / gScale; //ex: 9.81/9.81 * 100 = 100%
+          this.motionY = -1 * 100 * accelEvent.accelerationIncludingGravity.y / gScale;
+        }
+        else {
+          this.motionX = 0;
+          this.motionY = 0;
+        }
     },
     enableStrafe()
     {
@@ -139,16 +148,20 @@ module.exports = {
       }
     },
 
-    async startSendControlCmd()
+    async startSendControlCmd(stop=false)
     {
+      console.log("startSendControlCmd");
+      this.sendControlTimer = -1;
+
       let frwd = this.forwardIntensity;
       let right = this.rightIntensity;
       
       if(this.phoneMotionEn)
       {
         let cmd = this.controlMotors(this.motionX, this.motionY);
-        this.parent.device.send(cmd);
         console.log("phone send");
+        let resp = await this.parent.device.rcService.sendEvalCommand(cmd);
+        console.log("got resp!");
       }
       else if(frwd!= this.prevForwardIntensity || right != this.prevRightIntensity)
       {
@@ -157,9 +170,24 @@ module.exports = {
           this.prevRightIntensity = right;
           this.prevForwardIntensity = frwd;
           let cmd = this.controlMotors(frwd, right);
-          this.parent.device.send(cmd);
+          console.log("get resp");
+          let resp = await this.parent.device.rcService.sendEvalCommand(cmd);
+          console.log("got resp!");
       }
-      this.sendControlTimer = setTimeout(() => {this.startSendControlCmd();}, 100);
+
+      if(!stop)
+      {
+        this.sendControlTimer = setTimeout(() => {
+            this.startSendControlCmd();
+            }, 10);
+      }
+      else 
+      {
+        console.log("clear timeout");
+        clearTimeout(this.sendControlTimer); // then cancel next timer callback
+        this.sendControlTimer = null;
+      }
+      
     },
 
   controlMotors(forwardIntensity, rightIntensity) {
@@ -313,6 +341,7 @@ module.exports = {
 
       if(changed && this.sendControlTimer == null)
       {
+          console.warn("new!!");
           this.startSendControlCmd();
       }
     },
@@ -324,8 +353,8 @@ module.exports = {
       this.rightIntensity = 0; 
       if(!this.phoneMotionEn)
       {
-        clearTimeout(this.sendControlTimer);
-        this.sendControlTimer = null;
+        this.startSendControlCmd(true); // immediately sends msg to jem
+        console.warn("stop");
       }
     }
   }
