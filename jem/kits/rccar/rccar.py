@@ -83,10 +83,13 @@ class Car:
         print("backward right")
 
     def stop(self):
-        self.pcf8574.outputs(0b00000000) # stop
+        try:
+            self.pcf8574.outputs(0b00000000) # stop
+            self.set_speed(0)
+        except Exception as e:
+            print(e)
 
 car = Car()
-
 
 def run():
     print("rc car started")

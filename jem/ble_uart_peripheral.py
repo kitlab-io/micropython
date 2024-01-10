@@ -177,8 +177,11 @@ class BLE:
         self._connect_callbacks.append(cbk)
 
     def connect_callback(self, connected):
-        for cbk in self._connect_callbacks:
-            cbk(connected)
+        try:
+            for cbk in self._connect_callbacks:
+                cbk(connected)
+        except Exception as e:
+            print("connecte_callback: %s" % e)
 
     def get_mtu(self):
         return self._ble.config('mtu')
@@ -276,7 +279,7 @@ class BLE:
     
     def _chr_handler_thread(self):
         self._running = True
-        ms = 50
+        ms = 20
         while self._running:
             chr_evt = None
             utime.sleep_ms(ms)
@@ -300,7 +303,7 @@ class BLE:
                 elif event == IRQ_GATTS_INDICATE_DONE:
                     char_handle.irq((event, None))
             else:
-                ms = 50 # set back to default
+                ms = 20 # set back to default
                 
     def _safe_irq(self, event, data):
         try:

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h2>The Beast</h2>
     <button @click="enableStrafe">{{ EnableStrafeMessage }}</button>
     <button @click="toggleMotion">{{ PhoneMotionMessage }}</button>
     <div>{{ motionX }}</div>
@@ -20,10 +21,12 @@
 const LeftJoystickIndex = 0;
 const RightJoystickIndex = 1;
 module.exports = {
-  name: 'Joystick',
+  name: 'Joystick1',
   props: ['parent'],
   data() {
     return {
+      stopRequested: false,
+      auxReceived: false,
       motionX: 0,
       motionY: 0,
       EnableStrafeMessage: "Enable Strafe",
@@ -94,7 +97,38 @@ module.exports = {
       });
     }
   },
-  methods: {    
+  mounted() {
+    this.parent.device.rcService.handleAuxResp = this.handleAuxResp;
+  },
+  
+  methods: {  
+    async waitForAuxData()
+    {
+      return new Promise((resolve)=>{
+          let count = 0;
+          let t = setInterval(()=>{
+              if(this.auxReceived)
+              {
+                 resolve(true);
+                 clearTimeout(t);
+                 console.log("resolve");
+              }
+              else if(count++ >= 1000)
+              {
+                clearTimeout(t);
+                console.log("done");
+              }
+              
+          }, 5);
+      });
+
+    },
+    
+    handleAuxResp(data){
+      console.log("got data: " + data);
+      this.auxReceived = true;
+    },
+    
     toggleMotion()
     {
       if(!this.phoneMotionEn)
@@ -116,7 +150,7 @@ module.exports = {
         this.PhoneMotionMessage = "Enable Phone Motion";
         this.motionX = 0;
         this.motionY = 0; 
-        this.startSendControlCmd(true);
+        this.stopRequested = true;
         this.phoneMotionEn = false;
       }
     },
@@ -125,8 +159,8 @@ module.exports = {
       if(this.phoneMotionEn)
       {
           let gScale = 9.81; // gravity = 9.81 m/s^2
-          this.motionX = 100 * accelEvent.accelerationIncludingGravity.x / gScale; //ex: 9.81/9.81 * 100 = 100%
-          this.motionY = -1 * 100 * accelEvent.accelerationIncludingGravity.y / gScale;
+          this.motionX = parseInt(100 * accelEvent.accelerationIncludingGravity.x / gScale); //ex: 9.81/9.81 * 100 = 100%
+          this.motionY = parseInt(-1 * 100 * accelEvent.accelerationIncludingGravity.y / gScale);
         }
         else {
           this.motionX = 0;
@@ -148,7 +182,7 @@ module.exports = {
       }
     },
 
-    async startSendControlCmd(stop=false)
+    async startSendControlCmd()
     {
       console.log("startSendControlCmd");
       this.sendControlTimer = -1;
@@ -156,12 +190,34 @@ module.exports = {
       let frwd = this.forwardIntensity;
       let right = this.rightIntensity;
       
+      if(this.stopRequested)
+      {
+        console.log("stop Requested");
+        clearTimeout(this.sendControlTimer); // then cancel next timer callback
+        this.sendControlTimer = null;
+        this.stopRequested = false;
+        let cmd = this.controlMotors(0, 0);
+        this.auxReceived = false;
+        let resp = await this.parent.device.send(cmd);
+        resp = await this.waitForAuxData();
+        return;
+      }
+      
       if(this.phoneMotionEn)
       {
-        let cmd = this.controlMotors(this.motionX, this.motionY);
-        console.log("phone send");
-        let resp = await this.parent.device.rcService.sendEvalCommand(cmd);
-        console.log("got resp!");
+        frwd = this.motionX;
+      	right = this.motionY;
+        if(frwd != this.prevForwardIntensity || right != this.prevRightIntensity)
+        {
+          this.prevRightIntensity = right;
+          this.prevForwardIntensity = frwd;
+          let cmd = this.controlMotors(frwd, right);
+          console.log("phone send");
+          this.auxReceived = false;
+          let resp = await this.parent.device.send(cmd);
+          resp = await this.waitForAuxData();
+          console.log("got resp!");
+        }
       }
       else if(frwd!= this.prevForwardIntensity || right != this.prevRightIntensity)
       {
@@ -171,22 +227,16 @@ module.exports = {
           this.prevForwardIntensity = frwd;
           let cmd = this.controlMotors(frwd, right);
           console.log("get resp");
-          let resp = await this.parent.device.rcService.sendEvalCommand(cmd);
+          this.auxReceived = false;
+          let resp = await this.parent.device.send(cmd);
+          resp = await this.waitForAuxData();
           console.log("got resp!");
       }
 
-      if(!stop)
-      {
-        this.sendControlTimer = setTimeout(() => {
-            this.startSendControlCmd();
-            }, 10);
-      }
-      else 
-      {
-        console.log("clear timeout");
-        clearTimeout(this.sendControlTimer); // then cancel next timer callback
-        this.sendControlTimer = null;
-      }
+      
+      this.sendControlTimer = setTimeout(() => {
+        this.startSendControlCmd();
+      }, 10);
       
     },
 
@@ -246,7 +296,8 @@ module.exports = {
     let driverOutput = left_back_motor | right_front_motor | left_front_motor | right_back_motor;
 
     // Return the controls object
-    let cmd = `kit._kit.car.update(${driverOutput}, ${pwmA}, ${pwmB}, ${pwmC}, ${pwmD})\n\r`;
+    //let cmd = `kit._kit.car.update(${driverOutput}, ${pwmA}, ${pwmB}, ${pwmC}, ${pwmD})\n\r`;
+    let cmd = `mtr(${driverOutput},${pwmA},${pwmB},${pwmC},${pwmD})\n\r`;
     function dec2bin(dec) {
       return (dec >>> 0).toString(2);
     }
@@ -353,7 +404,7 @@ module.exports = {
       this.rightIntensity = 0; 
       if(!this.phoneMotionEn)
       {
-        this.startSendControlCmd(true); // immediately sends msg to jem
+        this.stopRequested = true;
         console.warn("stop");
       }
     }
