@@ -1,7 +1,7 @@
 <template>
   <div>
   <v-card>
-  <v-card-title>The Beast!!</v-card-title>
+  <v-card-title>The Beast</v-card-title>
           <v-list>
             <v-list-item>
               <v-list-item-content>
