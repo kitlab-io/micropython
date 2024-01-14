@@ -26,7 +26,7 @@ class TEMT6000:
     def __init__(self, pin_num=ADC_GPIO_PIN):
         self.pin_num = pin_num
         self.adc = ADC(Pin(self.pin_num, Pin.IN)) # 12 bit
-        self.adc.init(atten=ADC.ATTN_11DB) # 11dB attenuation (150mV - 2450mV)
+        self.adc.init(atten=ADC.ATTN_0DB) # 0dB attenuation (100mV - 950mV), 11dB attenuation (150mV - 2450mV)
 
     def get_analog_value(self):
         """returns 12 bit value 0 - 4095"""
