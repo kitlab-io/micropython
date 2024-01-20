@@ -31,9 +31,6 @@ module.exports = {
     
     //freq slider
     rangeTimer: null,
-    prevBuzzFreq: null,
-    buzzFreq: 0,
-    buzzSlider: 0,
     sliderValue: 0,
     readRangeMsg: startReadRangeMsg,
     //color picker
