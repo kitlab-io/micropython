@@ -14,6 +14,7 @@ class Car:
         self.pwmC = PWM(Pin(21),1000)  
         self.pwmD = PWM(Pin(22),1000)
         self.speed=512
+        print("kit started!")
         
     def update(self, output, pwma, pwmb, pwmc, pwmd):
         #print("output: %s, a: %s, b: %s, c: %s, d: %s" % (output, pwma, pwmb, pwmc, pwmd))
