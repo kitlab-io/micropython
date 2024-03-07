@@ -44,6 +44,12 @@ module.exports = {
     this.parent.device.rcService.handleAuxResp = this.kitAuxRespHandler;
   },
 
+  beforeDestroy() {
+      if (this.rangeTimer) {
+        clearInterval(this.rangeTimer);
+      }
+  },
+
   methods: {
     
   // send color to JEM via Bluetooth rc service
