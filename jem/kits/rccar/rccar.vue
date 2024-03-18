@@ -1,9 +1,7 @@
 <template>
   <div>
-    <div style="display: flex;">
-    <div style="flex: 1;">
   <v-card>
-  <v-card-title>CYBERBEAST RC</v-card-title>
+  <v-card-title>BEAST CAR</v-card-title>
           <v-list>
             <v-list-item>
               <v-list-item-content>
@@ -36,28 +34,6 @@
     </div>
   </v-card>
   </div>
-      <div style="flex: 1;">
-      <v-card>
-        <v-card-title>Sensor Data</v-card-title>
-        <v-simple-table>
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th class="text-left">Type</th>
-                <th class="text-left">Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(data, index) in sensorData" :key="index">
-                <td>{{ data.type }}</td>
-                <td>{{ data.value }}</td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      </v-card>
-    </div>
-  </div>
   </template>
   
   <script>
@@ -88,12 +64,6 @@
         joysticks: [
           { tracking: false, startX: 0, startY: 0, currentX: 0, currentY: 0, prevY: 0, prevX: 0 },
         ]
-        sensorData: [
-      { type: 'Sensor 1', value: 0 },
-      { type: 'Sensor 2', value: 0 },
-      { type: 'Sensor 3', value: 0 },
-      { type: 'Sensor 4', value: 0 },
-    ],
       };
     },
     computed: {
