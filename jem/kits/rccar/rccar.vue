@@ -2,6 +2,7 @@
   <div>
   <v-card>
   <v-card-title>BEAST CAR</v-card-title>
+          <v-btn class="ma-2" @click="trick"> Trick </v-btn>
           <v-list>
             <v-list-item>
               <v-list-item-content>
@@ -184,6 +185,12 @@
       handleAuxResp(data){
         console.log("got data: " + data);
         this.auxReceived = true;
+      },
+
+      async trick()
+      {
+        console.log("trick");
+        await this.parent.device.send("kit._kit.car.trick(3)\n\r");
       },
       
       toggleMotion()
