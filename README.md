@@ -12,3 +12,7 @@
 ## Notes
 - No button example in this kit yet
 
+# JEM Wiki
+- see: https://github.com/kitlab-io/micropython/wiki
+
+
