@@ -1,7 +1,7 @@
 <template>
 
   <div id="SimpleKitTemplate" :style="{'cursor': 'pointer'}">
-  <p>Simple Kit Template</p>
+  <p>Simple Kit</p>
   
   <!-- Example Buttons -->
   <v-btn @click="startRangeRead">{{ readRangeMsg }}</v-btn>
