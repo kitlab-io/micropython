@@ -93,14 +93,9 @@ class BLEUARTREMOTECONTROL:
             while self._cmd_queue:
                 code = self._cmd_queue.pop()
                 if eval_cmd:
-                    try:
-                        resp = eval(code)  # example: eval("move(50,40)") will move car left =50, right=40
-                        msg = CmdMsg(Cmd.EXE_CODE, str(resp)).msg()
-                        self.write(msg)
-                    except Exception as e:
-                        print("eval_cmd failed: %s" % e)
-                        msg = CmdMsg(Cmd.EXE_CODE, str(e)).msg()
-                        self.write(msg)
+                    resp = eval(code)  # example: eval("move(50,40)") will move car left =50, right=40
+                    msg = CmdMsg(Cmd.EXE_CODE, str(resp)).msg()
+                    self.write(msg)
                 else:
                     exec(code)
         except Exception as e:

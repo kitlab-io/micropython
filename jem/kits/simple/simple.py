@@ -1,7 +1,9 @@
 # simple.py
-from jem import jemrange, jemlight
+from jem import jemrange, jemled
 
-led = jemlight.JemLight()
+led = jemled.JemLed()
 range = jemrange.JemRange()
 
-print("simple kit started")
+running = True
+def run():
+    print("simple kit started")
