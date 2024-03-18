@@ -51,6 +51,8 @@ In this tutorial we will make the RC Car spin around while you hover your hand o
          # Tutorial_2
          or 
          // Tutorial_2
+         or 
+         <!-- Tutorial_1 -->
    ``` 
 - Replace 'rccar.py' and 'rccar.vue' in 'kits/rccar/' with the same files in 'kits/rccar/tutorial_2'
 - Flash the new code to JEM and reconnect
