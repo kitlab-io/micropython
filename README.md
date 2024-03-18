@@ -18,3 +18,5 @@
 - 600 mAh LiPo battery
 - User button: For interacting with JEM
 - WiFi and Bluetooth / BLE
+
+![hello](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTk2aWI2a2txZ3VuNm9sZnExbndnODJnNzZhcWhndzRlZHNtcnFoZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6xEEzPgehze0DBsyX6/giphy.gif)
