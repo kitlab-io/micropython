@@ -14,7 +14,7 @@ def run():
             time.sleep_ms(period_ms)
             # angles, example {'roll': -1.75, 'yaw': 359.9375, 'pitch': -5.9375}
             angles = imu.orientation
-            accel = imu.read_accelerometer()
+            accel = imu.accel # ex: {'x':1.9, 'y':5.81, 'z':9.88}
 
             json_dict = {"angles": angles, "accel": accel}
             json_str = json.dumps(json_dict)
